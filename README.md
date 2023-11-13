@@ -17,7 +17,8 @@ Made for the IES course on school year 23/24
 *Architect* - João Dourado joao.dourado1@ua.pt
 
 ## Architecture Diagram
-#todo
+
+![Architecture Diagram](ArchitectureDiagram.png)
 
 ## Bookmarks
 
