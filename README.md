@@ -26,11 +26,15 @@ An overall view of the user stories and their status can be found in the followi
 
 https://github.com/users/miguel-silva48/projects/1
 
-### Cloud versions of reports
+### Cloud versions of reports and others
 
-Project_Specification_Report_1: 
+Project_Specification_Report: 
 
 https://uapt33090-my.sharepoint.com/:w:/g/personal/miguel_silva48_ua_pt/EXsOQSmIemdGq2rLGfnC6HEBOKi5FoHY8IybOZjqo3_YhA?e=Zg4Z2b
+
+Prototype (Figma):
+
+https://www.figma.com/file/obImDvzy220l7wHxBSFWRW/KeyUsageProfiler?type=design&node-id=0%3A1&mode=design&t=VuI7D2o2buKyOZtO-1
 
 ### Entry point to the API documentation
 #todo
