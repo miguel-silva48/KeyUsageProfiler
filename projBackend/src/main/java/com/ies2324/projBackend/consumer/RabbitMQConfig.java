@@ -14,13 +14,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitMQConfig {
 
-    @Value("${rabbitmq.queue.name}")
+    @Value("strokes")
     private String queue;
 
-    @Value("${rabbitmq.exchange.name}")
+    @Value("strokes")
     private String exchange;
 
-    @Value("${rabbitmq.routing.key}")
+    @Value("")
     private String routingKey;
 
     @Bean
@@ -39,13 +39,13 @@ public class RabbitMQConfig {
     // spring bean for rabbitmq queue
     @Bean
     public Queue queue() {
-        return new Queue(queue);
+        return new Queue(queue, true);
     }
 
     // spring bean for rabbitmq exchange
     @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(exchange);
+    public FanoutExchange exchange() {
+        return new FanoutExchange(exchange, false, false);
     }
 
     // binding between queue and exchange using routing key
@@ -53,7 +53,6 @@ public class RabbitMQConfig {
     public Binding binding() {
         return BindingBuilder
                 .bind(queue())
-                .to(exchange())
-                .with(routingKey);
+                .to(exchange());
     }
 }

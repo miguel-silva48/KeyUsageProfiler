@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 @Service
-@RabbitListener(queues = { "${rabbitmq.queue.name}" })
+@RabbitListener(queues = { "strokes" })
 public class KeystrokesConsumer {
 
     @RabbitHandler
