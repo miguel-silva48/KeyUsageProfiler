@@ -2,10 +2,6 @@ package com.mibef108287.app;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 
-/**
- * Hello world!
- *
- */
 public class App 
 {
     public static void main( String[] args )
