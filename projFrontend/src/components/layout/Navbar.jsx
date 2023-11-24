@@ -9,7 +9,7 @@ import {
   RiSunFill,
 } from "react-icons/ri";
 
-import logo from "../../assets/key_usage_profiler_logo.svg";
+import logo from "../../assets/key_usage_profiler_logo_cut.svg";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -37,8 +37,8 @@ const Navbar = () => {
 
   return (
     <div className="navbar bg-secondary w-full flex justify-between items-center p-2 top-0">
-      <Link to="/" className="max-w-[5%]">
-        <img src={logo}></img>
+      <Link to="/">
+        <img src={logo} className="max-h-5 pl-5"></img>
       </Link>
 
       {user && (
