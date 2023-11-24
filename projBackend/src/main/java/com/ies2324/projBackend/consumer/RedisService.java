@@ -1,18 +1,18 @@
 package com.ies2324.projBackend.consumer;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import com.ies2324.projBackend.Keystroke;
 
 import jakarta.annotation.Resource;
 
@@ -20,11 +20,23 @@ import jakarta.annotation.Resource;
 public class RedisService {
 
   @Resource(name="redisTemplate")
-  private ListOperations<String, JsonNode> keystrokes_by_id;
-  private final String keyprefix = "strokes_by_user";
+  private SetOperations<String, String> setOps;
+  @Resource(name="redisTemplate")
+  private ListOperations<String, Keystroke> listOps;
 
-  public void addKeystroke(String userId, JsonNode k) {
-    keystrokes_by_id.leftPush(keyprefix + userId, k);
+  private final String user_ids = "stroked_users";
+
+  public void addKeystroke(String userId, Keystroke k) {
+    setOps.add(user_ids, userId);
+    listOps.leftPush(userId, k);
+  }
+
+  public Set<String> getAllUserIds(){
+    return setOps.members(user_ids);
+  }
+
+  public List<Keystroke> getAllKeystrokes(String userId){
+    return listOps.range(userId, 0, -1);
   }
 }
 
@@ -44,5 +56,5 @@ class ApplicationConfig {
     template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
     return template;
-}
+  }
 }

@@ -25,4 +25,9 @@ public class KeystrokeServiceImpl implements KeystrokeService {
     return keystrokeRepository.save(keystroke);
   }
 
+  @Override
+  public void createKeystrokes(List<Keystroke> keystrokes) {
+    keystrokeRepository.saveAll(keystrokes);
+  }
+
 }
