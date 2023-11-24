@@ -1,0 +1,11 @@
+.gradient-blue {
+  @apply bg-gradient-to-b from-[#00D5FF] to-[#2E5EA0];
+}
+
+.gradient-green {
+  @apply bg-gradient-to-bl from-[rgb(94,220,143)] to-[#289BAC];
+}
+
+.gradient-green-rev {
+  @apply bg-gradient-to-bl from-[#289BAC] to-[rgb(94,220,143)];
+}
