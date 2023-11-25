@@ -17,7 +17,7 @@ public class KeystrokeServiceImpl implements KeystrokeService {
 
   @Override
   public List<Keystroke> getKeystrokesByAuthorId(Long authorId) {
-    return keystrokeRepository.findByAuthorId(authorId);
+    return keystrokeRepository.findByAuthorIdOrderByTsAsc(authorId);
   }
 
   @Override
