@@ -36,7 +36,7 @@ public class Keystroke {
   private String pressedKey;
 
   @NotNull(message = "Timestamp is mandatory")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
   private Timestamp ts;
 
   @Override
