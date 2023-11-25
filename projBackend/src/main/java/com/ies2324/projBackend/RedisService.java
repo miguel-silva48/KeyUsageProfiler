@@ -30,7 +30,7 @@ public class RedisService {
 
   public void addKeystroke(String userId, Keystroke k) {
     setOps.add(user_ids, userId);
-    listOps.leftPush(userId, k);
+    listOps.rightPush(userId, k);
   }
 
   public Set<String> getAllUserIds(){
