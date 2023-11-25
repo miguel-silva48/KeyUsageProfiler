@@ -1,7 +1,8 @@
-package com.ies2324.projBackend.consumer;
+package com.ies2324.projBackend;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -12,12 +13,13 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
-import com.ies2324.projBackend.Keystroke;
-
 import jakarta.annotation.Resource;
 
 @Service
 public class RedisService {
+
+  @Autowired
+  private RedisTemplate<String, String> template;
 
   @Resource(name="redisTemplate")
   private SetOperations<String, String> setOps;
@@ -38,6 +40,15 @@ public class RedisService {
   public List<Keystroke> getAllKeystrokes(String userId){
     return listOps.range(userId, 0, -1);
   }
+
+  public boolean deleteKeystrokesOfId(String userId){
+    return template.delete(userId);
+  }
+
+  public boolean deleteUserIds(){
+    return template.delete(user_ids);
+  }
+
 }
 
 @Configuration

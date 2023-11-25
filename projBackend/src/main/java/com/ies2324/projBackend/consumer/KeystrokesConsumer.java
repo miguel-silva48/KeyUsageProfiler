@@ -22,6 +22,6 @@ public class KeystrokesConsumer {
     @RabbitHandler
     public void receive(byte[] in) throws JsonProcessingException, JsonMappingException{
         Keystroke k = mapper.readValue(new String(in, StandardCharsets.UTF_8), Keystroke.class);
-        keystrokeSaver.addKeyStroke("1", k);
+        keystrokeSaver.addKeyStroke(String.valueOf(k.getAuthor().getId()) , k);
     }
 }

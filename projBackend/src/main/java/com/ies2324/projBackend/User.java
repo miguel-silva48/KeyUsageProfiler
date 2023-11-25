@@ -31,6 +31,6 @@ public class User {
 
   @Override
   public String toString() {
-    return String.format("%s - email: %s", username, email);
+    return String.format("%s(id:%d) - email: %s", username, id, email);
   }
 }

