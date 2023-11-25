@@ -25,11 +25,4 @@ public class KeystrokeController {
     List<Keystroke> keystrokes = keystrokeService.getKeystrokesByAuthorId(userId);
     return new ResponseEntity<>(keystrokes, HttpStatus.OK);
   }
-
-  @PostMapping
-  public ResponseEntity<Keystroke> createKeystroke(@RequestBody Keystroke keystroke){
-    Keystroke savedKeystroke = keystrokeService.createKeystroke(keystroke);
-    return new ResponseEntity<>(savedKeystroke, HttpStatus.CREATED);
-  }
-
 }

@@ -8,4 +8,6 @@ public interface KeystrokeService {
   List<Keystroke> getKeystrokesByAuthorId(Long userId);
 
   Keystroke createKeystroke(Keystroke keystroke);
+
+  void createKeystrokes(List<Keystroke> keystrokes);
 }

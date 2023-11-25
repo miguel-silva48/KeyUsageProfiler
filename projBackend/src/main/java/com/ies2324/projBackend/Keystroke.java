@@ -2,6 +2,8 @@ package com.ies2324.projBackend;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,15 +32,16 @@ public class Keystroke {
   @ManyToOne
   private User author;
 
-  @NotBlank(message = "pressedKey is mandatory")
+  @NotNull(message = "pressedKey is mandatory")
   private String pressedKey;
 
   @NotNull(message = "Timestamp is mandatory")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
   private Timestamp ts;
 
   @Override
   public String toString() {
-    return String.format("%s pressed by %s at %s", pressedKey, author, ts.toString());
+    return String.format("%s pressed by (%s) at %s", pressedKey, author, ts.toString());
   }
   
 }
