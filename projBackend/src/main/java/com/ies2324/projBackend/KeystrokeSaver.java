@@ -19,7 +19,7 @@ public class KeystrokeSaver {
     redisService.addKeystroke(userId, k);
   }
 
-  @Scheduled(fixedRate = 20000)
+  @Scheduled(fixedRate = 15000)
   private void flushToSql(){
     StringBuilder sb = new StringBuilder();
     List<Keystroke> keystrokes = new ArrayList<>();
@@ -30,7 +30,7 @@ public class KeystrokeSaver {
         keystrokes.add(k);
         sb.append(k.getPressedKey());
       }
-      userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), sb.toString());
+      userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f,sb.toString());
       redisService.deleteKeystrokesOfId(user_id);
     }
     redisService.deleteUserIds();

@@ -11,7 +11,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService{
   UserStatisticsRepository userStatisticsRepository;
   
   @Override
-  public UserStatistics createOrAddUserStatistics(Long authorId, String writtenText) {
+  public UserStatistics createOrAddUserStatistics(Long authorId, Float interval, String writtenText) {
     Optional<UserStatistics> optUserStatistics = userStatisticsRepository.findByAuthorId(authorId);
     UserStatistics userStatistics = new UserStatistics();
     Float thisMinuteWPM = Float.valueOf(writtenText.split("\\s+").length);
@@ -19,13 +19,13 @@ public class UserStatisticsServiceImpl implements UserStatisticsService{
     author.setId(authorId);
     userStatistics.setAuthor(author);
     if (optUserStatistics.isEmpty()){
-      userStatistics.setMinutesTyping(1l);
-      userStatistics.setAwpm(thisMinuteWPM);
+      userStatistics.setMinutesTyping(interval);
+      userStatistics.setAwpm(thisMinuteWPM/interval);
     }else{
       userStatistics = optUserStatistics.get();
-      Long minutesTyping = userStatistics.getMinutesTyping();
-      userStatistics.setAwpm( (userStatistics.getAwpm() * minutesTyping + thisMinuteWPM) / (minutesTyping + 1) );
-      userStatistics.setMinutesTyping(minutesTyping + 1);
+      Float minutesTyping = userStatistics.getMinutesTyping();
+      userStatistics.setAwpm( (userStatistics.getAwpm() * minutesTyping + thisMinuteWPM) / (minutesTyping + interval) );
+      userStatistics.setMinutesTyping(minutesTyping + interval);
     }
     System.out.println(userStatistics);
     userStatisticsRepository.save(userStatistics);

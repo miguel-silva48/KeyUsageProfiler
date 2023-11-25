@@ -99,7 +99,7 @@ public class MyKeyEvent extends NativeKeyEvent{
 				return Toolkit.getProperty("AWT.backSpace", "Backspace");
 
 			case VC_TAB:
-				return "\t";
+				return "\\t";
 			case VC_CAPS_LOCK:
 				return Toolkit.getProperty("AWT.capsLock", "Caps Lock");
 
@@ -161,14 +161,14 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_CLOSE_BRACKET:
 				return "}";
 			case VC_BACK_SLASH:
-				return "\\";
+				return Toolkit.getProperty("AWT.backSlash", "Back Slash");
 
 			case VC_SEMICOLON:
 				return ";";
 			case VC_QUOTE:
 				return "'";
 			case VC_ENTER:
-				return "\n";
+				return "\\n";
 
 			case VC_COMMA:
 				return ",";

@@ -29,14 +29,14 @@ public class UserStatistics {
   private User author;
 
   @NotNull(message = "minutesTyping is mandatory")
-  private Long minutesTyping;
+  private Float minutesTyping;
   
   @NotNull(message = "awpm is mandatory")
   private Float awpm;
 
   @Override
   public String toString() {
-    return String.format("User %s spent %d minutes typing(AWPM: %f)", author, minutesTyping, awpm);
+    return String.format("User %s spent %f minutes typing(AWPM: %f)", author, minutesTyping, awpm);
   }
   
 }
