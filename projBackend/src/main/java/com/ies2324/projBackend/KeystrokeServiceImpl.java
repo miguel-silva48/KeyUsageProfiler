@@ -17,12 +17,17 @@ public class KeystrokeServiceImpl implements KeystrokeService {
 
   @Override
   public List<Keystroke> getKeystrokesByAuthorId(Long authorId) {
-    return keystrokeRepository.findByAuthorId(authorId);
+    return keystrokeRepository.findByAuthorIdOrderByTsAsc(authorId);
   }
 
   @Override
   public Keystroke createKeystroke(Keystroke keystroke) {
     return keystrokeRepository.save(keystroke);
+  }
+
+  @Override
+  public void createKeystrokes(List<Keystroke> keystrokes) {
+    keystrokeRepository.saveAll(keystrokes);
   }
 
 }
