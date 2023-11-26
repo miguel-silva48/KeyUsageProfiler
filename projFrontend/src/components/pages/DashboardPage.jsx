@@ -18,15 +18,22 @@ import next_arrow from "../../assets/next_arrow.svg";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [userStatistics, setUserStatistics] = useState(null);
 
-  useEffect(() => {
-    // Fetch user data from the API
+useEffect(() => {
     fetch('http://localhost:8080/api/users')
       .then((response) => response.json())
       .then((data) => {
-        // TODO change this to use more users
+        // TODO change this to add more users
         const user = data[0];
         setUserData(user);
+
+        fetch(`http://localhost:8080/api/statistics/${user.id}`)
+          .then((response) => response.json())
+          .then((statistics) => {
+            setUserStatistics(statistics);
+          })
+          .catch((error) => console.error('Error fetching user statistics:', error));
       })
       .catch((error) => console.error('Error fetching user data:', error));
   }, []);
@@ -77,6 +84,30 @@ const Dashboard = () => {
                     <p className="text-gray-500 text-sm">{userData ? userData.email : 'Loading...'}</p>
                   </div>
                 </tr> 
+              </tbody>
+            </table>
+            <table id="table-awpm-column" className="flex w-32 flex-col items-start">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <div className="flex items-center gap-1">
+                  <span className="text-[#667085]">Avg. WPM</span>
+                </div>
+              </thead>
+              <tbody className="w-full">
+                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                  <span className="text-gray-500 text-sm">{userStatistics ? userStatistics.awpm : 'Loading...'}</span>
+                </tr>
+              </tbody>
+            </table>
+            <table id="table-minutes-typing-column" className="flex w-36 flex-col items-start">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <div className="flex items-center gap-1">
+                  <span className="text-[#667085]">Min. Typing</span>
+                </div>
+              </thead>
+              <tbody className="w-full">
+                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                  <span className="text-gray-500 text-sm">{userStatistics ? userStatistics.minutesTyping : 'Loading...'}</span>
+                </tr>
               </tbody>
             </table>
             <table id="table-status-column" className="flex w-28 flex-col items-start">
