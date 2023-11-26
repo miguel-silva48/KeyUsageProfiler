@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import invite_link from "../../assets/invite_link.svg";
@@ -16,7 +17,20 @@ import next_arrow from "../../assets/next_arrow.svg";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
 
+  useEffect(() => {
+    // Fetch user data from the API
+    fetch('http://localhost:8080/api/users')
+      .then((response) => response.json())
+      .then((data) => {
+        // TODO change this to use more users
+        const user = data[0];
+        setUserData(user);
+      })
+      .catch((error) => console.error('Error fetching user data:', error));
+  }, []);
+   
   return (
     <div>
       <Navbar />
@@ -29,7 +43,7 @@ const Dashboard = () => {
                 <div className="flex items-start mix-blend-multiply">
                   <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg=[#F9F5FF]">
                     <span className="text-[#6941C6] text-sm font-medium leading-4">
-                      100 users
+                      1 user
                     </span>
                   </div>
                 </div>
@@ -59,8 +73,8 @@ const Dashboard = () => {
                   </div>
                   <img src={example_avatar} className="flex w-10 h-10 flex-col justify-center items-center rounded-full"></img>
                   <div className="flex flex-col items-start">
-                    <p className="text-gray-900">Olivia Rhye</p>
-                    <p className="text-gray-500 text-sm">olivia@example.com</p>
+                    <p className="text-gray-900">{userData ? userData.username : 'Loading...'}</p>
+                    <p className="text-gray-500 text-sm">{userData ? userData.email : 'Loading...'}</p>
                   </div>
                 </tr> 
               </tbody>
