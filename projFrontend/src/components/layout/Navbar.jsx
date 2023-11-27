@@ -41,6 +41,14 @@ const Navbar = () => {
         <img src={logo} className="max-h-5 pl-5"></img>
       </Link>
 
+      <Link to="/">
+        <h2 className="text-xl font-bold">HomePage</h2>
+      </Link>
+
+      <Link to="/dashboard">
+        <h2 className="text-xl font-bold">Dashboard</h2>
+      </Link>
+
       {user && (
         <p
           onClick={() => navigate(`/user`)}
@@ -64,11 +72,7 @@ const Navbar = () => {
         {true && (
           <button
             className="flex items-center m-2 p-2"
-            onClick={
-              user
-                ? () => navigate(`/user`)
-                : () => navigate('/login')
-            }
+            onClick={() => navigate('/user')}
           >
             <RiAccountCircleLine className="text-xl" />
           </button>
