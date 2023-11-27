@@ -57,38 +57,37 @@ useEffect(() => {
       {/* Estatísticas do User */}
       <div className="flex justify-center mt-20 space-x-4 mb-40">
 
-  <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
-    <RiKeyboardFill className="text-2xl text-gray-500 mb-5" />
-    <p className="font-semibold text-lg mb-2">Average Typing Speed</p>
-    {userStatistics ? (
-      <p className="text-gray-500">{userStatistics.awpm} words/minute</p>
-    ) : (
-      <p className="text-gray-500">Loading...</p>
-    )}
-  </div>
+        <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
+          <RiKeyboardFill className="text-2xl text-gray-500 mb-5" />
+          <p className="font-semibold text-lg mb-2">Average Typing Speed</p>
+          {userStatistics ? (
+            <p className="text-gray-500">{userStatistics.awpm} words/minute</p>
+          ) : (
+            <p className="text-gray-500">Loading...</p>
+          )}
+        </div>
 
-  <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
-    <RiTimeLine className="text-2xl text-gray-500 mb-5" />
-    <p className="font-semibold text-lg mb-2">Time Spent Typing</p>
-    {userStatistics ? (
-      <p className="text-gray-500">{userStatistics.minutesTyping} minutes</p>
-    ) : (
-      <p className="text-gray-500">Loading...</p>
-    )}
-  </div>
+        <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
+          <RiTimeLine className="text-2xl text-gray-500 mb-5" />
+          <p className="font-semibold text-lg mb-2">Time Spent Typing</p>
+          {userStatistics ? (
+            <p className="text-gray-500">{userStatistics.minutesTyping} minutes</p>
+          ) : (
+            <p className="text-gray-500">Loading...</p>
+          )}
+        </div>
 
-  <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
-    <RiShieldStarLine className="text-2xl text-gray-500 mb-5" />
-    <p className="font-semibold text-lg mb-2">Peak Typing Speed</p>
-    {userStatistics ? (
-      <p className="text-gray-500">{userStatistics.maxWpm} words/minute</p>
-    ) : (
-      <p className="text-gray-500">Loading...</p>
-    )}
-  </div>
+        <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
+          <RiShieldStarLine className="text-2xl text-gray-500 mb-5" />
+          <p className="font-semibold text-lg mb-2">Peak Typing Speed</p>
+          {userStatistics ? (
+            <p className="text-gray-500">{userStatistics.maxWpm} words/minute</p>
+          ) : (
+            <p className="text-gray-500">Loading...</p>
+          )}
+        </div>
 
-</div>
-
+      </div>
 
       <Footer />
     </div>
