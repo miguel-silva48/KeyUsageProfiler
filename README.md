@@ -16,6 +16,17 @@ Made for the IES course on school year 23/24
 
 *Architect* - João Dourado joao.dourado1@ua.pt
 
+## Important Notes
+
+To test  [user story #2](https://github.com/miguel-silva48/KeyUsageProfiler/issues/2) it's necessary to create an user with id 1. For instance posting the endpoint http://localhost:8080/api/users with the following body: 
+
+```json
+{
+  "username" : "Miguel",
+  "email": "miguel.belchior@ua.pt"
+}
+```
+
 ## Architecture Diagram
 
 ![Architecture Diagram](ArchitectureDiagram.png)
@@ -31,7 +42,7 @@ https://github.com/users/miguel-silva48/projects/1
 
 Project_Specification_Report: 
 
-https://uapt33090-my.sharepoint.com/:w:/g/personal/miguel_silva48_ua_pt/EXsOQSmIemdGq2rLGfnC6HEBOKi5FoHY8IybOZjqo3_YhA?e=Zg4Z2b
+https://docs.google.com/document/d/1QzRJoO-oqjjJ1CPPHerlChldXcHeHqTO6yjKa63GLKo/edit
 
 Prototype (Figma):
 
