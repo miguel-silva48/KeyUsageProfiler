@@ -15,13 +15,13 @@ public class KeystrokeController {
   private KeystrokeService keystrokeService;
 
   @GetMapping
-  public ResponseEntity<List<Keystroke>> getAllKeystrokes(){
+  public ResponseEntity<List<Keystroke>> getAllKeystrokes() {
     List<Keystroke> keystrokes = keystrokeService.getAllKeystrokes();
     return new ResponseEntity<>(keystrokes, HttpStatus.OK);
   }
 
   @GetMapping("{id}")
-  public ResponseEntity<List<Keystroke>> getKeystrokesByUserId(@PathVariable("id") Long userId){
+  public ResponseEntity<List<Keystroke>> getKeystrokesByUserId(@PathVariable("id") Long userId) {
     List<Keystroke> keystrokes = keystrokeService.getKeystrokesByAuthorId(userId);
     return new ResponseEntity<>(keystrokes, HttpStatus.OK);
   }
