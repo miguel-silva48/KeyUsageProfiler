@@ -1,12 +1,15 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.entities;
+
+import java.sql.Timestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -14,32 +17,30 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "UserStatistics")
+@Table(name = "Keystroke")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserStatistics {
+public class Keystroke {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @NotNull(message = "User is mandatory")
-  @OneToOne
+  @ManyToOne
   private User author;
 
-  @NotNull(message = "minutesTyping is mandatory")
-  private Float minutesTyping;
+  @NotNull(message = "pressedKey is mandatory")
+  private String pressedKey;
 
-  @NotNull(message = "awpm is mandatory")
-  private Float awpm;
-
-  @NotNull(message = "maxWpm is mandatory")
-  private Float maxWpm;
+  @NotNull(message = "Timestamp is mandatory")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
+  private Timestamp ts;
 
   @Override
   public String toString() {
-    return String.format("User %s spent %f minutes typing(AWPM: %f)", author, minutesTyping, awpm);
+    return String.format("%s pressed by (%s) at %s", pressedKey, author, ts.toString());
   }
 
 }

@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ies2324.projBackend.Keystroke;
-import com.ies2324.projBackend.KeystrokeSaver;
+import com.ies2324.projBackend.entities.Keystroke;
+import com.ies2324.projBackend.services.KeystrokeSaver;
+
 import lombok.AllArgsConstructor;
 
 @Component
@@ -20,8 +21,8 @@ public class KeystrokesConsumer {
     private KeystrokeSaver keystrokeSaver;
 
     @RabbitHandler
-    public void receive(byte[] in) throws JsonProcessingException, JsonMappingException{
+    public void receive(byte[] in) throws JsonProcessingException, JsonMappingException {
         Keystroke k = mapper.readValue(new String(in, StandardCharsets.UTF_8), Keystroke.class);
-        keystrokeSaver.addKeyStroke(String.valueOf(k.getAuthor().getId()) , k);
+        keystrokeSaver.addKeyStroke(String.valueOf(k.getAuthor().getId()), k);
     }
 }

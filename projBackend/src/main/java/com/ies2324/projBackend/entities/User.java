@@ -1,4 +1,4 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

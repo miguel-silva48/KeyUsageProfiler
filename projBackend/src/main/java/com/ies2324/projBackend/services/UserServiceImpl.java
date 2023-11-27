@@ -1,7 +1,11 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.repositories.UserRepository;
+
 import java.util.List;
 import java.util.Optional;
 

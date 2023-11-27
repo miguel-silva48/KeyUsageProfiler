@@ -1,9 +1,12 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.ies2324.projBackend.entities.Keystroke;
+import com.ies2324.projBackend.services.KeystrokeService;
 
 import java.util.List;
 

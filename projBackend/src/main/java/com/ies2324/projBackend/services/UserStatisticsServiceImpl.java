@@ -1,7 +1,12 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.services;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+
+import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
+import com.ies2324.projBackend.repositories.UserStatisticsRepository;
+
 import lombok.AllArgsConstructor;
 import java.lang.Math;
 

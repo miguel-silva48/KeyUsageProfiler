@@ -1,26 +1,28 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.services;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.ies2324.projBackend.entities.Keystroke;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class KeystrokeSaver {
-  
+
   private RedisService redisService;
   private KeystrokeService keystrokeService;
   private UserStatisticsService userStatisticsService;
 
-  public void addKeyStroke(String userId, Keystroke k){
+  public void addKeyStroke(String userId, Keystroke k) {
     redisService.addKeystroke(userId, k);
   }
 
   @Scheduled(fixedRate = 15000)
-  private void flushToSql(){
+  private void flushToSql() {
     StringBuilder sb = new StringBuilder();
     List<Keystroke> keystrokes = new ArrayList<>();
     for (String user_id : redisService.getAllUserIds()) {
@@ -30,7 +32,7 @@ public class KeystrokeSaver {
         keystrokes.add(k);
         sb.append(k.getPressedKey());
       }
-      userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f,sb.toString());
+      userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString());
       redisService.deleteKeystrokesOfId(user_id);
     }
     redisService.deleteUserIds();

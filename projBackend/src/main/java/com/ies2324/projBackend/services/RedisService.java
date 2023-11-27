@@ -1,4 +1,4 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.services;
 
 import java.util.List;
 import java.util.Set;
@@ -13,6 +13,9 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
+
+import com.ies2324.projBackend.entities.Keystroke;
+
 import jakarta.annotation.Resource;
 
 @Service
@@ -21,9 +24,9 @@ public class RedisService {
   @Autowired
   private RedisTemplate<String, String> template;
 
-  @Resource(name="redisTemplate")
+  @Resource(name = "redisTemplate")
   private SetOperations<String, String> setOps;
-  @Resource(name="redisTemplate")
+  @Resource(name = "redisTemplate")
   private ListOperations<String, Keystroke> listOps;
 
   private final String user_ids = "stroked_users";
@@ -33,19 +36,19 @@ public class RedisService {
     listOps.rightPush(userId, k);
   }
 
-  public Set<String> getAllUserIds(){
+  public Set<String> getAllUserIds() {
     return setOps.members(user_ids);
   }
 
-  public List<Keystroke> getAllKeystrokes(String userId){
+  public List<Keystroke> getAllKeystrokes(String userId) {
     return listOps.range(userId, 0, -1);
   }
 
-  public boolean deleteKeystrokesOfId(String userId){
+  public boolean deleteKeystrokesOfId(String userId) {
     return template.delete(userId);
   }
 
-  public boolean deleteUserIds(){
+  public boolean deleteUserIds() {
     return template.delete(user_ids);
   }
 
