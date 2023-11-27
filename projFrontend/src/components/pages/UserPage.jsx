@@ -50,19 +50,19 @@ useEffect(() => {
 
       {/* Estatísticas do User */}
       <div className="flex justify-center mt-20 space-x-8 mt-40 mb-40">
-        <div className="text-center">
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
           <p className="font-semibold text-lg">Peak Typing Speed</p>
           <p className="text-gray-500">{userData ? userData.peakTypingSpeed : 'Loading...'}</p>
         </div>
 
-        <div className="text-center">
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
           <p className="font-semibold text-lg">Time Spent Typing</p>
-          <p className="text-gray-500">{userData ? userData.timeSpentTyping : 'Loading...'}</p>
+          <p className="text-gray-500">{userStatistics ? userStatistics.timeSpentTyping : 'Loading...'}</p>
         </div>
 
-        <div className="text-center">
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
           <p className="font-semibold text-lg">Average Typing Speed</p>
-          <p className="text-gray-500">{userData ? userData.averageTypingSpeed : 'Loading...'}</p>
+          <p className="text-gray-500">{userStatistics ? userStatistics.averageTypingSpeed : 'Loading...'}</p>
         </div>
       </div>
       <Footer />
