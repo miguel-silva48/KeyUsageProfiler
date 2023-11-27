@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import invite_link from "../../assets/invite_link.svg";
 
@@ -20,11 +20,11 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [userStatistics, setUserStatistics] = useState(null);
 
-useEffect(() => {
+  const fetchData = () => {
     fetch('http://localhost:8080/api/users')
       .then((response) => response.json())
       .then((data) => {
-        // TODO change this to add more users
+        // TODO - handle multiple users
         const user = data[0];
         setUserData(user);
 
@@ -36,6 +36,19 @@ useEffect(() => {
           .catch((error) => console.error('Error fetching user statistics:', error));
       })
       .catch((error) => console.error('Error fetching user data:', error));
+  };
+
+  useEffect(() => {
+    // Fetch data initially
+    fetchData();
+
+    // Set up an interval to fetch data every second
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 1000);
+
+    // Clean up the interval when the component is unmounted
+    return () => clearInterval(intervalId);
   }, []);
    
   return (
@@ -78,11 +91,13 @@ useEffect(() => {
                   <div className="flex justify-center items-center">
                     <input type="checkbox" className="w-5 h-5 rounded-md border"></input>
                   </div>
-                  <img src={example_avatar} className="flex w-10 h-10 flex-col justify-center items-center rounded-full"></img>
-                  <div className="flex flex-col items-start">
+                  <Link to="/user">
+                    <img src={example_avatar} className="flex w-10 h-10 flex-col justify-center items-center rounded-full"></img>
+                  </Link>
+                  <Link to="/user" className="flex flex-col items-start">
                     <p className="text-gray-900">{userData ? userData.username : 'Loading...'}</p>
                     <p className="text-gray-500 text-sm">{userData ? userData.email : 'Loading...'}</p>
-                  </div>
+                  </Link>
                 </tr> 
               </tbody>
             </table>
@@ -147,9 +162,9 @@ useEffect(() => {
                     </div>
                   </button>
                   <button className="flex w-11 items-start rounded-lg">
-                    <div className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0">
+                    <Link to="/user" className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0">
                         <img src={goto_icon} className="w-5 h-5 pt-0.5 shrink-0"></img>
-                    </div>
+                    </Link>
                   </button>
                 </tr> 
               </tbody>
