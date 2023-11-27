@@ -22,7 +22,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
     if (optUserStatistics.isEmpty()) {
       userStatistics.setMinutesTyping(interval);
       userStatistics.setAwpm(thisMinuteWPM / interval);
-      userStatistics.setMaxWpm(thisMinuteWPM);
+      userStatistics.setMaxWpm(thisMinuteWPM / interval);
     } else {
       userStatistics = optUserStatistics.get();
       Float minutesTyping = userStatistics.getMinutesTyping();
