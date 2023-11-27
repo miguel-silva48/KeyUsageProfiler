@@ -3,13 +3,14 @@ package com.ies2324.projBackend;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
+import java.lang.Math;
 
 @Service
 @AllArgsConstructor
-public class UserStatisticsServiceImpl implements UserStatisticsService{
+public class UserStatisticsServiceImpl implements UserStatisticsService {
 
   UserStatisticsRepository userStatisticsRepository;
-  
+
   @Override
   public UserStatistics createOrAddUserStatistics(Long authorId, Float interval, String writtenText) {
     Optional<UserStatistics> optUserStatistics = userStatisticsRepository.findByAuthorId(authorId);
@@ -18,14 +19,16 @@ public class UserStatisticsServiceImpl implements UserStatisticsService{
     User author = new User();
     author.setId(authorId);
     userStatistics.setAuthor(author);
-    if (optUserStatistics.isEmpty()){
+    if (optUserStatistics.isEmpty()) {
       userStatistics.setMinutesTyping(interval);
-      userStatistics.setAwpm(thisMinuteWPM/interval);
-    }else{
+      userStatistics.setAwpm(thisMinuteWPM / interval);
+      userStatistics.setMaxWpm(thisMinuteWPM / interval);
+    } else {
       userStatistics = optUserStatistics.get();
       Float minutesTyping = userStatistics.getMinutesTyping();
-      userStatistics.setAwpm( (userStatistics.getAwpm() * minutesTyping + thisMinuteWPM) / (minutesTyping + interval) );
+      userStatistics.setAwpm((userStatistics.getAwpm() * minutesTyping + thisMinuteWPM) / (minutesTyping + interval));
       userStatistics.setMinutesTyping(minutesTyping + interval);
+      userStatistics.setMaxWpm(Math.max(userStatistics.getMaxWpm(), thisMinuteWPM / interval));
     }
     System.out.println(userStatistics);
     userStatisticsRepository.save(userStatistics);
@@ -33,7 +36,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService{
   }
 
   @Override
-  public UserStatistics getUserStatisticsByAuthorId(Long authorId) {
-    return userStatisticsRepository.findByAuthorId(authorId).get();
+  public Optional<UserStatistics> getUserStatisticsByAuthorId(Long authorId) {
+    return userStatisticsRepository.findByAuthorId(authorId);
   }
 }

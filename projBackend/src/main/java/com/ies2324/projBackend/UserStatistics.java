@@ -30,13 +30,16 @@ public class UserStatistics {
 
   @NotNull(message = "minutesTyping is mandatory")
   private Float minutesTyping;
-  
+
   @NotNull(message = "awpm is mandatory")
   private Float awpm;
+
+  @NotNull(message = "maxWpm is mandatory")
+  private Float maxWpm;
 
   @Override
   public String toString() {
     return String.format("User %s spent %f minutes typing(AWPM: %f)", author, minutesTyping, awpm);
   }
-  
+
 }

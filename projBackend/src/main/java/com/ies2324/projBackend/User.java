@@ -1,5 +1,6 @@
 package com.ies2324.projBackend;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,11 +23,12 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
-  
+
   @NotBlank(message = "Name is mandatory")
   private String username;
-  
+
   @NotBlank(message = "Email is mandatory")
+  @Column(unique = true)
   private String email;
 
   @Override
