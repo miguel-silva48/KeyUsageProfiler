@@ -6,6 +6,12 @@ import "./../../utils/styles.css";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 
+import {
+  RiTimeLine,
+  RiKeyboardFill,
+  RiShieldStarLine
+} from "react-icons/ri";
+
 import example_avatar from "../../assets/example_avatar.png";
 
 const UserPage = () => {
@@ -50,21 +56,43 @@ useEffect(() => {
 
       {/* Estatísticas do User */}
       <div className="flex justify-center mt-20 space-x-8 mt-40 mb-40">
-        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
-          <p className="font-semibold text-lg">Peak Typing Speed</p>
-          <p className="text-gray-500">{userData ? userData.peakTypingSpeed : 'Loading...'}</p>
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg flex items-center">
+          <RiKeyboardFill className="text-xl text-gray-500 mr-2" />
+          <div>
+            <p className="font-semibold text-lg">Average Typing Speed</p>
+            {userStatistics ? (
+              <p className="text-gray-500">{userStatistics.awpm} words/minute</p>
+            ) : (
+              <p className="text-gray-500">Loading...</p>
+            )}
+          </div>
         </div>
 
-        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
-          <p className="font-semibold text-lg">Time Spent Typing</p>
-          <p className="text-gray-500">{userStatistics ? userStatistics.timeSpentTyping : 'Loading...'}</p>
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg flex items-center">
+          <RiTimeLine className="text-xl text-gray-500 mr-2" />
+          <div>
+            <p className="font-semibold text-lg">Time Spent Typing</p>
+            {userStatistics ? (
+              <p className="text-gray-500">{userStatistics.minutesTyping} minutes</p>
+            ) : (
+              <p className="text-gray-500">Loading...</p>
+            )}
+          </div>
         </div>
 
-        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg">
-          <p className="font-semibold text-lg">Average Typing Speed</p>
-          <p className="text-gray-500">{userStatistics ? userStatistics.averageTypingSpeed : 'Loading...'}</p>
+        <div className="text-center bg-gray-200 p-4 rounded border border-gray-500 shadow-lg flex items-center">
+          <RiShieldStarLine className="text-xl text-gray-500 mr-2" />
+          <div>
+            <p className="font-semibold text-lg">Peak Typing Speed</p>
+            {userStatistics ? (
+              <p className="text-gray-500">{userStatistics.maxAwpm} words/minute</p>
+            ) : (
+              <p className="text-gray-500">Loading...</p>
+            )}
+          </div>
         </div>
       </div>
+
       <Footer />
     </div>
   );
