@@ -26,16 +26,12 @@ public class KeystrokeSaver {
     StringBuilder sb = new StringBuilder();
     List<Keystroke> keystrokes = new ArrayList<>();
     for (String user_id : redisService.getAllUserIds()) {
-      keystrokes = new ArrayList<>();
-      redisService.getAllKeystrokes(user_id);
-      for (Keystroke k : redisService.getAllKeystrokes(user_id)) {
-        keystrokes.add(k);
+      keystrokes = redisService.popAllKeystrokes(user_id);
+      for (Keystroke k : keystrokes) {
         sb.append(k.getPressedKey());
       }
       userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString());
-      redisService.deleteKeystrokesOfId(user_id);
     }
-    redisService.deleteUserIds();
     keystrokeService.createKeystrokes(keystrokes);
   }
 }

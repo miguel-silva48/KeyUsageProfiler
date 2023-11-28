@@ -1,14 +1,20 @@
 package com.ies2324.projBackend.services;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -33,6 +39,7 @@ public class RedisService {
 
   public void addKeystroke(String userId, Keystroke k) {
     setOps.add(user_ids, userId);
+    template.expire(userId, 120, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
@@ -40,16 +47,10 @@ public class RedisService {
     return setOps.members(user_ids);
   }
 
-  public List<Keystroke> getAllKeystrokes(String userId) {
-    return listOps.range(userId, 0, -1);
-  }
-
-  public boolean deleteKeystrokesOfId(String userId) {
-    return template.delete(userId);
-  }
-
-  public boolean deleteUserIds() {
-    return template.delete(user_ids);
+  public List<Keystroke> popAllKeystrokes(String userId) {
+    Long numberKeystrokes = listOps.size(userId);
+    List<Keystroke> keystrokes = listOps.leftPop(userId, numberKeystrokes);
+    return keystrokes;
   }
 
 }
