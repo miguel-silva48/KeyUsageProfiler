@@ -52,6 +52,7 @@ npm run dev;   # run frontend
 
 #### Running Keylogger
 ```bash
+cd projSensor/keylogger_sensor/;
 mvn package;
 mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
 ```
