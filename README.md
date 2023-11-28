@@ -30,24 +30,30 @@ To test  [user story #2](https://github.com/miguel-silva48/KeyUsageProfiler/issu
 ### How to run
 
 ```bash
-git clone git@github.com:miguel-silva48/KeyUsageProfiler.git
-cd KeyUsageProfiler
+git clone git@github.com:miguel-silva48/KeyUsageProfiler.git;
+cd KeyUsageProfiler;
 ```
 
 #### Running backend
 
 ```bash
-docker compose up -d     # run backend services (DBs, MQ)
-cd projBackend
-./mvnw spring-boot:run   # run spring backend
+docker compose up -d;     # run backend services (DBs, MQ)
+cd projBackend;
+./mvnw spring-boot:run;   # run spring backend
 ```
 
 #### Running frontend
 
 ```bash
-cd projFrontend
-npm install
-npm run dev   # run frontend
+cd projFrontend;
+npm install;
+npm run dev;   # run frontend
+```
+
+#### Running Keylogger
+```bash
+mvn package;
+mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
 ```
 
 
