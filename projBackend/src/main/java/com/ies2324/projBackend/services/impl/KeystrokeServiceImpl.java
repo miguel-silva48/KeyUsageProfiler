@@ -1,10 +1,11 @@
-package com.ies2324.projBackend.services;
+package com.ies2324.projBackend.services.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
 import com.ies2324.projBackend.repositories.KeystrokeRepository;
+import com.ies2324.projBackend.services.KeystrokeService;
 
 import java.util.List;
 
