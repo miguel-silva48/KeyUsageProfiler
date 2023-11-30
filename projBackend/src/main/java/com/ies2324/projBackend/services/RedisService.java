@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -23,6 +22,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -73,11 +73,19 @@ class ApplicationConfig {
 
   @Component
   public static class SessionExpiredEventListener {
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
     @EventListener
     public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-      System.out.println(String.format("Received expire event for key=%s with value %s.",
-					new String(event.getSource()), event.getValue()));
+      simpMessagingTemplate.convertAndSend(
+        "/topic/notifications", 
+        String.format("User with id %s is inactive", new String(event.getSource()).split(":")[1])
+      );
+      return ;
     }
+
   }
 
   @Bean
