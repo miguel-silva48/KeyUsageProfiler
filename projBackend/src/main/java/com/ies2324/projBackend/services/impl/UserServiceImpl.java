@@ -1,6 +1,10 @@
 package com.ies2324.projBackend.services.impl;
 
 import lombok.AllArgsConstructor;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.User;
@@ -34,5 +38,17 @@ public class UserServiceImpl implements UserService {
   @Override
   public void deleteUser(Long userId) {
     userRepository.deleteById(userId);
+  }
+
+  @Override
+  public UserDetailsService userDetailsService() {
+    return new UserDetailsService() {
+      // username -> our email
+      @Override
+      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User by that email not found"));
+      }
+    };
   }
 }
