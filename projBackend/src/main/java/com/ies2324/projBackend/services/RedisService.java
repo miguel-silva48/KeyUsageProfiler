@@ -6,17 +6,24 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisKeyExpiredEvent;
+import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
@@ -39,7 +46,7 @@ public class RedisService {
   public void addKeystroke(String userId, Keystroke k) {
     String keyname = ttl+userId;
     valueOps.set(keyname, userId); // value as name of the other variable
-    template.expire(keyname, 120l, TimeUnit.SECONDS);
+    template.expire(keyname, 29l, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
@@ -61,7 +68,17 @@ public class RedisService {
 }
 
 @Configuration
+@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
 class ApplicationConfig {
+
+  @Component
+  public static class SessionExpiredEventListener {
+    @EventListener
+    public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
+      System.out.println(String.format("Received expire event for key=%s with value %s.",
+					new String(event.getSource()), event.getValue()));
+    }
+  }
 
   @Bean
   public RedisConnectionFactory redisConnectionFactory() {
