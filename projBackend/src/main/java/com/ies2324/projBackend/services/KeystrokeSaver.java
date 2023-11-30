@@ -30,8 +30,10 @@ public class KeystrokeSaver {
       for (Keystroke k : keystrokes) {
         sb.append(k.getPressedKey());
       }
-      userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString());
+      if (sb.length() != 0){
+        userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString());
+        keystrokeService.createKeystrokes(keystrokes);
+      }
     }
-    keystrokeService.createKeystrokes(keystrokes);
   }
 }

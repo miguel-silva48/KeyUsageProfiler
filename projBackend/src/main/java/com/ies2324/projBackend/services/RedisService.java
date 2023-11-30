@@ -1,6 +1,6 @@
 package com.ies2324.projBackend.services;
 
-import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -8,14 +8,13 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SessionCallback;
-import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
@@ -31,20 +30,26 @@ public class RedisService {
   private RedisTemplate<String, String> template;
 
   @Resource(name = "redisTemplate")
-  private SetOperations<String, String> setOps;
+  private ValueOperations<String, String> valueOps;
   @Resource(name = "redisTemplate")
   private ListOperations<String, Keystroke> listOps;
 
-  private final String user_ids = "stroked_users";
+  private final String ttl = "ttl:";
 
   public void addKeystroke(String userId, Keystroke k) {
-    setOps.add(user_ids, userId);
-    template.expire(userId, 120, TimeUnit.SECONDS);
+    String keyname = ttl+userId;
+    valueOps.set(keyname, userId); // value as name of the other variable
+    template.expire(keyname, 120l, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
   public Set<String> getAllUserIds() {
-    return setOps.members(user_ids);
+    Cursor<String> cursor = template.scan(ScanOptions.scanOptions().match(ttl+"*").build());
+    Set<String> user_ids = new HashSet<>();
+    while (cursor.hasNext()) {
+      user_ids.add(valueOps.get(cursor.next()));
+    }
+    return user_ids;
   }
 
   public List<Keystroke> popAllKeystrokes(String userId) {
