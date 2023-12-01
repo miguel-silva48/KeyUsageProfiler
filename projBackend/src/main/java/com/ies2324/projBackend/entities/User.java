@@ -14,6 +14,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
@@ -47,6 +50,14 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "team_id", nullable = true)
+  private Team team;
+
+  @OneToOne(optional = true)
+  @JoinColumn(name = "leader_team_id", nullable = true, unique = true)
+  private Team leader_of_team;
 
   @Override
   public String toString() {
