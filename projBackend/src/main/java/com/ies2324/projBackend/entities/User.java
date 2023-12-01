@@ -14,7 +14,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -40,6 +43,7 @@ public class User implements UserDetails {
 
   @NotBlank(message = "Email is mandatory")
   @Column(unique = true)
+  @Email
   private String email;
 
   @NotBlank(message = "Password is mandatory")
@@ -47,6 +51,10 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "team_id", nullable = true)
+  private Team team;
 
   @Override
   public String toString() {
