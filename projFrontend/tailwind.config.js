@@ -35,7 +35,7 @@ export default {
           secondary: '#cfc9ca',
           accent: '#8c7469',
           neutral: '#1c1c30',
-          'base-100': '#e2e2ee',
+          'base-100': '#ffffff',
           '--color-card': '#f5f5f5',
         },
         dark: {
