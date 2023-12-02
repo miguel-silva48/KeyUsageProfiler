@@ -10,31 +10,38 @@ import { fetchData } from '../../utils';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [failed, setFailed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem("authToken") || "");
 
   const navigate = useNavigate();
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async () => {
     try {
-      const response = await fetchData(
-        `/user/checkLogin?email=${email}&password=${password}`
-      );
-      console.log('res - ', response);
-      if (response.length != 0) {
-        console.log('Login successful');
-        setEmail('');
-        setPassword('');
-        setFailed(false);
-        localStorage.setItem('user', JSON.stringify(response));
+      const credentials = { email: email, password : password };
+      // Perform sign-in API request
+      const signInResponse = await fetch("http://localhost:8080/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (signInResponse.ok) {
+        const { token } = await signInResponse.json();
+
+        // Store the token securely
+        localStorage.setItem("authToken", token);
+        setToken(token);
+
+        // TODO - Redirect to home page if user has no team, otherwise redirect to dashboard if team leader or profile if team member
         navigate('/');
       } else {
-        console.error('Login failed');
-        setFailed(true);
+        // Handle sign-in error
+        console.error("Failed to sign in:", signInResponse.statusText);
       }
     } catch (error) {
-      console.error('Error during API call', error);
+      console.error("Error during sign in:", error);
     }
   };
 
