@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,6 +63,7 @@ public class User implements UserDetails {
   }
 
   @Override
+  @JsonIgnore
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(new SimpleGrantedAuthority(role.name()));
   }
@@ -71,21 +73,25 @@ public class User implements UserDetails {
   }
 
   @Override
+  @JsonIgnore
   public boolean isAccountNonExpired() {
     return true;
   }
 
   @Override
+  @JsonIgnore
   public boolean isAccountNonLocked() {
     return true;
   }
 
   @Override
+  @JsonIgnore
   public boolean isCredentialsNonExpired() {
     return true;
   }
 
   @Override
+  @JsonIgnore
   public boolean isEnabled() {
     return true;
   }

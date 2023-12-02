@@ -1,20 +1,28 @@
 package com.ies2324.projBackend.services;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisKeyExpiredEvent;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
+import com.ies2324.projBackend.entities.Team;
+import com.ies2324.projBackend.entities.User;
 
 import jakarta.annotation.Resource;
 
@@ -22,53 +30,58 @@ import jakarta.annotation.Resource;
 public class RedisService {
 
   @Autowired
-  private RedisTemplate<String, String> template;
+  private UserService userService;
+  @Autowired
+  private SimpMessagingTemplate simpMessagingTemplate;
+  @Autowired
+  private SimpUserRegistry simpUserRegistry;
+  @Autowired
+  private RedisTemplate<String, String> redisTemplate;
 
   @Resource(name = "redisTemplate")
-  private SetOperations<String, String> setOps;
+  private ValueOperations<String, String> valueOps;
   @Resource(name = "redisTemplate")
   private ListOperations<String, Keystroke> listOps;
 
-  private final String user_ids = "stroked_users";
+  private final String ttl = "ttl:";
 
   public void addKeystroke(String userId, Keystroke k) {
-    setOps.add(user_ids, userId);
+    String keyname = ttl+userId;
+    valueOps.set(keyname, userId); // value as name of the other variable
+    redisTemplate.expire(keyname, 29l, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
   public Set<String> getAllUserIds() {
-    return setOps.members(user_ids);
+    Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(ttl+"*").build());
+    Set<String> user_ids = new HashSet<>();
+    while (cursor.hasNext()) {
+      user_ids.add(valueOps.get(cursor.next()));
+    }
+    return user_ids;
   }
 
-  public List<Keystroke> getAllKeystrokes(String userId) {
-    return listOps.range(userId, 0, -1);
+  public List<Keystroke> popAllKeystrokes(String userId) {
+    Long numberKeystrokes = listOps.size(userId);
+    List<Keystroke> keystrokes = listOps.leftPop(userId, numberKeystrokes);
+    return keystrokes;
   }
 
-  public boolean deleteKeystrokesOfId(String userId) {
-    return template.delete(userId);
-  }
-
-  public boolean deleteUserIds() {
-    return template.delete(user_ids);
+  @EventListener
+  public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
+    Long userid = Long.parseLong(new String(event.getSource()).split(":")[1]);
+    Optional<User> user = userService.getUserById(userid);
+    if (user.isPresent()){
+      Team userTeam = user.get().getTeam();
+      if (userTeam != null){
+        simpMessagingTemplate.convertAndSendToUser(
+          userTeam.getLeader().getUsername(),
+          "/topic/notifications", 
+          String.format("User with id %d is inactive", userid)
+        );
+      }
+    }
   }
 
 }
 
-@Configuration
-class ApplicationConfig {
-
-  @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory();
-  }
-
-  public @Bean RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-    RedisTemplate<Object, Object> template = new RedisTemplate<>();
-    template.setConnectionFactory(connectionFactory);
-    template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-    template.setKeySerializer(new StringRedisSerializer());
-    template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    return template;
-  }
-}

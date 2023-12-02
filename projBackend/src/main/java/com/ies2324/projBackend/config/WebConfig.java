@@ -1,4 +1,4 @@
-package com.ies2324.projBackend;
+package com.ies2324.projBackend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
