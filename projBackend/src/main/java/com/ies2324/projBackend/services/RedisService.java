@@ -67,6 +67,10 @@ public class RedisService {
     return keystrokes;
   }
 
+  public void saveToken(String teamId, String token){
+    valueOps.set("team:"+teamId, token);
+  }
+
   @EventListener
   public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
     Long userid = Long.parseLong(new String(event.getSource()).split(":")[1]);
