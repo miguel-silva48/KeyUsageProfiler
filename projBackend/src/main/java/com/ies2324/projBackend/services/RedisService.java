@@ -17,7 +17,6 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
@@ -44,11 +43,12 @@ public class RedisService {
   private ListOperations<String, Keystroke> listOps;
 
   private final String ttl = "ttl:";
+  private final String invitetoken = "invitetoken:";
 
   public void addKeystroke(String userId, Keystroke k) {
     String keyname = ttl+userId;
     valueOps.set(keyname, userId); // value as name of the other variable
-    redisTemplate.expire(keyname, 29l, TimeUnit.SECONDS);
+    redisTemplate.expire(keyname, 29, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
@@ -68,7 +68,13 @@ public class RedisService {
   }
 
   public void saveToken(String teamId, String token){
-    valueOps.set("team:"+teamId, token);
+    String keyname = invitetoken + token;
+    valueOps.set(keyname, teamId);
+    redisTemplate.expire(keyname, 900, TimeUnit.SECONDS);
+  }
+
+  public String getTokenTeam(String token){
+    return valueOps.get(invitetoken + token);
   }
 
   @EventListener

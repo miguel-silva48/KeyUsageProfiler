@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ies2324.projBackend.dao.CreateTeamRequest;
 import com.ies2324.projBackend.dao.CreateTeamResponse;
 import com.ies2324.projBackend.dao.InviteLinkResponse;
+import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
@@ -32,11 +33,21 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createTeam(team));
     }
 
-    @PostMapping("invite/{id}")
-    public ResponseEntity<InviteLinkResponse> generateInviteLink(@PathVariable("id") Long userId) {
+    @PostMapping("invite")
+    public ResponseEntity<InviteLinkResponse> generateInviteLink() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() != Role.TEAM_LEADER)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));
     }
+
+    @PostMapping("join/{token}")
+    public ResponseEntity<JoinTeamResponse> join(@PathVariable("token") String token) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getTeam() != null)
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return ResponseEntity.ok(teamService.joinTeam(user, token));
+    }
+
+
 }

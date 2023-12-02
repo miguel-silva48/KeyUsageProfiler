@@ -1,11 +1,13 @@
 package com.ies2324.projBackend.services.impl;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.dao.CreateTeamResponse;
 import com.ies2324.projBackend.dao.InviteLinkResponse;
+import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.dao.TeamLeaderDTO;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
@@ -49,6 +51,18 @@ public class TeamServiceImpl implements TeamService {
             String.format("http://localhost:5173/invite/%s", inviteToken),
             team
         );
+    }
+
+    @Override
+    public JoinTeamResponse joinTeam(User user, String token) {
+        String teamid = redisService.getTokenTeam(token);
+        Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
+        if (optTeam.isPresent()){
+            Team team = optTeam.get();
+            team.addMember(user);
+            return new JoinTeamResponse(team);
+        }
+        return null;
     }
 
     @Override

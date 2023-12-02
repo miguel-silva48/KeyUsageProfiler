@@ -42,4 +42,8 @@ public class Team {
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<User> members;
+
+    public void addMember(User user){
+        members.add(user);
+    }
 }
