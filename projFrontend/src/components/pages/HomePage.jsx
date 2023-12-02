@@ -9,7 +9,7 @@ import Navbar from "../layout/Navbar";
 const HomePage = () => {
   const [teamName, setTeamName] = useState("");
   const [token, setToken] = useState(localStorage.getItem("authToken") || "");
-  const credentials = {email: "ricardo@example.com", username:"ricardo", password: "secure"};
+  const credentials = {email: "ricardo@example.com", username:"ricardo", password: "segura"};
 
   const joinTeamHandler = async () => {
     try {
@@ -24,7 +24,7 @@ const HomePage = () => {
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: teamName,
+          "name": teamName,
         }),
       });
 
