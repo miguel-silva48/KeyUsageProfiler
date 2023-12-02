@@ -2,6 +2,7 @@ package com.ies2324.projBackend.services;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
+import com.ies2324.projBackend.entities.Team;
+import com.ies2324.projBackend.entities.User;
 
 import jakarta.annotation.Resource;
 
@@ -27,7 +30,13 @@ import jakarta.annotation.Resource;
 public class RedisService {
 
   @Autowired
-  private RedisTemplate<String, String> template;
+  private UserService userService;
+  @Autowired
+  private SimpMessagingTemplate simpMessagingTemplate;
+  @Autowired
+  private SimpUserRegistry simpUserRegistry;
+  @Autowired
+  private RedisTemplate<String, String> redisTemplate;
 
   @Resource(name = "redisTemplate")
   private ValueOperations<String, String> valueOps;
@@ -39,12 +48,12 @@ public class RedisService {
   public void addKeystroke(String userId, Keystroke k) {
     String keyname = ttl+userId;
     valueOps.set(keyname, userId); // value as name of the other variable
-    template.expire(keyname, 29l, TimeUnit.SECONDS);
+    redisTemplate.expire(keyname, 29l, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
   public Set<String> getAllUserIds() {
-    Cursor<String> cursor = template.scan(ScanOptions.scanOptions().match(ttl+"*").build());
+    Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(ttl+"*").build());
     Set<String> user_ids = new HashSet<>();
     while (cursor.hasNext()) {
       user_ids.add(valueOps.get(cursor.next()));
@@ -58,23 +67,19 @@ public class RedisService {
     return keystrokes;
   }
 
-  @Component
-  public static class SessionExpiredEventListener {
-
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-    @Autowired
-    private SimpUserRegistry simpUserRegistry;
-
-    @EventListener
-    public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-      System.out.println(simpUserRegistry.getUsers());
-      simpMessagingTemplate.convertAndSendToUser(
-        "miguel.belchior@ua.pt",
-        "/topic/notifications", 
-        String.format("User with id %s is inactive", new String(event.getSource()).split(":")[1])
-      );
-      return ;
+  @EventListener
+  public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
+    Long userid = Long.parseLong(new String(event.getSource()).split(":")[1]);
+    Optional<User> user = userService.getUserById(userid);
+    if (user.isPresent()){
+      Team userTeam = user.get().getTeam();
+      if (userTeam != null){
+        simpMessagingTemplate.convertAndSendToUser(
+          userTeam.getLeader().getUsername(),
+          "/topic/notifications", 
+          String.format("User with id %d is inactive", userid)
+        );
+      }
     }
   }
 
