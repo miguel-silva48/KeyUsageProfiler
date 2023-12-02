@@ -85,8 +85,7 @@ class ApplicationConfig {
 
     @EventListener
     public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-      System.out.println(simpUserRegistry.getUser("miguel.belchior@ua.pt").getName());
-      System.out.println(simpMessagingTemplate.getUserDestinationPrefix());
+      System.out.println(simpUserRegistry.getUsers());
       simpMessagingTemplate.convertAndSendToUser(
         "miguel.belchior@ua.pt",
         "/topic/notifications", 
