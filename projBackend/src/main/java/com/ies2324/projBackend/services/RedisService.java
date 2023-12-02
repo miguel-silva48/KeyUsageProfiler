@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
@@ -23,6 +24,9 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpSubscriptionMatcher;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -76,10 +80,15 @@ class ApplicationConfig {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private SimpUserRegistry simpUserRegistry;
 
     @EventListener
     public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-      simpMessagingTemplate.convertAndSend(
+      System.out.println(simpUserRegistry.getUser("miguel.belchior@ua.pt").getName());
+      System.out.println(simpMessagingTemplate.getUserDestinationPrefix());
+      simpMessagingTemplate.convertAndSendToUser(
+        "miguel.belchior@ua.pt",
         "/topic/notifications", 
         String.format("User with id %s is inactive", new String(event.getSource()).split(":")[1])
       );
