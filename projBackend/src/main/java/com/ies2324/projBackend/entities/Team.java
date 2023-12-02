@@ -2,7 +2,9 @@ package com.ies2324.projBackend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,8 +36,10 @@ public class Team {
 
     @OneToOne()
     @JoinColumn(name = "leader_id", nullable = false)
+    @JsonManagedReference
     private User leader;
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<User> members;
 }
