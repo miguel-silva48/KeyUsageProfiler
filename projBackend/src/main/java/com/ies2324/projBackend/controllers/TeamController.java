@@ -1,6 +1,7 @@
 package com.ies2324.projBackend.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,10 @@ public class TeamController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getTeam() != null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        return ResponseEntity.ok(teamService.joinTeam(user, token));
+        JoinTeamResponse res = teamService.joinTeam(user, token);
+        if (res == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.ok(res);
     }
 
 

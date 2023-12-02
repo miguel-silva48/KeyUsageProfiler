@@ -56,11 +56,13 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public JoinTeamResponse joinTeam(User user, String token) {
         String teamid = redisService.getTokenTeam(token);
-        Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
-        if (optTeam.isPresent()){
-            Team team = optTeam.get();
-            team.addMember(user);
-            return new JoinTeamResponse(team);
+        if (teamid != null){
+            Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
+            if (optTeam.isPresent()){
+                Team team = optTeam.get();
+                team.addMember(user);
+                return new JoinTeamResponse(team);
+            }
         }
         return null;
     }
