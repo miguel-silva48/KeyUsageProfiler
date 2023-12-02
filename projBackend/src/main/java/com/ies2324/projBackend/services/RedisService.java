@@ -4,28 +4,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisKeyExpiredEvent;
-import org.springframework.data.redis.core.RedisKeyValueAdapter.EnableKeyspaceEvents;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpSubscriptionMatcher;
-import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -69,12 +58,6 @@ public class RedisService {
     return keystrokes;
   }
 
-}
-
-@Configuration
-@EnableRedisRepositories(enableKeyspaceEvents = EnableKeyspaceEvents.ON_STARTUP)
-class ApplicationConfig {
-
   @Component
   public static class SessionExpiredEventListener {
 
@@ -93,21 +76,7 @@ class ApplicationConfig {
       );
       return ;
     }
-
   }
 
-  @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory();
-  }
-
-  public @Bean RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-    RedisTemplate<Object, Object> template = new RedisTemplate<>();
-    template.setConnectionFactory(connectionFactory);
-    template.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-    template.setKeySerializer(new StringRedisSerializer());
-    template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    return template;
-  }
 }
+
