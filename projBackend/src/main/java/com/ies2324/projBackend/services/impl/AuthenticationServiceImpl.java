@@ -31,7 +31,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
         long id = user.getId();
-        return JwtAuthenticationResponse.builder().id(id).token(jwt).build();
+        String username = user.getUsername();
+        String email = user.getEmail();
+        String userType = user.getRole().toString();
+        return JwtAuthenticationResponse.builder().id(id).token(jwt).username(username).email(email).userType(userType)
+                .build();
     }
 
     @Override
@@ -42,6 +46,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
         String jwt = jwtService.generateToken(user);
         long id = user.getId();
-        return JwtAuthenticationResponse.builder().id(id).token(jwt).build();
+        String username = user.getUsername();
+        String email = user.getEmail();
+        String userType = user.getRole().toString();
+        return JwtAuthenticationResponse.builder().id(id).token(jwt).username(username).email(email).userType(userType)
+                .build();
     }
 }
