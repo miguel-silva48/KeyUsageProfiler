@@ -36,9 +36,9 @@ const LoginPage = () => {
         localStorage.setItem("userType", userType);
         setToken(token);
 
-        if (userType === "teamLeader") {
+        if (userType === "TEAM_LEADER") {
           navigate('/dashboard');
-        } else if (userType === "teamMember") {
+        } else if (userType === "TEAM_MEMBER") {
           navigate('/profile');
         } else {
           navigate('/');
