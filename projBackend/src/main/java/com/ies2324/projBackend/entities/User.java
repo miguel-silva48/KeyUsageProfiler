@@ -69,7 +69,7 @@ public class User implements UserDetails {
   }
 
   public String getUsername() {
-    return this.username;
+    return this.email;
   }
 
   @Override
