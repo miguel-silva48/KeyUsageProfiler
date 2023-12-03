@@ -12,7 +12,6 @@ const RegisterPage = () => {
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
-
     const [token, setToken] = useState(localStorage.getItem("authToken") || "");
 
     const navigate = useNavigate();
@@ -20,14 +19,14 @@ const RegisterPage = () => {
     const handleRegister = async () => {
 
         if (password !== passwordConfirmation) {
+            //TODO - Show error message in a better way
             console.error("Passwords do not match!");
             return;
         }
-
-        // TODO - Review this function
+        
         try {
-            const credentials = { "email": email, "password": password };
-            // Perform sign-in API request
+            const credentials = { "username": username, "email": email, "password": password };
+            // Perform sign-up API request
             const registerResponse = await fetch("http://localhost:8080/api/auth/signup", {
                 method: "POST",
                 headers: {
@@ -36,21 +35,27 @@ const RegisterPage = () => {
                 body: JSON.stringify(credentials),
             });
 
-            // TODO - Review, deve retornar o token na mesma mas o resto não
             if (registerResponse.ok) {
-                const { id, token, username } = await registerResponse.json();
+                console.log("Register successful!");
+                const { id, token, username, email, userType } = await registerResponse.json();
 
                 // Store the token securely
                 localStorage.setItem("userId", id)
                 localStorage.setItem("authToken", token);
                 localStorage.setItem("email", email);
                 localStorage.setItem("username", username);
+                localStorage.setItem("userType", userType);
                 setToken(token);
 
-                // TODO - Redirect to home page if user has no team, otherwise redirect to dashboard if team leader or profile if team member
-                navigate('/');
+                if (userType === "TEAM_LEADER") {
+                    navigate('/dashboard');
+                } else if (userType === "TEAM_MEMBER") {
+                    navigate('/profile');
+                } else {
+                    navigate('/');
+                }
             } else {
-                // Handle sign-in error
+                // Handle sign-up error
                 console.error("Failed to register:", registerResponse.statusText);
             }
         } catch (error) {
@@ -155,6 +160,7 @@ const RegisterPage = () => {
 
                             <div className="form-control mt-6 mb-2">
                                 <button
+                                    type="button"
                                     className="btn btn-primary"
                                     onClick={handleRegister}
                                 >
