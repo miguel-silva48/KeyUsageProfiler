@@ -1,7 +1,9 @@
 package com.ies2324.projBackend.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ies2324.projBackend.dao.CreateTeamRequest;
 import com.ies2324.projBackend.dao.CreateTeamResponse;
+import com.ies2324.projBackend.dao.InviteLinkResponse;
+import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.TeamService;
@@ -26,5 +30,13 @@ public class TeamController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Team team = Team.builder().leader(user).name(request.getName()).build();
         return ResponseEntity.ok(teamService.createTeam(team));
+    }
+
+    @PostMapping("invite/{id}")
+    public ResponseEntity<InviteLinkResponse> generateInviteLink(@PathVariable("id") Long userId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getRole() != Role.TEAM_LEADER)
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));
     }
 }

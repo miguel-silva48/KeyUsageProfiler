@@ -21,14 +21,14 @@ const Dashboard = () => {
   const [userStatistics, setUserStatistics] = useState(null);
 
   const fetchData = () => {
-    fetch('http://localhost:8080/api/users')
+    fetch('http://localhost:8080/api/users', {headers: {"Authorization": "Bearer " + "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJyaWNAYXNkYXMucHQiLCJpYXQiOjE3MDE1MzY1MjksImV4cCI6MTcwMTUzNzcyOX0.Z2QLzayTIY0-Mu4wOeKUUPSBHdMQ5X_JpbssxsjGxsCo3JqTrTB_YWJS4f95caRw"}})
       .then((response) => response.json())
       .then((data) => {
         // TODO - handle multiple users
         const user = data[0];
         setUserData(user);
 
-        fetch(`http://localhost:8080/api/statistics/${user.id}`)
+        fetch(`http://localhost:8080/api/statistics/${user.id}`, {headers: {"Authorization": "Bearer " + "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJyaWNAYXNkYXMucHQiLCJpYXQiOjE3MDE1MzY1MjksImV4cCI6MTcwMTUzNzcyOX0.Z2QLzayTIY0-Mu4wOeKUUPSBHdMQ5X_JpbssxsjGxsCo3JqTrTB_YWJS4f95caRw"}})
           .then((response) => response.json())
           .then((statistics) => {
             setUserStatistics(statistics);
