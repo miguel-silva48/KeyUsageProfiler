@@ -26,17 +26,23 @@ const LoginPage = () => {
       });
 
       if (signInResponse.ok) {
-        const { id, token, username } = await signInResponse.json();
+        const { id, token, username, email, userType } = await signInResponse.json();
 
         // Store the token securely
         localStorage.setItem("userId", id)
         localStorage.setItem("authToken", token);
         localStorage.setItem("email", email);
         localStorage.setItem("username", username);
+        localStorage.setItem("userType", userType);
         setToken(token);
 
-        // TODO - Redirect to home page if user has no team, otherwise redirect to dashboard if team leader or profile if team member
-        navigate('/');
+        if (userType === "teamLeader") {
+          navigate('/dashboard');
+        } else if (userType === "teamMember") {
+          navigate('/profile');
+        } else {
+          navigate('/');
+        }
       } else {
         // Handle sign-in error
         console.error("Failed to sign in:", signInResponse.statusText);
@@ -105,6 +111,7 @@ const LoginPage = () => {
               
               <div className="form-control mt-6 mb-2">
                 <button
+                  type="button"
                   className="btn btn-primary"
                   onClick={handleLogin}
                 >
