@@ -17,7 +17,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const credentials = { email: email, password : password };
+      const credentials = { "email": email, "password" : password };
       // Perform sign-in API request
       const signInResponse = await fetch("http://localhost:8080/api/auth/signin", {
         method: "POST",
@@ -28,10 +28,13 @@ const LoginPage = () => {
       });
 
       if (signInResponse.ok) {
-        const { token } = await signInResponse.json();
+        const { id, token, username } = await signInResponse.json();
 
         // Store the token securely
+        localStorage.setItem("userId", id)
         localStorage.setItem("authToken", token);
+        localStorage.setItem("email", email);
+        localStorage.setItem("username", username);
         setToken(token);
 
         // TODO - Redirect to home page if user has no team, otherwise redirect to dashboard if team leader or profile if team member
@@ -111,6 +114,7 @@ const LoginPage = () => {
               </div>
               <div className="form-control mt-6">
                 <button
+                  type="button"
                   className="btn btn-primary"
                   onClick={handleLogin}
                 >
