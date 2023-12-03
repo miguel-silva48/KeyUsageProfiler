@@ -3,9 +3,7 @@ import Footer from '../layout/Footer';
 import Navbar from '../layout/Navbar';
 import { useNavigate } from 'react-router-dom';
 
-import { RiEyeLine, RiEyeCloseLine } from 'react-icons/ri';
-
-import { fetchData } from '../../utils';
+import { RiEyeLine, RiEyeOffFill } from 'react-icons/ri';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -58,24 +56,16 @@ const LoginPage = () => {
 
   return (
     <div>
-      <Navbar />
-      <div className="hero min-h-screen bg-[url('/src/assets/shopping2.jpg')]">
-        <div className="hero-content flex-col w-full lg:flex-row-reverse justify-center items-center">
-          <div className="text-center bg:text-left bg-secondary bg-opacity-80 p-2 rounded-md">
-            <h1 className="text-5xl font-bold">Login now!</h1>
-            <p className="py-6">
-              New here?{' '}
-              <a
-                href=""
-                onClick={() => navigate('/registerUser')}
-                className="link link-accent"
-              >
-                Sign up
-              </a>{' '}
-              for an account to get started.
+      <Navbar/>
+      <div className="hero min-h-screen">
+        <div className="hero-content flex-col w-full justify-center items-center">
+          <div className="text-center bg:text-left p-2 rounded-sm">
+            <h1 className="text-5xl font-bold">Sign in to your account</h1>
+            <p className="text-xl mt-4 mb-6">
+              KeyUsageProfiler gives you the ability to obtain various key stroke statistics from a team in an interactive way!
             </p>
           </div>
-          <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+          <div className="card flex-shrink-0 w-full max-w-xl h- shadow-2xl bg-base-100">
             <form className="card-body">
               <div className="form-control">
                 <label className="label">
@@ -84,7 +74,7 @@ const LoginPage = () => {
                 <input
                   type="email"
                   placeholder="email"
-                  className="input input-bordered"
+                  className="input input-bordered w-full"
                   required
                   value={email}
                   onChange={handleEmailChange}
@@ -98,7 +88,7 @@ const LoginPage = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="password"
-                    className="input input-bordered join-item "
+                    className="input input-bordered join-item w-full"
                     required
                     value={password}
                     onChange={handlePasswordChange}
@@ -108,24 +98,34 @@ const LoginPage = () => {
                     className="btn btn-bordered join-item"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <RiEyeCloseLine /> : <RiEyeLine />}
+                    {showPassword ? <RiEyeOffFill /> : <RiEyeLine />}
                   </button>
                 </div>
               </div>
-              <div className="form-control mt-6">
+              
+              <div className="form-control mt-6 mb-2">
                 <button
-                  type="button"
                   className="btn btn-primary"
                   onClick={handleLogin}
                 >
                   Login
                 </button>
               </div>
+              <p className="text-sm text-center">
+              Don't have an account?{' '}
+              <a
+                href=""
+                onClick={() => navigate('/register')}
+                className="link link-accent"
+              >
+                Sign up
+              </a>{' '}
+              to get started.
+            </p>
             </form>
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
