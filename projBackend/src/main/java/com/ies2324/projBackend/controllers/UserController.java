@@ -56,17 +56,17 @@ public class UserController {
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
 
-  @PutMapping("remove/{id}")
-    public ResponseEntity<Team> removeUserFromTeam(@PathVariable("id") String userId) {
-      // necessary because of new team members
-      User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      Optional<User> expeledToBe = userService.getUserById(Long.parseLong(userId));
+  @PutMapping("/removefromteam/{id}")
+  public ResponseEntity<Team> removeUserFromTeam(@PathVariable("id") String userId) {
+    // necessary because of new team members
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    Optional<User> expeledToBe = userService.getUserById(Long.parseLong(userId));
 
-      if (expeledToBe.isEmpty())
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      if (user.getRole() != Role.TEAM_LEADER || user.getTeam() != expeledToBe.get().getTeam())
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      userService.removeFromTeam(user);
-      return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
-    }
+    if (expeledToBe.isEmpty())
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    if (user.getRole() != Role.TEAM_LEADER || !user.getTeam().equals(expeledToBe.get().getTeam()))
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    userService.removeFromTeam(expeledToBe.get());
+    return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
+  }
 }

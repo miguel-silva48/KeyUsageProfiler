@@ -46,4 +46,14 @@ public class Team {
     public void addMember(User user){
         members.add(user);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Team))
+            return false;
+        Team other = (Team) obj;
+        return this.id == other.id;
+    }
 }
