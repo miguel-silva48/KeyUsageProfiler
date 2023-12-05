@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.UserService;
 
@@ -42,6 +44,16 @@ public class UserController {
     } catch (DataIntegrityViolationException e) {
       return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
+  }
 
+  @PutMapping("/leaveteam")
+  public ResponseEntity<User> leaveTeam(){
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (user.getRole() != Role.TEAM_MEMBER)
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    user.setTeam(null);
+    user.setRole(Role.USER);
+    userService.updateUser(user);
+    return new ResponseEntity<>(user, HttpStatus.OK);
   }
 }

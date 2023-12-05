@@ -1,9 +1,6 @@
 package com.ies2324.projBackend.controllers;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
