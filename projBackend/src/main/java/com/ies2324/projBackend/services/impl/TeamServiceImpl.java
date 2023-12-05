@@ -73,8 +73,16 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    @Transactional
     public void deleteTeam(Team team) {
-        teamRepository.delete(team);
+        if (team != null){
+            for (User u : team.getMembers()) {
+                u.setRole(Role.USER);
+                u.setTeam(null);
+                userService.updateUser(u);
+            }
+            teamRepository.delete(team);
+        }
     }
 
 }
