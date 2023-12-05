@@ -45,7 +45,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public InviteLinkResponse createInviteLink(Team team) {
-        String inviteToken = UUID.randomUUID().toString() + System.currentTimeMillis();
+        String inviteToken = UUID.randomUUID().toString() + "-" + System.currentTimeMillis();
         redisService.saveToken(String.valueOf(team.getId()), inviteToken);
         return new InviteLinkResponse(
             String.format("http://localhost:5173/invite/%s", inviteToken),
@@ -77,12 +77,9 @@ public class TeamServiceImpl implements TeamService {
     public void deleteTeam(Team team) {
         if (team != null){
             for (User u : team.getMembers()) {
-                u.setRole(Role.USER);
-                u.setTeam(null);
-                userService.updateUser(u);
+                userService.removeFromTeam(u);
             }
             teamRepository.delete(team);
         }
     }
-
 }

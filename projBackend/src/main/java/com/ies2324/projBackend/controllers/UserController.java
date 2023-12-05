@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.ies2324.projBackend.entities.Role;
+import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.UserService;
 
@@ -51,9 +52,21 @@ public class UserController {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (user.getRole() != Role.TEAM_MEMBER)
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    user.setTeam(null);
-    user.setRole(Role.USER);
-    userService.updateUser(user);
+    userService.removeFromTeam(user);
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
+
+  @PutMapping("remove/{id}")
+    public ResponseEntity<Team> removeUserFromTeam(@PathVariable("id") String userId) {
+      // necessary because of new team members
+      User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      Optional<User> expeledToBe = userService.getUserById(Long.parseLong(userId));
+
+      if (expeledToBe.isEmpty())
+          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      if (user.getRole() != Role.TEAM_LEADER || user.getTeam() != expeledToBe.get().getTeam())
+          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      userService.removeFromTeam(user);
+      return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
+    }
 }

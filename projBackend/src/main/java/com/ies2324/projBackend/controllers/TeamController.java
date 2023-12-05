@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RequestMapping("api/teams")
 public class TeamController {
+
     private final TeamService teamService;
 
     @PostMapping("create")

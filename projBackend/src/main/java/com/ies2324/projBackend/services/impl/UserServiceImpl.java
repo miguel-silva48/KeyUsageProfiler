@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.repositories.UserRepository;
 import com.ies2324.projBackend.services.UserService;
@@ -55,5 +56,12 @@ public class UserServiceImpl implements UserService {
   @Override
   public User updateUser(User user) {
     return userRepository.save(user);
+  }
+
+  @Override
+  public void removeFromTeam(User user) {
+      user.setRole(Role.USER);
+      user.setTeam(null);
+      updateUser(user);
   }
 }
