@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 
 public interface UserService {
@@ -20,4 +21,6 @@ public interface UserService {
   User updateUser(User user);
 
   void deleteUser(Long userId);
+
+  Team removeFromTeam(User user);
 }

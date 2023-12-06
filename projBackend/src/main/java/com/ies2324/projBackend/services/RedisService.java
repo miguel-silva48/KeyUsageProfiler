@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
@@ -44,16 +44,17 @@ public class RedisService {
   private ListOperations<String, Keystroke> listOps;
 
   private final String ttl = "ttl:";
+  private final String invitetoken = "invitetoken:";
 
   public void addKeystroke(String userId, Keystroke k) {
-    String keyname = ttl+userId;
+    String keyname = ttl + userId;
     valueOps.set(keyname, userId); // value as name of the other variable
-    redisTemplate.expire(keyname, 29l, TimeUnit.SECONDS);
+    redisTemplate.expire(keyname, 29, TimeUnit.SECONDS);
     listOps.rightPush(userId, k);
   }
 
   public Set<String> getAllUserIds() {
-    Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(ttl+"*").build());
+    Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(ttl + "*").build());
     Set<String> user_ids = new HashSet<>();
     while (cursor.hasNext()) {
       user_ids.add(valueOps.get(cursor.next()));
@@ -67,25 +68,40 @@ public class RedisService {
     return keystrokes;
   }
 
-  public void saveToken(String teamId, String token){
-    valueOps.set("team:"+teamId, token);
+  public String createToken(String teamId) {
+    String token = UUID.randomUUID().toString() + "-" + System.currentTimeMillis() + "-" + teamId;
+    String keyname = invitetoken + teamId;
+    valueOps.set(keyname, token);
+    redisTemplate.expire(keyname, 900, TimeUnit.SECONDS);
+    return token;
+  }
+
+  public String validateTokenAndGetTeamId(String token) {
+    String teamId = token.substring(token.lastIndexOf("-") + 1);
+    if (valueOps.get(invitetoken + teamId).equals(token))
+      return teamId;
+    return null;
   }
 
   @EventListener
   public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-    Long userid = Long.parseLong(new String(event.getSource()).split(":")[1]);
+    String[] keynameParts = new String(event.getSource()).split(":");
+    if (keynameParts[0].equals("ttl"))
+      handleInactivityExpiredEvent(keynameParts[1]);
+  }
+
+  private void handleInactivityExpiredEvent(String userId) {
+    Long userid = Long.parseLong(userId);
     Optional<User> user = userService.getUserById(userid);
-    if (user.isPresent()){
+    if (user.isPresent()) {
       Team userTeam = user.get().getTeam();
-      if (userTeam != null){
+      if (userTeam != null) {
         simpMessagingTemplate.convertAndSendToUser(
-          userTeam.getLeader().getUsername(),
-          "/topic/notifications", 
-          String.format("User with id %d is inactive", userid)
-        );
+            userTeam.getLeader().getUsername(),
+            "/topic/notifications",
+            String.format("User with id %d is inactive", userid));
       }
     }
   }
 
 }
-

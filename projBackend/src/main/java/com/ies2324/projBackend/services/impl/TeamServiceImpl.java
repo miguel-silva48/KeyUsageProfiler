@@ -1,11 +1,12 @@
 package com.ies2324.projBackend.services.impl;
 
-import java.util.UUID;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.dao.CreateTeamResponse;
 import com.ies2324.projBackend.dao.InviteLinkResponse;
+import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.dao.TeamLeaderDTO;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
@@ -43,17 +44,40 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public InviteLinkResponse createInviteLink(Team team) {
-        String inviteToken = UUID.randomUUID().toString() + System.currentTimeMillis();
-        redisService.saveToken(String.valueOf(team.getId()), inviteToken);
+        Long teamId = team.getId();
         return new InviteLinkResponse(
-            String.format("http://localhost:5173/invite/%s", inviteToken),
+            redisService.createToken(String.valueOf(teamId)),
             team
         );
     }
 
     @Override
-    public void deleteTeam(Team team) {
-        teamRepository.delete(team);
+    @Transactional
+    public JoinTeamResponse joinTeam(User user, String token) {
+        String teamid = redisService.validateTokenAndGetTeamId(token);
+        if (teamid != null){
+            Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
+            if (optTeam.isPresent()){
+                Team team = optTeam.get();
+                user.setTeam(team);
+                user.setRole(Role.TEAM_MEMBER);
+                userService.updateUser(user);
+                team.addMember(user);
+                teamRepository.save(team);
+                return new JoinTeamResponse(team);
+            }
+        }
+        return null;
     }
 
+    @Override
+    @Transactional
+    public void deleteTeam(Team team) {
+        if (team != null){
+            for (User u : team.getMembers()) {
+                userService.removeFromTeam(u);
+            }
+            teamRepository.delete(team);
+        }
+    }
 }
