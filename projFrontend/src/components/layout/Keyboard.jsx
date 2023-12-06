@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
+import "./../../utils/keyboard.css";
+
 
 function Keyboard() {
   const token =
-    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE4ODU2NDAsImV4cCI6MTcwMTg4Njg0MH0.k2Zg3XE0XwxnMHhCvqFsMxYAT5Ko1tgTOySgfDE-CzmJvwfMzZ-88yiaRWWM2MV9";
+    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE4OTA2OTAsImV4cCI6MTcwMTg5MTg5MH0.QQ43pEzLotD3r4d-CLHnqSKFNzgK5meGppIikAnBJIsakIy6vp-vA-qvRwyLpV-I";
   const [stompClient, setStompClient] = useState(null);
 
   const [lastKey, setLastKey] = useState("");
@@ -29,20 +31,16 @@ function Keyboard() {
   }, []);
 
   const updatePressedKey = useCallback(() => {
-    console.log("last key ", lastKey);
     const elem = document.getElementById(lastKey);
-    console.log(elem);
     if (elem) {
-      elem.classList.add("pressed");
+      elem.classList.add("kb-pressed");
       setTimeout(() => {
-        console.log("depressing key");
-        elem.classList.remove("pressed");
+        elem.classList.remove("kb-pressed");
       }, 700);
     }
   }, [lastKey]);
 
   useEffect(() => {
-    console.log("lastkey updated: ", lastKey);
     updatePressedKey();
   }, [lastKey, updatePressedKey]);
 
@@ -69,256 +67,304 @@ function Keyboard() {
   }, [stompClient]);
 
   return (
-    <div className="main-container">
-      <div className="row">
-        <div className="col" id="esc">
+    <div className="kb-main-container">
+      <div className="kb-row">
+        <div className="kb-col" id="esc">
           Esc
         </div>
-        <div className="col" id="f1">
+        { /* empty space between keys */}
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="f1">
           F1
         </div>
-        <div className="col" id="f2">
+        <div className="kb-col" id="f2">
           F2
         </div>
-        <div className="col" id="f3">
+        <div className="kb-col" id="f3">
           F3
         </div>
-        <div className="col" id="f4">
+        <div className="kb-col" id="f4">
           F4
         </div>
-        <div className="col" id="f5">
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="f5">
           F5
         </div>
-        <div className="col" id="f6">
+        <div className="kb-col" id="f6">
           F6
         </div>
-        <div className="col" id="f7">
+        <div className="kb-col" id="f7">
           F7
         </div>
-        <div className="col" id="f8">
+        <div className="kb-col" id="f8">
           F8
         </div>
-        <div className="col" id="f9">
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="f9">
           F9
         </div>
-        <div className="col" id="f10">
+        <div className="kb-col" id="f10">
           F10
         </div>
-        <div className="col" id="f11">
+        <div className="kb-col" id="f11">
           F11
         </div>
-        <div className="col" id="f12">
+        <div className="kb-col" id="f12">
           F12
         </div>
-        <div className="col" id="print">
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="print">
           Print <span>Screen</span>
         </div>
-        <div className="col" id="scroll">
+        <div className="kb-col" id="scroll">
           Scroll <span>Lock</span>
         </div>
-        <div className="col" id="pause">
+        <div className="kb-col" id="pause">
           Pause <span>Break</span>
         </div>
       </div>
-      <div className="row">
-        <div className="col symb" id="tilde">
+      <div className="kb-row">
+        <div className="kb-col symb" id="tilde">
           <span>~</span>`
         </div>
-        <div className="col symb" id="exclamation">
+        <div className="kb-col symb" id="exclamation">
           <span>!</span>1
         </div>
-        <div className="col symb" id="at">
+        <div className="kb-col symb" id="at">
           <span>@</span>2
         </div>
-        <div className="col symb" id="hash">
+        <div className="kb-col symb" id="hash">
           <span>#</span>3
         </div>
-        <div className="col symb" id="dollar">
+        <div className="kb-col symb" id="dollar">
           <span>$</span>4
         </div>
-        <div className="col symb" id="percent">
+        <div className="kb-col symb" id="percent">
           <span>%</span>5
         </div>
-        <div className="col symb" id="caret">
+        <div className="kb-col symb" id="caret">
           <span>^</span>6
         </div>
-        <div className="col symb" id="ampersand">
+        <div className="kb-col symb" id="ampersand">
           <span>&</span>7
         </div>
-        <div className="col symb" id="asterisk">
+        <div className="kb-col symb" id="asterisk">
           <span>*</span>8
         </div>
-        <div className="col symb" id="left_paren">
+        <div className="kb-col symb" id="left_paren">
           <span>(</span>9
         </div>
-        <div className="col symb" id="right_paren">
+        <div className="kb-col symb" id="right_paren">
           <span>)</span>0
         </div>
-        <div className="col symb" id="underscore">
+        <div className="kb-col symb" id="underscore">
           <span>_</span>-
         </div>
-        <div className="col symb" id="plus">
+        <div className="kb-col symb" id="plus">
           <span>+</span>=
         </div>
-        <div className="col backspace" id="backspace">
+        <div className="kb-col kb-backspace" id="backspace">
           Backspace
         </div>
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="pause">
+          Insert
+        </div>
+        <div className="kb-col" id="pause">
+          Home
+        </div>
+        <div className="kb-col" id="pause">
+          Page<span>Up</span>
+        </div>
       </div>
-      <div className="row">
-        <div className="col tab" id="tab">
+      <div className="kb-row">
+        <div className="kb-col kb-tab" id="tab">
           Tab
         </div>
-        <div className="col col-key" id="q">
+        <div className="kb-col kb-col-key" id="q">
           q
         </div>
-        <div className="col col-key" id="w">
+        <div className="kb-col kb-col-key" id="w">
           w
         </div>
-        <div className="col col-key" id="e">
+        <div className="kb-col kb-col-key" id="e">
           e
         </div>
-        <div className="col col-key" id="r">
+        <div className="kb-col kb-col-key" id="r">
           r
         </div>
-        <div className="col col-key" id="t">
+        <div className="kb-col kb-col-key" id="t">
           t
         </div>
-        <div className="col col-key" id="y">
+        <div className="kb-col kb-col-key" id="y">
           y
         </div>
-        <div className="col col-key" id="u">
+        <div className="kb-col kb-col-key" id="u">
           u
         </div>
-        <div className="col col-key" id="i">
+        <div className="kb-col kb-col-key" id="i">
           i
         </div>
-        <div className="col col-key" id="o">
+        <div className="kb-col kb-col-key" id="o">
           o
         </div>
-        <div className="col col-key" id="p">
+        <div className="kb-col kb-col-key" id="p">
           p
         </div>
-        <div className="col" id="left_brace">
+        <div className="kb-col" id="left_brace">
           <span>&#123;</span>
           <span>[</span>
         </div>
-        <div className="col" id="right_brace">
+        <div className="kb-col" id="right_brace">
           <span>&#125;</span>
           <span>]</span>
         </div>
-        <div className="col slace" id="pipe">
+        <div className="kb-col kb-slace" id="pipe">
           <span>&#124;</span>
           <span>&#92;</span>
         </div>
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="pause">
+          Delete
+        </div>
+        <div className="kb-col" id="pause">
+          End
+        </div>
+        <div className="kb-col" id="pause">
+          Page<span>Down</span>
+        </div>
       </div>
-      <div className="row">
-        <div className="col capslock" id="caps_lock">
+      <div className="kb-row">
+        <div className="kb-col kb-capslock" id="caps_lock">
           caps <span>lock</span>
         </div>
-        <div className="col col-key" id="a">
+        <div className="kb-col kb-col-key" id="a">
           a
         </div>
-        <div className="col col-key" id="s">
+        <div className="kb-col kb-col-key" id="s">
           s
         </div>
-        <div className="col col-key" id="d">
+        <div className="kb-col kb-col-key" id="d">
           d
         </div>
-        <div className="col col-key" id="f">
+        <div className="kb-col kb-col-key" id="f">
           f
         </div>
-        <div className="col col-key" id="g">
+        <div className="kb-col kb-col-key" id="g">
           g
         </div>
-        <div className="col col-key" id="h">
+        <div className="kb-col kb-col-key" id="h">
           h
         </div>
-        <div className="col col-key" id="j">
+        <div className="kb-col kb-col-key" id="j">
           j
         </div>
-        <div className="col col-key" id="k">
+        <div className="kb-col kb-col-key" id="k">
           k
         </div>
-        <div className="col col-key" id="l">
+        <div className="kb-col kb-col-key" id="l">
           l
         </div>
-        <div className="col" id="colon">
+        <div className="kb-col" id="colon">
           <span>:</span>
           <span>;</span>
         </div>
-        <div className="col" id="quote">
+        <div className="kb-col" id="quote">
           <span>"</span>
           <span>'</span>
         </div>
-        <div className="col enter" id="enter">
+        <div className="kb-col kb-enter" id="enter">
           Enter
         </div>
+        <div className="kb-empty"></div>
+        <div className="kb-empty"></div>
+        <div className="kb-empty"></div>
+        <div className="kb-empty"></div>
+
       </div>
-      <div className="row">
-        <div className="col shift" id="left_shift">
+      <div className="kb-row">
+        <div className="kb-col kb-shift" id="left_shift">
           Shift
         </div>
-        <div className="col col-key" id="z">
+        <div className="kb-col kb-col-key" id="z">
           z
         </div>
-        <div className="col col-key" id="x">
+        <div className="kb-col kb-col-key" id="x">
           x
         </div>
-        <div className="col col-key" id="c">
+        <div className="kb-col kb-col-key" id="c">
           c
         </div>
-        <div className="col col-key" id="v">
+        <div className="kb-col kb-col-key" id="v">
           v
         </div>
-        <div className="col col-key" id="b">
+        <div className="kb-col kb-col-key" id="b">
           b
         </div>
-        <div className="col col-key" id="n">
+        <div className="kb-col kb-col-key" id="n">
           n
         </div>
-        <div className="col col-key" id="m">
+        <div className="kb-col kb-col-key" id="m">
           m
         </div>
-        <div className="col" id="left_angle_bracket">
+        <div className="kb-col" id="left_angle_bracket">
           <span>&lt;</span>
           <span>,</span>
         </div>
-        <div className="col" id="greaterthan_dot">
+        <div className="kb-col" id="greaterthan_dot">
           <span>&gt;</span>
           <span>.</span>
         </div>
-        <div className="col" id="questionmark_slash">
+        <div className="kb-col" id="questionmark_slash">
           <span>?</span>
           <span>/</span>
         </div>
-        <div className="col shift" id="right_shift">
+        <div className="kb-col kb-shift" id="right_shift">
           Shift
         </div>
+        <div className="kb-empty"></div>
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="questionmark_slash">
+            &uarr;
+        </div>
+        <div className="kb-empty"></div>
+
       </div>
-      <div className="row">
-        <div className="col ctrl" id="left_ctrl">
+      <div className="kb-row">
+        <div className="kb-col ctrl" id="left_ctrl">
           Ctrl
         </div>
-        <div className="col" id="left_win">
+        <div className="kb-col" id="left_win">
           win
         </div>
-        <div className="col" id="left_alt">
+        <div className="kb-col" id="left_alt">
           Alt
         </div>
-        <div className="col space" id="space"></div>
-        <div className="col" id="right_alt">
+        <div className="kb-col kb-space" id="space"></div>
+        <div className="kb-col" id="right_alt">
           Alt
         </div>
-        <div className="col">
+        <div className="kb-col">
           <div className="rightclickopt" id="right_click_opt">
             <span></span>
             <span></span>
             <span></span>
           </div>
         </div>
-        <div className="col ctrl" id="right_ctrl">
+        <div className="kb-col ctrl" id="right_ctrl">
           Ctrl
         </div>
+        <div className="kb-empty"></div>
+        <div className="kb-col" id="questionmark_slash">
+            &larr;
+        </div>
+        <div className="kb-col" id="questionmark_slash">
+            &darr;
+        </div>
+        <div className="kb-col" id="questionmark_slash">
+            &rarr;
+        </div>
+        
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import "./../../utils/styles.css";
 
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
+import Keyboard from '../layout/Keyboard';
 
 import {
   RiTimeLine,
@@ -88,7 +89,9 @@ useEffect(() => {
         </div>
 
       </div>
-
+      <div className='mb-20'>
+        <Keyboard />
+      </div>
       <Footer />
     </div>
   );
