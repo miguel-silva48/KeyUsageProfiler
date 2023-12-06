@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,19 +68,30 @@ public class RedisService {
     return keystrokes;
   }
 
-  public void saveToken(String teamId, String token){
-    String keyname = invitetoken + token;
-    valueOps.set(keyname, teamId);
+  public String createToken(String teamId){
+    String token = UUID.randomUUID().toString() + "-" + System.currentTimeMillis() + "-" + teamId;;
+    String keyname = invitetoken + teamId;
+    valueOps.set(keyname, token);
     redisTemplate.expire(keyname, 900, TimeUnit.SECONDS);
+    return token;
   }
 
-  public String getTokenTeam(String token){
-    return valueOps.get(invitetoken + token);
+  public String validateTokenAndGetTeamId(String token){
+    String teamId = token.substring(token.lastIndexOf("-") + 1);
+    if (valueOps.get(invitetoken + teamId).equals(token))
+      return teamId;
+    return null;
   }
 
   @EventListener
   public void handleRedisKeyExpiredEvent(RedisKeyExpiredEvent<Session> event) {
-    Long userid = Long.parseLong(new String(event.getSource()).split(":")[1]);
+    String[] keynameParts = new String(event.getSource()).split(":");
+    if (keynameParts[0] == ttl)
+      handleInactivityExpiredEvent(keynameParts[1]);
+  }
+
+  private void handleInactivityExpiredEvent(String userId){
+    Long userid = Long.parseLong(userId);
     Optional<User> user = userService.getUserById(userid);
     if (user.isPresent()){
       Team userTeam = user.get().getTeam();

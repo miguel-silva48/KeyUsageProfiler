@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InviteLinkResponse {
-  private String link;
+  private String token;
   private Team team;
 }

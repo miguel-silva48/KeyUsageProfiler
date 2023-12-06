@@ -1,7 +1,6 @@
 package com.ies2324.projBackend.services.impl;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -45,10 +44,9 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public InviteLinkResponse createInviteLink(Team team) {
-        String inviteToken = UUID.randomUUID().toString() + "-" + System.currentTimeMillis();
-        redisService.saveToken(String.valueOf(team.getId()), inviteToken);
+        Long teamId = team.getId();
         return new InviteLinkResponse(
-            String.format("http://localhost:5173/invite/%s", inviteToken),
+            redisService.createToken(String.valueOf(teamId)),
             team
         );
     }
@@ -56,7 +54,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     public JoinTeamResponse joinTeam(User user, String token) {
-        String teamid = redisService.getTokenTeam(token);
+        String teamid = redisService.validateTokenAndGetTeamId(token);
         if (teamid != null){
             Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
             if (optTeam.isPresent()){
