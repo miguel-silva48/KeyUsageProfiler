@@ -42,4 +42,22 @@ public class Team {
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<User> members;
+
+    public void addMember(User user){
+        members.add(user);
+    }
+
+    public void removeMember(User user){
+        members.remove(user);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Team))
+            return false;
+        Team other = (Team) obj;
+        return this.id == other.id;
+    }
 }
