@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import typing_image from "../../assets/home_typing_image.png";
 
 import "./../../utils/styles.css";
@@ -7,15 +8,25 @@ import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 
 const HomePage = () => {
+  const [state, setState] = useState(false); // Destructuring assignment
+  const navigate = useNavigate();
   const [teamName, setTeamName] = useState("");
-  const [token, setToken] = useState(localStorage.getItem("authToken") || "");
-  const credentials = {email: "ricardo@example.com", username:"ricardo", password: "segura"};
+  const [token, setToken] = useState(localStorage.getItem("authToken"));
+  const [userType, setUserType] = useState(localStorage.getItem("userType"));
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const joinTeamHandler = async () => {
+  useEffect(() => {
+      if (!token || !userType) {
+        navigate("/login");
+      } else if (userType === "TEAM_MEMBER") {
+        navigate("/user"); // TODO maybe change to profile
+      } else if (userType === "TEAM_LEADER") {
+        navigate("/dashboard");
+      }
+  }, []);
+
+  const createTeamHandler = async () => {
     try {
-      // Wait for sign-in to complete
-      await handleSignIn(credentials);
-
       // Now that sign-in is complete, proceed with team creation
       const response = await fetch("http://localhost:8080/api/teams/create", {
         method: "POST",
@@ -31,40 +42,15 @@ const HomePage = () => {
       if (response.ok) {
         // Handle successful response (team creation)
         console.log("Team created successfully!");
+        navigate("/dashboard");
       } else {
         // Handle error response
         console.error("Failed to create team:", response.statusText);
+        setErrorMessage(errorData.message || "Failed to create team. Please try again.");
       }
     } catch (error) {
       console.error("Error creating team:", error);
-    }
-  };
-
-  const handleSignIn = async (credentials) => {
-    try {
-      // Perform sign-in API request
-      const signInResponse = await fetch("http://localhost:8080/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (signInResponse.ok) {
-        const { token } = await signInResponse.json();
-
-        // Store the token securely
-        localStorage.setItem("authToken", token);
-        setToken(token);
-
-        // Optionally, redirect to the home page or perform other actions
-      } else {
-        // Handle sign-in error
-        console.error("Failed to sign in:", signInResponse.statusText);
-      }
-    } catch (error) {
-      console.error("Error during sign in:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -85,7 +71,7 @@ const HomePage = () => {
               <div className="flex w-full h-full flex-col justify-center items-start gap-2.5 shrink-0">
                 <div className="flex p-5 pr-6 items-center gap-3 flex-[1_0_0] self-stretch rounded-2xl border border-gray-400 bg-gray-50">
                   <input id="team-name" placeholder="Enter team name" value={teamName} onChange={(e) => setTeamName(e.target.value)}></input>
-                  <button type="button" onClick={joinTeamHandler} className="flex w-[13rem] h-[3.35rem] p-4 flex-col justify-center items-center gap-2.5 shrink-0 rounded-[0.625rem] bg-gray-950">
+                  <button type="button" onClick={createTeamHandler} className="flex w-[13rem] h-[3.35rem] p-4 flex-col justify-center items-center gap-2.5 shrink-0 rounded-[0.625rem] bg-gray-950">
                     <div className="flex justify-center items-center gap-2">
                       <p className="text-white text-base font-bold text-white">Create a Team</p>
                     </div>
@@ -93,6 +79,13 @@ const HomePage = () => {
                 </div>
               </div>
             </form>
+            <div className="mt-5">
+              {errorMessage && (
+                <div className="text-red-500 p-3 border border-red-500 rounded">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <img className="w-[22rem] h-[22rem] absolute right-80 top-56" src={typing_image} alt="Typing" />
