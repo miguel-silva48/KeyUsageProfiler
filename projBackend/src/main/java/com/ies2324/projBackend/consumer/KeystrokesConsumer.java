@@ -38,7 +38,7 @@ public class KeystrokesConsumer {
         Team team = author.getTeam();
         if (team != null) {
             simpMessagingTemplate.convertAndSendToUser(
-                    author.getUsername(),
+                    team.getLeader().getUsername(),
                     "/topic/keystrokes",
                     k.getPressedKey());
         }
