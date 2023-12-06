@@ -39,7 +39,6 @@ public class TeamController {
     @PostMapping("invite")
     public ResponseEntity<InviteLinkResponse> generateInviteLink() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(user.getRole());
         if (user.getRole() != Role.TEAM_LEADER)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));

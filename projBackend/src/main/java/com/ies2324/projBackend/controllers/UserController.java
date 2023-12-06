@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +52,7 @@ public class UserController {
   public ResponseEntity<User> leaveTeam(){
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (user.getRole() != Role.TEAM_MEMBER)
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     userService.removeFromTeam(user);
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
@@ -62,11 +63,9 @@ public class UserController {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     Optional<User> expeledToBe = userService.getUserById(Long.parseLong(userId));
 
-    if (expeledToBe.isEmpty())
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    if (user.getRole() != Role.TEAM_LEADER || !user.getTeam().equals(expeledToBe.get().getTeam()))
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    userService.removeFromTeam(expeledToBe.get());
-    return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
+    // always return FORBIDDEN (can't return NOT FOUND when expeledToBe isEmpty because we then would be which users don't have a team)
+    if (user.getRole() != Role.TEAM_LEADER || expeledToBe.isEmpty() || !user.getTeam().equals(expeledToBe.get().getTeam()))
+      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    return new ResponseEntity<>( userService.removeFromTeam(expeledToBe.get()), HttpStatus.OK);
   }
 }

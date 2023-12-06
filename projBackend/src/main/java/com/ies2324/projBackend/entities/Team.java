@@ -47,6 +47,10 @@ public class Team {
         members.add(user);
     }
 
+    public void removeMember(User user){
+        members.remove(user);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
