@@ -54,7 +54,7 @@ const LoginPage = () => {
         if (userType === "TEAM_LEADER") {
           navigate('/dashboard');
         } else if (userType === "TEAM_MEMBER") {
-          navigate('/profile');
+          navigate('/user');
         } else {
           navigate('/');
         }

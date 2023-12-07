@@ -42,7 +42,7 @@ const RegisterPage = () => {
             setErrorMessage("Passwords do not match. Please check and try again.");
             return;
         }
-        
+
         try {
             const credentials = { "username": username, "email": email, "password": password };
             // Perform sign-up API request
@@ -66,12 +66,29 @@ const RegisterPage = () => {
                 localStorage.setItem("userType", userType);
                 setToken(token);
 
-                if (userType === "TEAM_LEADER") {
-                    navigate('/dashboard');
-                } else if (userType === "TEAM_MEMBER") {
-                    navigate('/profile');
-                } else {
+                //Auto-login after successful registration
+                const loginResponse = await fetch("http://localhost:8080/api/auth/signin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ "email": email, "password": password }),
+                });
+
+                if (loginResponse.ok) {
+                    console.log("LOGIN: Sign in after registration successful!");
+                    const {token} = await loginResponse.json();
+
+                    // Store the token securely
+                    localStorage.setItem("authToken", token);
+                    setToken(token);
+
+                    //New user are all of type USER
+                    //Send them to to the homepage to incentivize them to join a team
                     navigate('/');
+                } else {
+                    console.error("LOGIN: Failed to signin after registration - ", loginResponse.statusText);
+                    setErrorMessage("Invalid email or password. Please try again.");
                 }
             } else {
                 // Handle sign-up error
