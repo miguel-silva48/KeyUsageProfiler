@@ -10,10 +10,24 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("authToken") || "");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+
+    if (email === "") {
+      console.error("LOGIN: Empty email");
+      setErrorMessage("Email cannot be empty. Please check and try again.");
+      return;
+    }
+
+    if (password === "") {
+      console.error("LOGIN: Empty password");
+      setErrorMessage("Password cannot be empty. Please check and try again.");
+      return;
+    }
+
     try {
       const credentials = { "email": email, "password" : password };
       // Perform sign-in API request
@@ -26,6 +40,7 @@ const LoginPage = () => {
       });
 
       if (signInResponse.ok) {
+        console.log("LOGIN: Sign in successful!");
         const { id, token, username, email, userType } = await signInResponse.json();
 
         // Store the token securely
@@ -44,11 +59,14 @@ const LoginPage = () => {
           navigate('/');
         }
       } else {
-        // Handle sign-in error
-        console.error("Failed to sign in:", signInResponse.statusText);
+        //Bad credentials
+        console.error("LOGIN: Failed to signin - ", signInResponse.statusText);
+        setErrorMessage("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      console.error("Error during sign in:", error);
+      //Connection error
+      console.error("LOGIN: Error during signin - ", error);
+      setErrorMessage("Connection error. Please try again later.");
     }
   };
 
@@ -108,6 +126,14 @@ const LoginPage = () => {
                   </button>
                 </div>
               </div>
+
+              {errorMessage && (
+                <div className="alert alert-error mt-4">
+                  <div className="flex-1">
+                    <label>{errorMessage}</label>
+                  </div>
+                </div>
+              )}
               
               <div className="form-control mt-6 mb-2">
                 <button

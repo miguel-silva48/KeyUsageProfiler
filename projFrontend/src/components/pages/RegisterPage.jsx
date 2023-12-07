@@ -13,14 +13,33 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("authToken") || "");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
     const handleRegister = async () => {
 
+        if (username === "") {
+            console.error("REGISTER: Empty username");
+            setErrorMessage("Username cannot be empty. Please check and try again.");
+            return;
+        }
+
+        if (email === "") {
+            console.error("REGISTER: Empty email");
+            setErrorMessage("Email cannot be empty. Please check and try again.");
+            return;
+        }
+
+        if (password === "") {
+            console.error("REGISTER: Empty password");
+            setErrorMessage("Password cannot be empty. Please check and try again.");
+            return;
+        }
+
         if (password !== passwordConfirmation) {
-            //TODO - Show error message in a better way
-            console.error("Passwords do not match!");
+            console.error("REGISTER: Unmatched passwords");
+            setErrorMessage("Passwords do not match. Please check and try again.");
             return;
         }
         
@@ -36,7 +55,7 @@ const RegisterPage = () => {
             });
 
             if (registerResponse.ok) {
-                console.log("Register successful!");
+                console.log("REGISTER: Sign up successful!");
                 const { id, token, username, email, userType } = await registerResponse.json();
 
                 // Store the token securely
@@ -56,10 +75,12 @@ const RegisterPage = () => {
                 }
             } else {
                 // Handle sign-up error
-                console.error("Failed to register:", registerResponse.statusText);
+                console.error("REGISTER: signup failed - ", registerResponse.statusText);
+                setErrorMessage("Registration failed. Please try again.");
             }
         } catch (error) {
-            console.error("Error during register:", error);
+            console.error("REGISTER: Error during signup - ", error);
+            setErrorMessage("Connection error. Please try again later.");
         }
     };
 
@@ -157,6 +178,14 @@ const RegisterPage = () => {
                                     </button>
                                 </div>
                             </div>
+
+                            {errorMessage && (
+                                <div className="alert alert-error mt-4">
+                                    <div className="flex-1">
+                                        <label>{errorMessage}</label>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="form-control mt-6 mb-2">
                                 <button
