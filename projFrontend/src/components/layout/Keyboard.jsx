@@ -4,7 +4,7 @@ import "./../../utils/keyboard.css";
 
 function Keyboard() {
   const token =
-    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE5ODU3ODQsImV4cCI6MTcwMTk4Njk4NH0.D0ca7tTtXr1ugXa8j_Vr_dSPnbs6laInzx1VN--EIajEqUMcDjk1nQgdGVWZJiSy";
+    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE5ODcxODIsImV4cCI6MTcwMTk4ODM4Mn0.4vx-G0_tf7XG7CIgAx4GUXDvmmG6KH0eRdULLf1b0HO0VGV5rDJjuYtr4y36Mg3Q";
   const [stompClient, setStompClient] = useState(null);
 
   // [lastKey, counter]
@@ -52,7 +52,10 @@ function Keyboard() {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/keystrokes", (message) => {
-          setLastKey((prevState) => [message.body.toLowerCase(), (prevState[1] + 1) % 10 ], console.log("@callback, lastKey:", lastKey));
+          setLastKey((prevState) => [
+            message.body.toLowerCase(),
+            (prevState[1] + 1) % 10,
+          ]);
         });
       };
 
@@ -321,9 +324,7 @@ function Keyboard() {
           <span>?</span>
           <span>/</span>
         </div>
-        <div className="kb-col kb-shift">
-          Shift
-        </div>
+        <div className="kb-col kb-shift">Shift</div>
         <div className="kb-empty"></div>
         <div className="kb-empty"></div>
         <div className="kb-col" id="up">
@@ -345,12 +346,8 @@ function Keyboard() {
         <div className="kb-col" id="unused_alt">
           Alt
         </div>
-        <div className="kb-col">
-          <div className="rightclickopt" id="context menu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+        <div className="kb-col" id="context menu">
+          Menu
         </div>
         <div className="kb-col ctrl" id="unused_ctrl">
           Ctrl
