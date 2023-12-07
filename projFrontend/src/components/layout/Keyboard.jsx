@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import "./../../utils/keyboard.css";
 
-
 function Keyboard() {
   const token =
-    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE4OTA2OTAsImV4cCI6MTcwMTg5MTg5MH0.QQ43pEzLotD3r4d-CLHnqSKFNzgK5meGppIikAnBJIsakIy6vp-vA-qvRwyLpV-I";
+    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE5NTIzNDksImV4cCI6MTcwMTk1MzU0OX0.YIDGJQloh2E0utgMzEnmdAKNmztGjU4CR-8KQ0xtwT2zaKeq2pvZqV51BcCbQX_l";
   const [stompClient, setStompClient] = useState(null);
 
-  const [lastKey, setLastKey] = useState("");
+  // [lastKey, counter]
+  // because if you receive two equal states (user presses 'A' and then 'A')
+  // state change callbacks wont be changed
+  const [lastKey, setLastKey] = useState(["", 0]);
 
   useEffect(() => {
     const headers = {
@@ -30,13 +32,28 @@ function Keyboard() {
     };
   }, []);
 
-  const updatePressedKey = useCallback(() => {
+  const updatePressedKey2 = () => {
+    console.log("callback lastKey: ", lastKey);
     const elem = document.getElementById(lastKey);
+    console.log("pressed2, lastKey: " + lastKey);
+    console.log(elem);
     if (elem) {
       elem.classList.add("kb-pressed");
       setTimeout(() => {
         elem.classList.remove("kb-pressed");
-      }, 700);
+      }, 400);
+    }
+  };
+
+  const updatePressedKey = useCallback(() => {
+    const elem = document.getElementById(lastKey);
+    console.log("pressed " + lastKey);
+    console.log(elem);
+    if (elem) {
+      elem.classList.add("kb-pressed");
+      setTimeout(() => {
+        elem.classList.remove("kb-pressed");
+      }, 400);
     }
   }, [lastKey]);
 
@@ -49,7 +66,13 @@ function Keyboard() {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/keystrokes", (message) => {
-          setLastKey(message.body.toLowerCase());
+          console.log(
+            "received a message from /user/topic/keystrokes, the body: ",
+            message.body.toLowerCase()
+          );
+          setLastKey(message.body.toLowerCase(), () =>
+            console.log("@callback lastKey: ", lastKey)
+          );
         });
       };
 
@@ -72,7 +95,7 @@ function Keyboard() {
         <div className="kb-col" id="esc">
           Esc
         </div>
-        { /* empty space between keys */}
+        {/* empty space between keys */}
         <div className="kb-empty"></div>
         <div className="kb-col" id="f1">
           F1
@@ -280,7 +303,6 @@ function Keyboard() {
         <div className="kb-empty"></div>
         <div className="kb-empty"></div>
         <div className="kb-empty"></div>
-
       </div>
       <div className="kb-row">
         <div className="kb-col kb-shift" id="left_shift">
@@ -325,10 +347,9 @@ function Keyboard() {
         <div className="kb-empty"></div>
         <div className="kb-empty"></div>
         <div className="kb-col" id="questionmark_slash">
-            &uarr;
+          &uarr;
         </div>
         <div className="kb-empty"></div>
-
       </div>
       <div className="kb-row">
         <div className="kb-col ctrl" id="left_ctrl">
@@ -356,15 +377,14 @@ function Keyboard() {
         </div>
         <div className="kb-empty"></div>
         <div className="kb-col" id="questionmark_slash">
-            &larr;
+          &larr;
         </div>
         <div className="kb-col" id="questionmark_slash">
-            &darr;
+          &darr;
         </div>
         <div className="kb-col" id="questionmark_slash">
-            &rarr;
+          &rarr;
         </div>
-        
       </div>
     </div>
   );

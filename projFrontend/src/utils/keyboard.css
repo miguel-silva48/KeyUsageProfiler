@@ -63,7 +63,7 @@
 	display: inline-block;
 	text-transform: capitalize;
 	font-weight: 600;
-	animation: fade 0.7s linear;
+	animation: fade 0.4s linear;
 }
 @keyframes fade {
 	0%, 100% { background-color: #eeeeee; }
