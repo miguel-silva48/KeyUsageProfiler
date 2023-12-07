@@ -12,22 +12,40 @@ const RegisterPage = () => {
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
-
     const [token, setToken] = useState(localStorage.getItem("authToken") || "");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
     const handleRegister = async () => {
 
-        if (password !== passwordConfirmation) {
-            console.error("Passwords do not match!");
+        if (username === "") {
+            console.error("REGISTER: Empty username");
+            setErrorMessage("Username cannot be empty. Please check and try again.");
             return;
         }
 
-        // TODO - Review this function
+        if (email === "") {
+            console.error("REGISTER: Empty email");
+            setErrorMessage("Email cannot be empty. Please check and try again.");
+            return;
+        }
+
+        if (password === "") {
+            console.error("REGISTER: Empty password");
+            setErrorMessage("Password cannot be empty. Please check and try again.");
+            return;
+        }
+
+        if (password !== passwordConfirmation) {
+            console.error("REGISTER: Unmatched passwords");
+            setErrorMessage("Passwords do not match. Please check and try again.");
+            return;
+        }
+
         try {
-            const credentials = { "email": email, "password": password };
-            // Perform sign-in API request
+            const credentials = { "username": username, "email": email, "password": password };
+            // Perform sign-up API request
             const registerResponse = await fetch("http://localhost:8080/api/auth/signup", {
                 method: "POST",
                 headers: {
@@ -36,25 +54,50 @@ const RegisterPage = () => {
                 body: JSON.stringify(credentials),
             });
 
-            // TODO - Review, deve retornar o token na mesma mas o resto não
             if (registerResponse.ok) {
-                const { id, token, username } = await registerResponse.json();
+                console.log("REGISTER: Sign up successful!");
+                const { id, token, username, email, userType } = await registerResponse.json();
 
                 // Store the token securely
                 localStorage.setItem("userId", id)
                 localStorage.setItem("authToken", token);
                 localStorage.setItem("email", email);
                 localStorage.setItem("username", username);
+                localStorage.setItem("userType", userType);
                 setToken(token);
 
-                // TODO - Redirect to home page if user has no team, otherwise redirect to dashboard if team leader or profile if team member
-                navigate('/');
+                //Auto-login after successful registration
+                const loginResponse = await fetch("http://localhost:8080/api/auth/signin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ "email": email, "password": password }),
+                });
+
+                if (loginResponse.ok) {
+                    console.log("LOGIN: Sign in after registration successful!");
+                    const {token} = await loginResponse.json();
+
+                    // Store the token securely
+                    localStorage.setItem("authToken", token);
+                    setToken(token);
+
+                    //New user are all of type USER
+                    //Send them to to the homepage to incentivize them to join a team
+                    navigate('/');
+                } else {
+                    console.error("LOGIN: Failed to signin after registration - ", loginResponse.statusText);
+                    setErrorMessage("Invalid email or password. Please try again.");
+                }
             } else {
-                // Handle sign-in error
-                console.error("Failed to register:", registerResponse.statusText);
+                // Handle sign-up error
+                console.error("REGISTER: signup failed - ", registerResponse.statusText);
+                setErrorMessage("Registration failed. Please try again.");
             }
         } catch (error) {
-            console.error("Error during register:", error);
+            console.error("REGISTER: Error during signup - ", error);
+            setErrorMessage("Connection error. Please try again later.");
         }
     };
 
@@ -153,8 +196,17 @@ const RegisterPage = () => {
                                 </div>
                             </div>
 
+                            {errorMessage && (
+                                <div className="alert alert-error mt-4">
+                                    <div className="flex-1">
+                                        <label>{errorMessage}</label>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="form-control mt-6 mb-2">
                                 <button
+                                    type="button"
                                     className="btn btn-primary"
                                     onClick={handleRegister}
                                 >
