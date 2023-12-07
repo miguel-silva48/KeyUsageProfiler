@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { fetchData } from "../../utils";
 
 import {
-  RiAccountCircleLine,
+  RiArrowDownSLine,
+  RiNotification3Line,
   RiMoonClearFill,
   RiSunFill,
 } from "react-icons/ri";
@@ -17,7 +17,7 @@ const Navbar = () => {
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const userType = localStorage.getItem("userType");
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
@@ -25,7 +25,7 @@ const Navbar = () => {
 
     document.querySelector("html").setAttribute("data-theme", localTheme);
   }, [theme]);
-  
+
   const handleToggle = (e) => {
     if (e.target.checked) {
       setTheme("dark");
@@ -41,21 +41,29 @@ const Navbar = () => {
         <img src={logo} className="max-h-5 pl-5"></img>
       </Link>
 
-      <Link to="/">
-        <h2 className="text-xl font-bold">HomePage</h2>
-      </Link>
+      {(!userType || userType === "USER") && (
+        <Link to="/">
+          <h2 className="text-xl font-bold">HomePage</h2>
+        </Link>
+      )}
 
-      <Link to="/dashboard">
-        <h2 className="text-xl font-bold">Dashboard</h2>
-      </Link>
+      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
+        <Link to="/user">
+          <h2 className="text-xl font-bold">Profile</h2>
+        </Link>
+      )}
 
-      {user && (
-        <p
-          onClick={() => navigate(`/user`)}
-          className="mr-2 cursor-grab"
-        >
-          {`Hello ${user.name}!`}
-        </p>
+      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
+
+        <Link to="/#">
+          <h2 className="text-xl font-bold">Leaderboard</h2>
+        </Link>
+      )}
+
+      {userType === "TEAM_LEADER" && (
+          <Link to="/dashboard">
+            <h2 className="text-xl font-bold">Dashboard</h2>
+          </Link>
       )}
 
       <div className="flex">
@@ -69,13 +77,29 @@ const Navbar = () => {
           <RiMoonClearFill className="swap-on" />
           <RiSunFill className="swap-off" />
         </label>
-        {true && (
-          <button
-            className="flex items-center m-2 p-2"
-            onClick={() => navigate('/user')}
-          >
-            <RiAccountCircleLine className="text-xl" />
+
+        {userType === "TEAM_LEADER" && (
+          <button className="btn m-2 p-2">
+            <RiNotification3Line className="text-xl" />
+            <RiArrowDownSLine className="text-xl" />
           </button>
+        )}
+
+        {userType && (
+          <Link to="/user">
+            <button className="btn m-2 p-2">Account</button>
+          </Link>
+        )}
+
+        {!userType && (
+          <div className="flex">
+            <Link to="/register">
+              <button className="btn m-2 p-2">Sign Up</button>
+            </Link>
+            <Link to="/login">
+              <button className="btn m-2 p-2">Sign In</button>
+            </Link>
+          </div>
         )}
       </div>
     </div>
