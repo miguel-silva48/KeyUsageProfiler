@@ -33,15 +33,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         public JwtAuthenticationResponse signup(SignUpRequest request) {
                 User user = User.builder().email(request.getEmail())
                                 .password(passwordEncoder.encode(request.getPassword()))
-                                .username(request.getUsername()).role(Role.USER).build();
+                                .name(request.getUsername()).role(Role.USER).build();
                 userRepository.save(user);
                 var jwt = jwtService.generateToken(user);
                 var refreshJwt = jwtService.generateRefreshToken(user);
                 long id = user.getId();
-                String username = user.getUsername();
+                String name = user.getName();
                 String email = user.getEmail();
                 String userType = user.getRole().toString();
-                return JwtAuthenticationResponse.builder().id(id).token(jwt).refreshToken(refreshJwt).username(username)
+                return JwtAuthenticationResponse.builder().id(id).token(jwt).refreshToken(refreshJwt).username(name)
                                 .email(email).userType(userType)
                                 .build();
         }
