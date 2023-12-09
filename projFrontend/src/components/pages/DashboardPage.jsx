@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
+  const [inviteLink, setInviteLink] = useState("");
   const usersPerPage = 2;
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const Dashboard = () => {
       navigate("/");
     }
     fetchData();
+    createInviteLink();
 
     const intervalId = setInterval(fetchData(), 5000);
 
@@ -80,6 +82,27 @@ const Dashboard = () => {
     }
   };
 
+  const createInviteLink = async () => {
+    try {
+      const fetchLinkToken = await fetch(
+        "http://localhost:8080/api/teams/invite",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (fetchLinkToken.ok) {
+        let { token } = await fetchLinkToken.json();
+
+        setInviteLink(`http://localhost:5173/teams/join/${token}`);
+      } else {
+        console.log("Error creating invite link");
+      }
+    } catch (error) {
+      console.error("Error fetching link token:", error);
+    }
+  };
+   
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
@@ -116,6 +139,7 @@ const Dashboard = () => {
             </div>
             <button
               type="button"
+              onClick={() => navigator.clipboard.writeText(inviteLink)}
               className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]"
             >
               <div className="flex w-10 h-5 justify-center items-center gap-2.5">
