@@ -72,6 +72,10 @@ const Dashboard = () => {
 
       setUserData(usersData);
     } catch (error) {
+      let theme = localStorage.getItem("theme");
+      localStorage.clear();
+      localStorage.setItem("theme", theme);
+      navigate("/login");
       console.error("Error fetching data:", error);
     }
   };
