@@ -9,7 +9,7 @@ const GamingBadge = () => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <circle cx="4" cy="4" r="3" fill="#B71230" fill-opacity="0.64" />
+          <circle cx="4" cy="4" r="3" fill="#B71230" fillOpacity="0.64" />
         </svg>
         <span className="text-[#B71230] text-xs font-medium leading-4">Gaming</span>
       </div>
