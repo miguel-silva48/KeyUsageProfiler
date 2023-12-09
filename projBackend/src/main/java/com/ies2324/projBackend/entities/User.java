@@ -43,7 +43,7 @@ public class User implements UserDetails {
   private long id;
 
   @NotBlank(message = "Name is mandatory")
-  private String username;
+  private String name;
 
   @NotBlank(message = "Email is mandatory")
   @Column(unique = true)
@@ -51,6 +51,7 @@ public class User implements UserDetails {
   private String email;
 
   @NotBlank(message = "Password is mandatory")
+  @JsonIgnore
   private String password;
 
   @Enumerated(EnumType.STRING)
@@ -63,7 +64,7 @@ public class User implements UserDetails {
 
   @Override
   public String toString() {
-    return String.format("%s(id:%d) - email: %s", username, id, email);
+    return String.format("%s(id:%d) - email: %s", name, id, email);
   }
 
   @Override
