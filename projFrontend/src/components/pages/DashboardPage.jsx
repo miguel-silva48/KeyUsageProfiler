@@ -22,7 +22,7 @@ const Dashboard = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 20;
+  const usersPerPage = 2;
 
   useEffect(() => {
     if (!token || !userType) {
@@ -34,9 +34,7 @@ const Dashboard = () => {
     }
     fetchData();
 
-    const intervalId = setInterval(() => {
-      fetchData();
-    }, 5000);
+    const intervalId = setInterval(fetchData(), 5000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -83,6 +81,8 @@ const Dashboard = () => {
   const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(userData.length / usersPerPage);
+  const showPagination = totalPages > 1;
 
   return (
     <div>
@@ -91,7 +91,6 @@ const Dashboard = () => {
         id="body"
         className="flex w-screen mt-2 pb-0 flex-col items-center gap-5"
       >
-        <h1 className="">{teamName}</h1>
         <div
           id="table-team-members"
           className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]"
@@ -99,11 +98,13 @@ const Dashboard = () => {
           <div className="flex items-center self-stretch">
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-10/12">
               <div className="flex items-center flex-[1_0_0] gap-2">
-                <h2 className="text-2xl font-normal leading-7">Team Members</h2>
+                <h2 className="text-2xl font-normal leading-7">
+                  Team Members of {teamName}
+                </h2>
                 <div className="flex items-start mix-blend-multiply">
                   <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg=[#F9F5FF]">
                     <span className="text-[#6941C6] text-sm font-medium leading-4">
-                      1 user
+                      {currentUsers.length} users
                     </span>
                   </div>
                 </div>
@@ -164,10 +165,6 @@ const Dashboard = () => {
                         <p className="text-gray-900">{user.username}</p>
                         <p className="text-gray-500 text-sm">{user.email}</p>
                       </Link>
-                      <td className="text-gray-500 text-sm">
-                        {user.minutesTyping}
-                      </td>
-                      <td className="text-gray-500 text-sm">{user.awpm}</td>
                     </tr>
                   ))}
               </tbody>
@@ -182,11 +179,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <td className="text-gray-500 text-sm">
-                    {userData ? userData.awpm : "Loading..."}
-                  </td>
-                </tr>
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                      <td className="text-gray-500 text-sm">
+                        {user ? user.awpm : "Loading..."}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
             <table
@@ -199,11 +199,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <td className="text-gray-500 text-sm">
-                    {userData ? userData.minutesTyping : "Loading..."}
-                  </td>
-                </tr>
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                      <td className="text-gray-500 text-sm">
+                        {user ? user.minutesTyping : "Loading..."}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
             <table
@@ -268,21 +271,20 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
-          <div className="flex px-6 pt-3 pb-4 justify-between items-center self-stretch">
-            <button
-              className="flex items-start rounded-lg"
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
-                <img src={previous_arrow} className="w-5 h-5"></img>
-                <span className="text-gray-700">Previous</span>
-              </div>
-            </button>
-            <div className="flex items-start rounded-lg">
-              {Array.from(
-                { length: Math.ceil(userData.length / usersPerPage) },
-                (_, index) => (
+          {showPagination && (
+            <div className="flex px-6 pt-3 pb-4 justify-between items-center self-stretch">
+              <button
+                className="flex items-start rounded-lg"
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                  <img src={previous_arrow} className="w-5 h-5"></img>
+                  <span className="text-gray-700">Previous</span>
+                </div>
+              </button>
+              <div className="flex items-start rounded-lg">
+                {Array.from({ length: totalPages }, (_, index) => (
                   <button
                     key={index}
                     onClick={() => paginate(index + 1)}
@@ -302,22 +304,20 @@ const Dashboard = () => {
                       </span>
                     </div>
                   </button>
-                )
-              )}
-            </div>
-            <button
-              className="flex items-start rounded-lg"
-              onClick={() => paginate(currentPage + 1)}
-              disabled={
-                currentPage === Math.ceil(userData.length / usersPerPage)
-              }
-            >
-              <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
-                <span className="text-gray-700">Next</span>
-                <img src={next_arrow} className="w-5 h-5"></img>
+                ))}
               </div>
-            </button>
-          </div>
+              <button
+                className="flex items-start rounded-lg"
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                  <span className="text-gray-700">Next</span>
+                  <img src={next_arrow} className="w-5 h-5"></img>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
