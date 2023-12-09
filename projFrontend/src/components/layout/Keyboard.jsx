@@ -3,8 +3,7 @@ import { Client } from "@stomp/stompjs";
 import "./../../utils/keyboard.css";
 
 function Keyboard() {
-  const token =
-    "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QHRlc3QucHQiLCJpYXQiOjE3MDE5ODcxODIsImV4cCI6MTcwMTk4ODM4Mn0.4vx-G0_tf7XG7CIgAx4GUXDvmmG6KH0eRdULLf1b0HO0VGV5rDJjuYtr4y36Mg3Q";
+  const token = localStorage.getItem("authToken");
   const [stompClient, setStompClient] = useState(null);
 
   // [lastKey, counter]
