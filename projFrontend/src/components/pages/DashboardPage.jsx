@@ -14,7 +14,7 @@ import "./../../utils/styles.css";
 
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
-import GamingBadge from "../layout/GamingBadge";
+import GamingBadge from "../layout/StatusBadges/GamingBadge";
 
 const Dashboard = () => {
   const navigate = useNavigate();
