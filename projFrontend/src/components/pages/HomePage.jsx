@@ -27,6 +27,16 @@ const HomePage = () => {
   }, []);
 
   const joinTeamHandler = async () => {
+
+    if (!inviteLink) {
+      setErrorMessage("Please enter an invite link and try again.");
+      return;
+    }
+
+    if (inviteLink.startsWith("http://localhost:8080/api/teams/join/")) {
+      setInviteLink(inviteLink.replace("http://localhost:8080/api/teams/join/", ""));
+    }
+
     try {
       const response = await fetch(`http://localhost:8080/api/teams/join/${inviteLink}`, {
         method: "POST",
