@@ -17,10 +17,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
+import com.ies2324.projBackend.entities.Notification;
+import com.ies2324.projBackend.entities.NotificationType;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 
@@ -28,13 +29,12 @@ import jakarta.annotation.Resource;
 
 @Service
 public class RedisService {
-
+  @Autowired
+  private NotificationService notificationService;
   @Autowired
   private UserService userService;
   @Autowired
   private SimpMessagingTemplate simpMessagingTemplate;
-  @Autowired
-  private SimpUserRegistry simpUserRegistry;
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
 
@@ -94,12 +94,17 @@ public class RedisService {
     Long userid = Long.parseLong(userId);
     Optional<User> user = userService.getUserById(userid);
     if (user.isPresent()) {
-      Team userTeam = user.get().getTeam();
-      if (userTeam != null) {
+      User u = user.get();
+      Team userTeam = u.getTeam();
+      if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
+        Notification n = new Notification();
+        n.setType(NotificationType.INACTIVE);
+        n.setUser(u);
+        n = notificationService.createNotification(n);
         simpMessagingTemplate.convertAndSendToUser(
             userTeam.getLeader().getUsername(),
             "/topic/notifications",
-            String.format("User with id %d is inactive", userid));
+            n);
       }
     }
   }

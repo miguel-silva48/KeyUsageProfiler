@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import "./../../utils/styles.css";
 
@@ -14,9 +14,8 @@ import {
   RiUser3Line,
 } from "react-icons/ri";
 
-const UserPage = () => {
+const ProfilePage = () => {
   const navigate = useNavigate();
-  const { userId } = useParams();
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userData, setUserData] = useState(null);
@@ -29,29 +28,21 @@ const UserPage = () => {
       return;
     }
 
+    const userID = localStorage.getItem("userId");
+
     //TODO: fetch user data and statistics according to API call
-    fetch(`http://localhost:8080/api/statistics/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(`http://localhost:8080/api/statistics/${userID}`)
       .then((response) => response.json())
       .then((data) => {
         // Assuming the data structure contains both user and statistics information
+        const { user, statistics } = data;
 
-        if (!data) {
+        if (!user || !statistics) {
           console.error("Invalid response format");
           return;
         }
 
-        const statistics = {
-          awpm: data.awpm,
-          maxWpm: data.maxWpm,
-          minutesTyping: data.minutesTyping,
-        };
-        setUserData(data.author);
+        setUserData(user);
         setUserStatistics(statistics);
       })
       .catch((error) => {
@@ -157,4 +148,4 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default ProfilePage;

@@ -35,7 +35,7 @@ const Dashboard = () => {
     if (!token || !userType) {
       navigate("/login");
     } else if (userType === "TEAM_MEMBER") {
-      navigate("/user"); // TODO maybe change to profile
+      navigate("/profile");
     } else if (userType === "USER") {
       navigate("/");
     }
@@ -244,12 +244,15 @@ const Dashboard = () => {
                         ></input>
                       </td>
                       <td>
-                        <Link to="/user">
+                        <Link to={`/user/${user.id}`}>
                           <RiUser3Line className="text-2xl" />
                         </Link>
                       </td>
                       <td>
-                        <Link to="/user" className="flex flex-col items-start">
+                        <Link
+                          to={`/user/${user.id}`}
+                          className="flex flex-col items-start"
+                        >
                           <p className="text-gray-900">{user.username}</p>
                           <p className="text-gray-500 text-sm">{user.email}</p>
                         </Link>
@@ -345,7 +348,7 @@ const Dashboard = () => {
                       </td>
                       <td className="flex w-11 items-start rounded-lg">
                         <Link
-                          to="/user"
+                          to={`/user/${user.id}`}
                           className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0"
                         >
                           <RiShareForwardLine className="text-xl" />
