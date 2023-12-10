@@ -18,6 +18,8 @@ import GamingBadge from "../layout/StatusBadges/GamingBadge";
 import CodingBadge from "../layout/StatusBadges/CodingBadge";
 import InactiveBadge from "../layout/StatusBadges/InactiveBadge";
 
+import refreshToken from "../../utils/refreshToken";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState([]);
@@ -27,7 +29,7 @@ const Dashboard = () => {
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
   const [inviteLink, setInviteLink] = useState("");
-  const usersPerPage = 2;
+  const usersPerPage = 10;
 
   useEffect(() => {
     if (!token || !userType) {
@@ -50,6 +52,8 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
+      var token = localStorage.getItem("authToken");
+      setToken(token);
       const teamDataResponse = await fetch(
         "http://localhost:8080/api/teams/user",
         {
@@ -95,10 +99,25 @@ const Dashboard = () => {
 
       setUserData(usersData);
     } catch (error) {
-      let theme = localStorage.getItem("theme");
-      localStorage.clear();
-      localStorage.setItem("theme", theme);
-      navigate("/login");
+      console.error("Error in fetchData:", error);
+
+      try {
+        const newToken = await refreshToken();
+
+        if (newToken !== null) {
+          fetchData();
+        } else {
+          throw new Error("Failed to refresh token");
+        }
+      } catch (refreshError) {
+        console.error("Error refreshing token:", refreshError.message);
+
+        // Handle the error appropriately, for now, just log it
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/login");
+      }
     }
   };
 
@@ -149,6 +168,7 @@ const Dashboard = () => {
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
   const countUsers = userData.length;
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -173,7 +193,7 @@ const Dashboard = () => {
                   Team Members of {teamName}
                 </h2>
                 <div className="flex items-start mix-blend-multiply">
-                  <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg=[#F9F5FF]">
+                  <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg-[#F9F5FF]">
                     <span className="text-[#6941C6] text-sm font-medium leading-4">
                       {countUsers} users
                     </span>
@@ -211,8 +231,8 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                {userData &&
-                  userData.map((user) => (
+                {currentUsers &&
+                  currentUsers.map((user) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
@@ -248,8 +268,8 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                {userData &&
-                  userData.map((user) => (
+                {currentUsers &&
+                  currentUsers.map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.awpm : "Loading..."}
@@ -268,8 +288,8 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                {userData &&
-                  userData.map((user) => (
+                {currentUsers &&
+                  currentUsers.map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
@@ -288,8 +308,8 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                {userData &&
-                  userData.map((user) => (
+                {currentUsers &&
+                  currentUsers.map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
                         <GamingBadge />
@@ -306,17 +326,21 @@ const Dashboard = () => {
                 <tr className="flex items-center gap-1"></tr>
               </thead>
               <tbody className="w-full">
-                {userData &&
-                  userData.map((user) => (
+                {currentUsers &&
+                  currentUsers.map((user) => (
                     <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
                       <td className="flex items-start rounded-lg">
-                        {user.id != userId && (
+                        {(user.id != userId && (
                           <button
                             onClick={() => removeFromTeam(user.id)}
                             className="flex p-2.5 justify-center items-center gap-2 rounded-lg"
                           >
                             <RiDeleteBinLine className="text-xl" />
                           </button>
+                        )) || (
+                          <div className="flex p-2.5 justify-center items-center gap-2 rounded-lg">
+                            <RiDeleteBinLine className="text-xl opacity-0" />
+                          </div>
                         )}
                       </td>
                       <td className="flex w-11 items-start rounded-lg">
@@ -334,16 +358,21 @@ const Dashboard = () => {
           </div>
           {showPagination && (
             <div className="flex px-6 pt-3 pb-4 justify-between items-center self-stretch">
-              <button
-                className="flex items-start rounded-lg"
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
-                  <RiArrowLeftLine className="text-xl" />
-                  <span className="text-gray-700">Previous</span>
-                </div>
-              </button>
+              {(currentPage > 1 && (
+                <button
+                  className="flex items-start rounded-lg"
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                    <RiArrowLeftLine className="text-xl" />
+                    <span className="text-gray-700">Previous</span>
+                  </div>
+                </button>
+              )) || (
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg"></div>
+              )}
+
               <div className="flex items-start rounded-lg">
                 {Array.from({ length: totalPages }, (_, index) => (
                   <button
@@ -367,16 +396,21 @@ const Dashboard = () => {
                   </button>
                 ))}
               </div>
-              <button
-                className="flex items-start rounded-lg"
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
-                  <span className="text-gray-700">Next</span>
-                  <RiArrowRightLine className="text-xl" />
-                </div>
-              </button>
+
+              {(currentPage < totalPages && (
+                <button
+                  className="flex items-start rounded-lg"
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                    <span className="text-gray-700">Next</span>
+                    <RiArrowRightLine className="text-xl" />
+                  </div>
+                </button>
+              )) || (
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg"></div>
+              )}
             </div>
           )}
         </div>
