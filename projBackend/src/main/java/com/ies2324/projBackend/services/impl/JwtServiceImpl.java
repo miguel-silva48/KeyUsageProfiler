@@ -85,12 +85,8 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isRefreshTokenValid(UserDetails user, String refreshToken) {
         final Claims refClaims = extractAllClaims(refreshToken);
-        System.out.println("CHECKING IF REFRESHTOKEN IS VALID\n\tclaims from refreshToken: " + refClaims);
-        System.out.println("\tuser in refreshToken: " + extractSubject(refreshToken));
-
-        boolean validRefreshToken = refClaims.get("type").equals("refresh") && !isTokenExpired(refreshToken);
-        System.out.println("\tIs refresh token valid? " + validRefreshToken);
-
+        boolean validRefreshToken = refClaims.containsKey("type") && refClaims.get("type").equals("refresh")
+                && !isTokenExpired(refreshToken);
         return validRefreshToken;
     }
 

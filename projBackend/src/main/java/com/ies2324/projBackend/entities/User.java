@@ -73,6 +73,7 @@ public class User implements UserDetails {
     return List.of(new SimpleGrantedAuthority(role.name()));
   }
 
+  @JsonIgnore
   public String getUsername() {
     return this.email;
   }

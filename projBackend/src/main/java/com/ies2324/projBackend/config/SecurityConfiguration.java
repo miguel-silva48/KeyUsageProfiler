@@ -21,7 +21,7 @@ import com.ies2324.projBackend.services.UserService;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;

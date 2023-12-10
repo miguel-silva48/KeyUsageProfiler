@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
@@ -12,165 +12,351 @@ import {
 
 import "./../../utils/styles.css";
 
-import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
+import Navbar from "../layout/Navbar";
 import GamingBadge from "../layout/StatusBadges/GamingBadge";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const [userStatistics, setUserStatistics] = useState(null);
-
-  const fetchData = () => {
-    fetch('http://localhost:8080/api/users', {headers: {"Authorization": "Bearer " + "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJyaWNAYXNkYXMucHQiLCJpYXQiOjE3MDE1MzY1MjksImV4cCI6MTcwMTUzNzcyOX0.Z2QLzayTIY0-Mu4wOeKUUPSBHdMQ5X_JpbssxsjGxsCo3JqTrTB_YWJS4f95caRw"}})
-      .then((response) => response.json())
-      .then((data) => {
-        // TODO - handle multiple users
-        const user = data[0];
-        setUserData(user);
-
-        fetch(`http://localhost:8080/api/statistics/${user.id}`, {headers: {"Authorization": "Bearer " + "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJyaWNAYXNkYXMucHQiLCJpYXQiOjE3MDE1MzY1MjksImV4cCI6MTcwMTUzNzcyOX0.Z2QLzayTIY0-Mu4wOeKUUPSBHdMQ5X_JpbssxsjGxsCo3JqTrTB_YWJS4f95caRw"}})
-          .then((response) => response.json())
-          .then((statistics) => {
-            setUserStatistics(statistics);
-          })
-          .catch((error) => console.error('Error fetching user statistics:', error));
-      })
-      .catch((error) => console.error('Error fetching user data:', error));
-  };
+  const [userData, setUserData] = useState([]);
+  const [teamName, setTeamName] = useState("");
+  const [token, setToken] = useState(localStorage.getItem("authToken"));
+  const [userType, setUserType] = useState(localStorage.getItem("userType"));
+  const [currentPage, setCurrentPage] = useState(1);
+  const [inviteLink, setInviteLink] = useState("");
+  const usersPerPage = 2;
 
   useEffect(() => {
-    // Fetch data initially
-    fetchData();
+    const fetchDataAndInviteLink = async () => {
+      try {
+        if (!token || !userType) {
+          navigate("/login");
+        } else if (userType === "TEAM_MEMBER") {
+          navigate("/user"); // TODO maybe change to profile
+        } else if (userType === "USER") {
+          navigate("/");
+        }
 
-    // Set up an interval to fetch data every second
-    const intervalId = setInterval(() => {
-      fetchData();
-    }, 1000);
+        await fetchData();
+        await createInviteLink();
 
-    // Clean up the interval when the component is unmounted
-    return () => clearInterval(intervalId);
-  }, []);
-   
+        const intervalId = setInterval(fetchData, 5000);
+
+        return () => clearInterval(intervalId);
+      } catch (error) {
+        clearInterval(intervalId);
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/login");
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchDataAndInviteLink();
+  }, [token, userType, navigate]);
+
+  const fetchData = async () => {
+    try {
+      const teamDataResponse = await fetch(
+        "http://localhost:8080/api/teams/user",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const teamData = await teamDataResponse.json();
+      setTeamName(teamData.name);
+
+      const usersData = await Promise.all(
+        teamData.members.map(async (member) => {
+          const statisticsResponse = await fetch(
+            `http://localhost:8080/api/statistics/${member.id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (statisticsResponse.ok) {
+            const statistics = await statisticsResponse.json();
+            return {
+              id: statistics.author.id,
+              username: statistics.author.username,
+              email: statistics.author.email,
+              minutesTyping: statistics.minutesTyping,
+              awpm: statistics.awpm,
+            };
+          } else if (statisticsResponse.status === 404) {
+            return {
+              id: member.id,
+              username: member.username,
+              email: member.email,
+              minutesTyping: 0,
+              awpm: 0,
+            };
+          } else {
+            throw new Error(
+              `Statistics API returned an error: ${statisticsResponse.statusText}`
+            );
+          }
+        })
+      );
+
+      setUserData(usersData);
+    } catch (error) {
+      let theme = localStorage.getItem("theme");
+      localStorage.clear();
+      localStorage.setItem("theme", theme);
+      navigate("/login");
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const createInviteLink = async () => {
+    try {
+      const fetchLinkToken = await fetch(
+        "http://localhost:8080/api/teams/invite",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (fetchLinkToken.ok) {
+        let { token } = await fetchLinkToken.json();
+
+        setInviteLink(`http://localhost:5173/teams/join/${token}`);
+      } else {
+        console.log("Error creating invite link");
+      }
+    } catch (error) {
+      console.error("Error fetching link token:", error);
+    }
+  };
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const countUsers = userData.length;
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(userData.length / usersPerPage);
+  const showPagination = totalPages > 1;
+
   return (
     <div>
       <Navbar />
-      <div id="body" className="flex w-screen mt-2 pb-0 flex-col items-center gap-5">
-        <div id="table-team-members" className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]">
+      <div
+        id="body"
+        className="flex w-screen mt-2 pb-0 flex-col items-center gap-5"
+      >
+        <div
+          id="table-team-members"
+          className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]"
+        >
           <div className="flex items-center self-stretch">
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-10/12">
               <div className="flex items-center flex-[1_0_0] gap-2">
-                <h2 className="text-2xl font-normal leading-7">Team Members</h2>
+                <h2 className="text-2xl font-normal leading-7">
+                  Team Members of {teamName}
+                </h2>
                 <div className="flex items-start mix-blend-multiply">
                   <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg=[#F9F5FF]">
                     <span className="text-[#6941C6] text-sm font-medium leading-4">
-                      1 user
+                      {countUsers} users
                     </span>
                   </div>
                 </div>
               </div>
             </div>
-            <button className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]">
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(inviteLink)}
+              className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]"
+            >
               <RiLink className='text-xl'/>
-              <span className="text-[#12B76A] text-l">Invite Link</span>
+              <span className="text-[#12B76A] text-l">
+                Invite Link
+              </span>
             </button>
           </div>
           <div className="flex items-start self-stretch">
-            <div className="flex flex-col items-start flex-[1_0_0]">
-              <div className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
-                <div className="flex justify-center items-center">
-                  <input type="checkbox" className="w-5 h-5 rounded-md border"></input>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[#667085]">Member</span>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <div className="flex justify-center items-center">
-                    <input type="checkbox" className="w-5 h-5 rounded-md border"></input>
-                  </div>
-                  <Link to="/user">
-                    <RiUser3Line className='text-2xl'/>
-                  </Link>
-                  <Link to="/user" className="flex flex-col items-start">
-                    <p className="text-gray-900">{userData ? userData.username : 'Loading...'}</p>
-                    <p className="text-gray-500 text-sm">{userData ? userData.email : 'Loading...'}</p>
-                  </Link>
-                </div> 
-              </div>
-            </div>
-            <div id="table-awpm-column" className="flex w-32 flex-col items-start">
-              <div className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
-                <div className="flex items-center gap-1">
-                  <span className="text-[#667085]">Avg. WPM</span>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <span className="text-gray-500 text-sm">{userStatistics ? userStatistics.awpm : 'Loading...'}</span>
-                </div>
-              </div>
-            </div>
-            <div id="table-minutes-typing-column" className="flex w-36 flex-col items-start">
-              <div className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
-                <div className="flex items-center gap-1">
-                  <span className="text-[#667085]">Min. Typing</span>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <span className="text-gray-500 text-sm">{userStatistics ? userStatistics.minutesTyping : 'Loading...'}</span>
-                </div>
-              </div>
-            </div>
-            <div id="table-status-column" className="flex w-28 flex-col items-start">
-            <div className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
-                <div className="flex items-center gap-1">
-                  <span className="text-[#667085]">Status</span>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <GamingBadge /> 
-                </div> 
-              </div>
-            </div>
-            <div id="table-remove/view-column" className="flex flex-col items-start">
-            <div className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
-                <div className="flex items-center gap-1">
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
-                  <button className="flex items-start rounded-lg">
-                    <div className="flex p-2.5 justify-center items-center gap-2 rounded-lg">
+            <table
+              id="table-name-column"
+              className="flex flex-col items-start flex-[1_0_0]"
+            >
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <tr className="flex justify-center items-center">
+                  <th>
+                    <input
+                      type="checkbox"
+                      className="w-5 h-5 rounded-md border"
+                    ></input>
+                  </th>
+                </tr>
+                <tr className="flex items-center gap-1">
+                  <th>
+                    <span className="text-[#667085]">Member</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="w-full">
+                {userData &&
+                  userData.map((user) => (
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
+                    >
+                      <td className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          className="w-5 h-5 rounded-md border"
+                        ></input>
+                      </td>
+                      <td>
+                        <Link to="/user">
+                          <RiUser3Line className='text-2xl'/>
+                        </Link>
+                      </td>
+                      <td>
+                        <Link to="/user" className="flex flex-col items-start">
+                          <p className="text-gray-900">{user.username}</p>
+                          <p className="text-gray-500 text-sm">{user.email}</p>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <table
+              id="table-awpm-column"
+              className="flex w-32 flex-col items-start"
+            >
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <tr className="flex items-center gap-1">
+                  <th className="text-[#667085]">Avg. WPM</th>
+                </tr>
+              </thead>
+              <tbody className="w-full">
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                      <td className="text-gray-500 text-sm">
+                        {user ? user.awpm : "Loading..."}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <table
+              id="table-minutes-typing-column"
+              className="flex w-36 flex-col items-start"
+            >
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <tr className="flex items-center gap-1">
+                  <th className="text-[#667085]">Min. Typing</th>
+                </tr>
+              </thead>
+              <tbody className="w-full">
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                      <td className="text-gray-500 text-sm">
+                        {user ? user.minutesTyping : "Loading..."}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <table
+              id="table-status-column"
+              className="flex w-28 flex-col items-start"
+            >
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <tr className="flex items-center gap-1">
+                  <th className="text-[#667085]">Status</th>
+                </tr>
+              </thead>
+              <tbody className="w-full">
+                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                  <td>
+                    <GamingBadge />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table
+              id="table-remove/view-column"
+              className="flex flex-col items-start"
+            >
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+                <tr className="flex items-center gap-1"></tr>
+              </thead>
+              <tbody className="w-full">
+                <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
+                  <td className="flex items-start rounded-lg">
+                    <button className="flex p-2.5 justify-center items-center gap-2 rounded-lg">
                       <RiDeleteBinLine className='text-xl'/>
+                    </button>
+                  </td>
+                  <td className="flex w-11 items-start rounded-lg">
+                    <Link
+                      to="/user"
+                      className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0"
+                    >
+
+                        <RiShareForwardLine className='text-xl'/>
+
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          {showPagination && (
+            <div className="flex px-6 pt-3 pb-4 justify-between items-center self-stretch">
+              <button
+                className="flex items-start rounded-lg"
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                    <RiArrowLeftLine className='text-xl'/>
+                  <span className="text-gray-700">Previous</span>
+                </div>
+              </button>
+              <div className="flex items-start rounded-lg">
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => paginate(index + 1)}
+                    className={`flex w-10 h-10 justify-center items-center rounded-lg ${
+                      currentPage === index + 1 ? "bg-primary-50" : ""
+                    }`}
+                  >
+                    <div className="flex w-10 p-3 justify-center items-center shrink-0 self-stretch rounded-lg">
+                      <span
+                        className={
+                          currentPage === index + 1
+                            ? "text-primary-600"
+                            : "text-gray-500"
+                        }
+                      >
+                        {index + 1}
+                      </span>
                     </div>
                   </button>
-                  <button className="flex w-11 items-start rounded-lg">
-                    <Link to="/user" className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0">
-                        <RiShareForwardLine className='text-xl'/>
-                    </Link>
-                  </button>
-                </div> 
+                ))}
               </div>
+              <button
+                className="flex items-start rounded-lg"
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
+                  <span className="text-gray-700">Next</span>
+                  <RiArrowRightLine className='text-xl'/>
+                </div>
+              </button>
             </div>
-          </div>
-          <div className="flex px-6 pt-3 pb-4 justify-between items-center self-stretch">
-            <button className="flex items-start rounded-lg">
-              <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border">
-                <RiArrowLeftLine className='text-xl'/>
-                <span className="text-gray-700">Previous</span>
-              </div>
-            </button>
-            <button className="flex items-start rounded-lg">
-              <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border">
-                <span className="text-gray-700">Next</span>
-                <RiArrowRightLine className='text-xl'/>
-              </div>
-            </button>
-          </div>
+          )}
         </div>
       </div>
       <Footer />
