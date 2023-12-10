@@ -7,7 +7,7 @@ import {
   RiArrowLeftLine,
   RiDeleteBinLine,
   RiShareForwardLine,
-  RiLink
+  RiLink,
 } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -15,11 +15,14 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 import GamingBadge from "../layout/StatusBadges/GamingBadge";
+import CodingBadge from "../layout/StatusBadges/CodingBadge";
+import InactiveBadge from "../layout/StatusBadges/InactiveBadge";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState([]);
   const [teamName, setTeamName] = useState("");
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,34 +30,23 @@ const Dashboard = () => {
   const usersPerPage = 2;
 
   useEffect(() => {
-    const fetchDataAndInviteLink = async () => {
-      try {
-        if (!token || !userType) {
-          navigate("/login");
-        } else if (userType === "TEAM_MEMBER") {
-          navigate("/user"); // TODO maybe change to profile
-        } else if (userType === "USER") {
-          navigate("/");
-        }
+    if (!token || !userType) {
+      navigate("/login");
+    } else if (userType === "TEAM_MEMBER") {
+      navigate("/user"); // TODO maybe change to profile
+    } else if (userType === "USER") {
+      navigate("/");
+    }
 
-        await fetchData();
-        await createInviteLink();
+    fetchData();
+    createInviteLink();
 
-        const intervalId = setInterval(fetchData, 5000);
+    var intervalId = setInterval(fetchData, 5000);
 
-        return () => clearInterval(intervalId);
-      } catch (error) {
-        clearInterval(intervalId);
-        let theme = localStorage.getItem("theme");
-        localStorage.clear();
-        localStorage.setItem("theme", theme);
-        navigate("/login");
-        console.error("Error fetching data:", error);
-      }
+    return () => {
+      clearInterval(intervalId);
     };
-
-    fetchDataAndInviteLink();
-  }, [token, userType, navigate]);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -107,7 +99,6 @@ const Dashboard = () => {
       localStorage.clear();
       localStorage.setItem("theme", theme);
       navigate("/login");
-      console.error("Error fetching data:", error);
     }
   };
 
@@ -129,6 +120,30 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching link token:", error);
+    }
+  };
+
+  const removeFromTeam = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/users/removefromteam/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful response (team creation)
+        fetchData();
+      } else {
+        console.error("Couldn't delete user", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting user from team:", error);
     }
   };
 
@@ -171,10 +186,8 @@ const Dashboard = () => {
               onClick={() => navigator.clipboard.writeText(inviteLink)}
               className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]"
             >
-              <RiLink className='text-xl'/>
-              <span className="text-[#12B76A] text-l">
-                Invite Link
-              </span>
+              <RiLink className="text-xl" />
+              <span className="text-[#12B76A] text-l">Invite Link</span>
             </button>
           </div>
           <div className="flex items-start self-stretch">
@@ -212,7 +225,7 @@ const Dashboard = () => {
                       </td>
                       <td>
                         <Link to="/user">
-                          <RiUser3Line className='text-2xl'/>
+                          <RiUser3Line className="text-2xl" />
                         </Link>
                       </td>
                       <td>
@@ -275,11 +288,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="w-full">
-                <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
-                  <td>
-                    <GamingBadge />
-                  </td>
-                </tr>
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                      <td>
+                        <GamingBadge />
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
             <table
@@ -290,23 +306,29 @@ const Dashboard = () => {
                 <tr className="flex items-center gap-1"></tr>
               </thead>
               <tbody className="w-full">
-                <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
-                  <td className="flex items-start rounded-lg">
-                    <button className="flex p-2.5 justify-center items-center gap-2 rounded-lg">
-                      <RiDeleteBinLine className='text-xl'/>
-                    </button>
-                  </td>
-                  <td className="flex w-11 items-start rounded-lg">
-                    <Link
-                      to="/user"
-                      className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0"
-                    >
-
-                        <RiShareForwardLine className='text-xl'/>
-
-                    </Link>
-                  </td>
-                </tr>
+                {userData &&
+                  userData.map((user) => (
+                    <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
+                      <td className="flex items-start rounded-lg">
+                        {user.id != userId && (
+                          <button
+                            onClick={() => removeFromTeam(user.id)}
+                            className="flex p-2.5 justify-center items-center gap-2 rounded-lg"
+                          >
+                            <RiDeleteBinLine className="text-xl" />
+                          </button>
+                        )}
+                      </td>
+                      <td className="flex w-11 items-start rounded-lg">
+                        <Link
+                          to="/user"
+                          className="flex w-11 p-2.5 justify-center items-center gap-2 rounded-lg shrink-0"
+                        >
+                          <RiShareForwardLine className="text-xl" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -318,7 +340,7 @@ const Dashboard = () => {
                 disabled={currentPage === 1}
               >
                 <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
-                    <RiArrowLeftLine className='text-xl'/>
+                  <RiArrowLeftLine className="text-xl" />
                   <span className="text-gray-700">Previous</span>
                 </div>
               </button>
@@ -352,7 +374,7 @@ const Dashboard = () => {
               >
                 <div className="flex px-3.5 py-2 justify-center items-center gap-2 rounded-lg border shadow-[0_1px_2px_0px_rgba(16,24,40,0.05)]">
                   <span className="text-gray-700">Next</span>
-                  <RiArrowRightLine className='text-xl'/>
+                  <RiArrowRightLine className="text-xl" />
                 </div>
               </button>
             </div>
