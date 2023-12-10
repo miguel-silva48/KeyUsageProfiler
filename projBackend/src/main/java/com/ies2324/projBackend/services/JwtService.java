@@ -9,6 +9,12 @@ public interface JwtService {
     // generates JWT for given UserDetails object (from spring security)
     String generateToken(UserDetails user);
 
+    // generates refresh token so users don't have to login a bunch of times
+    // and instead just refresh their tokens
+    String generateRefreshToken(UserDetails user);
+
     // Verifies if JWT is valid for given user
     boolean isTokenValid(String token, UserDetails user);
+
+    boolean isRefreshTokenValid(UserDetails user, String refreshToken);
 }

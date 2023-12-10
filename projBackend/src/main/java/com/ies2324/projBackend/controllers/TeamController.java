@@ -1,5 +1,7 @@
 package com.ies2324.projBackend.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.TeamService;
 
 import lombok.AllArgsConstructor;
@@ -64,11 +67,21 @@ public class TeamController {
         return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
     }
 
+    @GetMapping("userstatistics")
+    public ResponseEntity<List<UserStatistics>> getUserStatisticsTeam() {
+        // necessary because of new team members
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // only team leader can get team statistics
+        if (user.getRole() != Role.TEAM_LEADER)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(teamService.getUserStatisticsTeam(user.getTeam()), HttpStatus.OK);
+    }
+
     @DeleteMapping("delete")
     public ResponseEntity<Void> deleteUsersTeam() {
         Team team;
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user.getRole() != Role.TEAM_LEADER || (team=user.getTeam()) == null)
+        if (user.getRole() != Role.TEAM_LEADER || (team = user.getTeam()) == null)
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         teamService.deleteTeam(team);
         return ResponseEntity.ok().build();

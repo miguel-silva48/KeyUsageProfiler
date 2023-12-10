@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +15,16 @@ import com.ies2324.projBackend.services.JwtService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtServiceImpl implements JwtService {
-    private final String jwtSigningKey = "413F4428472B4B6250655368566D5970337336763979244226452948404D6351";
-    private final int expirationTime = 1000 * 60 * 20; // 20 minutes
+    @Value("${jwt.secret_key}")
+    private String jwtSigningKey;
+    @Value("${jwt.expirationtime.access}")
+    private int accessExpTime; // 20 minutes
+    @Value("${jwt.expirationtime.refresh}")
+    private int refreshExpTime; // 2 days
 
     @Override
     public String extractSubject(String token) {
@@ -29,7 +33,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(UserDetails user) {
-        return generateToken(new HashMap<>(), user);
+        return generateToken(new HashMap<>(), user, accessExpTime);
     }
 
     @Override
@@ -38,10 +42,11 @@ public class JwtServiceImpl implements JwtService {
         return extractSubject(token).equals(username) && !isTokenExpired(token);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails user) {
+    private String generateToken(Map<String, Object> extraClaims, UserDetails user, int expirationTime) {
         return Jwts.builder().claims().empty().add(extraClaims).subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationTime)).and().signWith(getSigningKey())
+                .expiration(new Date(System.currentTimeMillis() + expirationTime)).and()
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -64,8 +69,25 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
+        byte[] keyBytes = jwtSigningKey.getBytes();
+        System.out.println("length of key in bytes: " + keyBytes.length);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    @Override
+    public String generateRefreshToken(UserDetails user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        // extra claim to distinguish it from the access token with this claim
+        extraClaims.put("type", new String("refresh"));
+        return this.generateToken(extraClaims, user, refreshExpTime);
+    }
+
+    @Override
+    public boolean isRefreshTokenValid(UserDetails user, String refreshToken) {
+        final Claims refClaims = extractAllClaims(refreshToken);
+        boolean validRefreshToken = refClaims.containsKey("type") && refClaims.get("type").equals("refresh")
+                && !isTokenExpired(refreshToken);
+        return validRefreshToken;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.ies2324.projBackend.services.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,10 +13,12 @@ import com.ies2324.projBackend.dao.TeamLeaderDTO;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.TeamRepository;
 import com.ies2324.projBackend.services.RedisService;
 import com.ies2324.projBackend.services.TeamService;
 import com.ies2324.projBackend.services.UserService;
+import com.ies2324.projBackend.services.UserStatisticsService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,7 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final UserService userService;
     private final RedisService redisService;
+    private final UserStatisticsService userStatisticsService;
 
     @Override
     @Transactional
@@ -46,18 +51,17 @@ public class TeamServiceImpl implements TeamService {
     public InviteLinkResponse createInviteLink(Team team) {
         Long teamId = team.getId();
         return new InviteLinkResponse(
-            redisService.createToken(String.valueOf(teamId)),
-            team
-        );
+                redisService.createToken(String.valueOf(teamId)),
+                team);
     }
 
     @Override
     @Transactional
     public JoinTeamResponse joinTeam(User user, String token) {
         String teamid = redisService.validateTokenAndGetTeamId(token);
-        if (teamid != null){
+        if (teamid != null) {
             Optional<Team> optTeam = teamRepository.findById(Long.parseLong(teamid));
-            if (optTeam.isPresent()){
+            if (optTeam.isPresent()) {
                 Team team = optTeam.get();
                 user.setTeam(team);
                 user.setRole(Role.TEAM_MEMBER);
@@ -73,11 +77,24 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     public void deleteTeam(Team team) {
-        if (team != null){
+        if (team != null) {
             for (User u : team.getMembers()) {
                 userService.removeFromTeam(u);
             }
             teamRepository.delete(team);
         }
+    }
+
+    public List<UserStatistics> getUserStatisticsTeam(Team t) {
+        List<UserStatistics> userStats = new ArrayList<>();
+        Optional<UserStatistics> stat;
+        for (User user : t.getMembers()) {
+            if (t.getLeader().getId() == user.getId())
+                continue;
+            stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
+            if (stat.isPresent())
+                userStats.add(stat.get());
+        }
+        return userStats;
     }
 }
