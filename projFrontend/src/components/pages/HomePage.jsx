@@ -42,6 +42,7 @@ const HomePage = () => {
       if (response.ok) {
         // Handle successful response (team creation)
         console.log("Team created successfully!");
+        localStorage.setItem("userType", "TEAM_LEADER");
         navigate("/dashboard");
       } else {
         // Handle error response
