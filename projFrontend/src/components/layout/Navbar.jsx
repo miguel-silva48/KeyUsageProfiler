@@ -28,23 +28,25 @@ const Navbar = () => {
 
   // connect to WS
   useEffect(() => {
-    const headers = {
-      Authorization: "Bearer " + token,
-    };
+    if (userType === "TEAM_LEADER") {
+      const headers = {
+        Authorization: "Bearer " + token,
+      };
 
-    const client = new Client({
-      brokerURL: "ws://localhost:8080/websocket",
-      connectHeaders: headers,
-    });
+      const client = new Client({
+        brokerURL: "ws://localhost:8080/websocket",
+        connectHeaders: headers,
+      });
 
-    setStompClient(client);
+      setStompClient(client);
 
-    client.activate();
+      client.activate();
 
-    // Cleanup the WebSocket connection when the component unmounts
-    return () => {
-      client.deactivate();
-    };
+      // Cleanup the WebSocket connection when the component unmounts
+      return () => {
+        client.deactivate();
+      };
+    }
   }, []);
 
   // subscribe to WS
