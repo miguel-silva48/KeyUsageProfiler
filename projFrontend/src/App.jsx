@@ -3,6 +3,8 @@ import HomePage from './components/pages/HomePage';
 import LoginPage from './components/pages/LoginPage';
 import UserPage from './components/pages/UserPage';
 import DashboardPage from './components/pages/DashboardPage';
+import RegisterPage from './components/pages/RegisterPage';
+import JoinTeamPage from './components/pages/JoinTeamPage';
 
 const App = () => {
   return (
@@ -17,12 +19,20 @@ const App = () => {
           element={<LoginPage />}
         />
         <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+        <Route
           path="/user"
           element={<UserPage />}
         />
         <Route
           path="/dashboard"
           element={<DashboardPage />}
+        ></Route>
+        <Route
+          path="/teams/join/:token"
+          element={<JoinTeamPage />}
         ></Route>
       </Routes>
     </BrowserRouter>
