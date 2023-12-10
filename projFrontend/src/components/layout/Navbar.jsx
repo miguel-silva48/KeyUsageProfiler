@@ -17,7 +17,7 @@ const Navbar = () => {
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
 
-  const userType = localStorage.getItem("userType");
+  const [userType, setUserType] = useState(localStorage.getItem("userType"));
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
@@ -33,6 +33,13 @@ const Navbar = () => {
       setTheme("light");
     }
     setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const handleLogout = () => {
+    //TODO API call
+
+    //localStorage.clear();
+    //navigate("/login");
   };
 
   return (
@@ -86,9 +93,17 @@ const Navbar = () => {
         )}
 
         {userType && (
-          <Link to="/user">
+          <div className="dropdown">
             <button className="btn m-2 p-2">Account</button>
-          </Link>
+            <div className="dropdown-content">
+              <button
+                className="btn m-2 p-2 btn-accent" 
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         )}
 
         {!userType && (

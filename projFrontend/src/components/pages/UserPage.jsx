@@ -22,13 +22,13 @@ const UserPage = () => {
   const [userStatistics, setUserStatistics] = useState(null);
 
   useEffect(() => {
+    //If user is not team member or leader, redirect to homepage
+    if (!userType || userType === "USER") {
+      navigate("/");
+      return;
+    }
+
     const userID = localStorage.getItem("userId");
-  
-    // if (!userID) {
-    //   console.log("USERPAGE: User not logged in!");
-    //   navigate("/login");
-    //   return;
-    // }
   
     //TODO: fetch user data and statistics according to API call
     fetch(`http://localhost:8080/api/statistics/${userID}`)
