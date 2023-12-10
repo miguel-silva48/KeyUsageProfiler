@@ -18,6 +18,11 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
   UserStatisticsRepository userStatisticsRepository;
 
   @Override
+  public UserStatistics createUserStatistics(UserStatistics u) {
+    return userStatisticsRepository.save(u);
+  }
+
+  @Override
   public UserStatistics createOrAddUserStatistics(Long authorId, Float interval, String writtenText) {
     Optional<UserStatistics> optUserStatistics = userStatisticsRepository.findByAuthorId(authorId);
     UserStatistics userStatistics = new UserStatistics();
