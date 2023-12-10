@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import "./../../utils/keyboard.css";
 
-function Keyboard() {
+function Keyboard({ userId }) {
   const token = localStorage.getItem("authToken");
   const [stompClient, setStompClient] = useState(null);
 
@@ -51,10 +51,12 @@ function Keyboard() {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/keystrokes", (message) => {
-          setLastKey((prevState) => [
-            message.body.toLowerCase(),
-            (prevState[1] + 1) % 10,
-          ]);
+          const keypress = JSON.parse(message.body);
+          if (keypress.author.id == userId)
+            setLastKey((prevState) => [
+              keypress.pressedKey.toLowerCase(),
+              (prevState[1] + 1) % 10,
+            ]);
         });
       };
 

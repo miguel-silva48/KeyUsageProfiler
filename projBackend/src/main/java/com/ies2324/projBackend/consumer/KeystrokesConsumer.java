@@ -36,11 +36,12 @@ public class KeystrokesConsumer {
         User author = userService.getUserById(k.getAuthor().getId())
                 .orElseThrow(() -> new IllegalArgumentException("KeystrokeConsumer: User not found"));
         Team team = author.getTeam();
+        k.setAuthor(author);
         if (team != null) {
             simpMessagingTemplate.convertAndSendToUser(
                     team.getLeader().getUsername(),
                     "/topic/keystrokes",
-                    k.getPressedKey());
+                    k);
         }
     }
 }

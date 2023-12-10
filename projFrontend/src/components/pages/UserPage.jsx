@@ -29,7 +29,6 @@ const UserPage = () => {
       return;
     }
 
-    //TODO: fetch user data and statistics according to API call
     fetch(`http://localhost:8080/api/statistics/${userId}`, {
       method: "GET",
       headers: {
@@ -40,7 +39,6 @@ const UserPage = () => {
       .then((response) => response.json())
       .then((data) => {
         // Assuming the data structure contains both user and statistics information
-
         if (!data) {
           console.error("Invalid response format");
           return;
@@ -150,7 +148,7 @@ const UserPage = () => {
 
       <div className="mb-20">
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
-        <Keyboard />
+        <Keyboard userId={userId} />
       </div>
       <Footer />
     </div>
