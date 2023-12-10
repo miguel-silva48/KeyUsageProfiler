@@ -43,6 +43,7 @@ const Dashboard = () => {
 
         return () => clearInterval(intervalId);
       } catch (error) {
+        clearInterval(intervalId);
         let theme = localStorage.getItem("theme");
         localStorage.clear();
         localStorage.setItem("theme", theme);
@@ -54,58 +55,60 @@ const Dashboard = () => {
     fetchDataAndInviteLink();
   }, [token, userType, navigate]);
 
-const fetchData = async () => {
-  try {
-    const teamDataResponse = await fetch(
-      "http://localhost:8080/api/teams/user",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    const teamData = await teamDataResponse.json();
-    setTeamName(teamData.name);
-
-    const usersData = await Promise.all(
-      teamData.members.map(async (member) => {
-        const statisticsResponse = await fetch(
-          `http://localhost:8080/api/statistics/${member.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (statisticsResponse.ok) {
-          const statistics = await statisticsResponse.json();
-          return {
-            id: statistics.author.id,
-            username: statistics.author.username,
-            email: statistics.author.email,
-            minutesTyping: statistics.minutesTyping,
-            awpm: statistics.awpm,
-          };
-        } else if (statisticsResponse.status === 404) {
-          return {
-            id: member.id,
-            username: member.username,
-            email: member.email,
-            minutesTyping: 0,
-            awpm: 0,
-          };
-        } else {
-          throw new Error(`Statistics API returned an error: ${statisticsResponse.statusText}`);
+  const fetchData = async () => {
+    try {
+      const teamDataResponse = await fetch(
+        "http://localhost:8080/api/teams/user",
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      })
-    );
+      );
+      const teamData = await teamDataResponse.json();
+      setTeamName(teamData.name);
 
-    setUserData(usersData);
-  } catch (error) {
-    let theme = localStorage.getItem("theme");
-    localStorage.clear();
-    localStorage.setItem("theme", theme);
-    navigate("/login");
-    console.error("Error fetching data:", error);
-  }
-};
+      const usersData = await Promise.all(
+        teamData.members.map(async (member) => {
+          const statisticsResponse = await fetch(
+            `http://localhost:8080/api/statistics/${member.id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (statisticsResponse.ok) {
+            const statistics = await statisticsResponse.json();
+            return {
+              id: statistics.author.id,
+              username: statistics.author.username,
+              email: statistics.author.email,
+              minutesTyping: statistics.minutesTyping,
+              awpm: statistics.awpm,
+            };
+          } else if (statisticsResponse.status === 404) {
+            return {
+              id: member.id,
+              username: member.username,
+              email: member.email,
+              minutesTyping: 0,
+              awpm: 0,
+            };
+          } else {
+            throw new Error(
+              `Statistics API returned an error: ${statisticsResponse.statusText}`
+            );
+          }
+        })
+      );
+
+      setUserData(usersData);
+    } catch (error) {
+      let theme = localStorage.getItem("theme");
+      localStorage.clear();
+      localStorage.setItem("theme", theme);
+      navigate("/login");
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const createInviteLink = async () => {
     try {
@@ -208,16 +211,20 @@ const fetchData = async () => {
                           className="w-5 h-5 rounded-md border"
                         ></input>
                       </td>
-                      <Link to="/user">
-                        <img
-                          src={example_avatar}
-                          className="flex w-10 h-10 flex-col justify-center items-center rounded-full"
-                        ></img>
-                      </Link>
-                      <Link to="/user" className="flex flex-col items-start">
-                        <p className="text-gray-900">{user.username}</p>
-                        <p className="text-gray-500 text-sm">{user.email}</p>
-                      </Link>
+                      <td>
+                        <Link to="/user">
+                          <img
+                            src={example_avatar}
+                            className="flex w-10 h-10 flex-col justify-center items-center rounded-full"
+                          ></img>
+                        </Link>
+                      </td>
+                      <td>
+                        <Link to="/user" className="flex flex-col items-start">
+                          <p className="text-gray-900">{user.username}</p>
+                          <p className="text-gray-500 text-sm">{user.email}</p>
+                        </Link>
+                      </td>
                     </tr>
                   ))}
               </tbody>
