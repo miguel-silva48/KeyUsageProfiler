@@ -7,6 +7,8 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 
+import refreshToken from "../../utils/refreshToken";
+
 const HomePage = () => {
   const navigate = useNavigate();
   const [inviteLink, setInviteLink] = useState("");
@@ -69,6 +71,7 @@ const HomePage = () => {
 
   const createTeamHandler = async () => {
     try {
+      var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
       const response = await fetch("http://localhost:8080/api/teams/create", {
         method: "POST",
@@ -80,6 +83,23 @@ const HomePage = () => {
           name: teamName,
         }),
       });
+
+      if (response.status === 403) {
+        const newToken = await refreshToken();
+        setToken(newToken);
+
+        if (newToken !== null) {
+          createTeamHandler();
+          return;
+        }
+        console.error("Error refreshing token:", refreshError.message);
+
+        // Handle the error appropriately, for now, just log it
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/login");
+      }
 
       if (response.ok) {
         // Handle successful response (team creation)

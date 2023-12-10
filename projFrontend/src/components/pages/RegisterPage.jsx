@@ -56,11 +56,12 @@ const RegisterPage = () => {
 
             if (registerResponse.ok) {
                 console.log("REGISTER: Sign up successful!");
-                const { id, token, username, email, userType } = await registerResponse.json();
+                const { id, token, refreshToken, username, email, userType } = await registerResponse.json();
 
                 // Store the token securely
                 localStorage.setItem("userId", id)
                 localStorage.setItem("authToken", token);
+                localStorage.setItem("refreshToken", refreshToken);
                 localStorage.setItem("email", email);
                 localStorage.setItem("username", username);
                 localStorage.setItem("userType", userType);
