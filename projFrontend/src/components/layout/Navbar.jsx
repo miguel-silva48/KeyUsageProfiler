@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Client } from "@stomp/stompjs";
 
 import {
   RiArrowDownSLine,
@@ -12,12 +13,72 @@ import {
 import logo from "../../assets/key_usage_profiler_logo_cut.svg";
 
 const Navbar = () => {
+  const token = localStorage.getItem("authToken");
+  const [stompClient, setStompClient] = useState(null);
+
   const navigate = useNavigate();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const maxNotifications = 5;
 
   const userType = localStorage.getItem("userType");
+
+  // connect to WS
+  useEffect(() => {
+    if (userType === "TEAM_LEADER") {
+      const headers = {
+        Authorization: "Bearer " + token,
+      };
+
+      const client = new Client({
+        brokerURL: "ws://localhost:8080/websocket",
+        connectHeaders: headers,
+      });
+
+      setStompClient(client);
+
+      client.activate();
+
+      // Cleanup the WebSocket connection when the component unmounts
+      return () => {
+        client.deactivate();
+      };
+    }
+  }, []);
+
+  // subscribe to WS
+  useEffect(() => {
+    if (stompClient) {
+      const onConnect = (frame) => {
+        console.log("Connected: " + frame);
+        stompClient.subscribe("/user/topic/notifications", (message) => {
+          const newNotification = JSON.parse(message.body);
+          console.log("received new notification: ", newNotification);
+          setNotifications((prevNotifications) => {
+            const updatedNotifications = [
+              newNotification,
+              ...prevNotifications.slice(0, maxNotifications - 1),
+            ];
+            return updatedNotifications;
+          });
+        });
+      };
+
+      stompClient.onConnect = onConnect;
+
+      stompClient.onWebSocketError = (error) => {
+        console.error("Error with WebSocket", error);
+      };
+
+      stompClient.onStompError = (frame) => {
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
+      };
+    }
+  }, [stompClient]);
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
@@ -25,6 +86,10 @@ const Navbar = () => {
 
     document.querySelector("html").setAttribute("data-theme", localTheme);
   }, [theme]);
+
+  const handleNotificationToggle = () => {
+    setShowDropdown(!showDropdown);
+  };
 
   const handleToggle = (e) => {
     if (e.target.checked) {
@@ -54,16 +119,15 @@ const Navbar = () => {
       )}
 
       {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
-
         <Link to="/#">
           <h2 className="text-xl font-bold">Leaderboard</h2>
         </Link>
       )}
 
       {userType === "TEAM_LEADER" && (
-          <Link to="/dashboard">
-            <h2 className="text-xl font-bold">Dashboard</h2>
-          </Link>
+        <Link to="/dashboard">
+          <h2 className="text-xl font-bold">Dashboard</h2>
+        </Link>
       )}
 
       <div className="flex">
@@ -79,10 +143,37 @@ const Navbar = () => {
         </label>
 
         {userType === "TEAM_LEADER" && (
-          <button className="btn m-2 p-2">
+          <button className="btn m-2 p-2" onClick={handleNotificationToggle}>
             <RiNotification3Line className="text-xl" />
-            <RiArrowDownSLine className="text-xl" />
+            <RiArrowDownSLine
+              className={`text-xl ${
+                showDropdown ? "transform rotate-180" : ""
+              }`}
+            />
           </button>
+        )}
+
+        {/* Dropdown content */}
+        {showDropdown && (
+          <div
+            style={{ background: "#f0f0f5" }}
+            className="absolute top-14 right-24 mt-2 rounded-md shadow-md border border-gray-300"
+          >
+            {notifications.length === 0 ? (
+              <div className="p-2 border border-gray-300">
+                There's no notifications
+              </div>
+            ) : (
+              notifications.map((notification, index) => (
+                <div
+                  key={index}
+                  className="p-2 border border-gray-300 font-semibold"
+                >
+                  {notification.user.name} - {notification.type}
+                </div>
+              ))
+            )}
+          </div>
         )}
 
         {userType && (
