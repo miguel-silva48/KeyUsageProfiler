@@ -26,42 +26,56 @@ const Dashboard = () => {
   const usersPerPage = 2;
 
   useEffect(() => {
-    if (!token || !userType) {
-      navigate("/login");
-    } else if (userType === "TEAM_MEMBER") {
-      navigate("/user"); // TODO maybe change to profile
-    } else if (userType === "USER") {
-      navigate("/");
-    }
-    fetchData();
-    createInviteLink();
-
-    const intervalId = setInterval(fetchData(), 5000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/user",
-        {
-          headers: { Authorization: `Bearer ${token}` },
+    const fetchDataAndInviteLink = async () => {
+      try {
+        if (!token || !userType) {
+          navigate("/login");
+        } else if (userType === "TEAM_MEMBER") {
+          navigate("/user"); // TODO maybe change to profile
+        } else if (userType === "USER") {
+          navigate("/");
         }
-      );
-      const teamData = await teamDataResponse.json();
-      setTeamName(teamData.name);
 
-      const usersData = await Promise.all(
-        teamData.members.map(async (member) => {
-          const statisticsResponse = await fetch(
-            `http://localhost:8080/api/statistics/${member.id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+        await fetchData();
+        await createInviteLink();
+
+        const intervalId = setInterval(fetchData, 5000);
+
+        return () => clearInterval(intervalId);
+      } catch (error) {
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/login");
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchDataAndInviteLink();
+  }, [token, userType, navigate]);
+
+const fetchData = async () => {
+  try {
+    const teamDataResponse = await fetch(
+      "http://localhost:8080/api/teams/user",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const teamData = await teamDataResponse.json();
+    setTeamName(teamData.name);
+
+    const usersData = await Promise.all(
+      teamData.members.map(async (member) => {
+        const statisticsResponse = await fetch(
+          `http://localhost:8080/api/statistics/${member.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (statisticsResponse.ok) {
           const statistics = await statisticsResponse.json();
-
           return {
             id: statistics.author.id,
             username: statistics.author.username,
@@ -69,18 +83,29 @@ const Dashboard = () => {
             minutesTyping: statistics.minutesTyping,
             awpm: statistics.awpm,
           };
-        })
-      );
+        } else if (statisticsResponse.status === 404) {
+          return {
+            id: member.id,
+            username: member.username,
+            email: member.email,
+            minutesTyping: 0,
+            awpm: 0,
+          };
+        } else {
+          throw new Error(`Statistics API returned an error: ${statisticsResponse.statusText}`);
+        }
+      })
+    );
 
-      setUserData(usersData);
-    } catch (error) {
-      let theme = localStorage.getItem("theme");
-      localStorage.clear();
-      localStorage.setItem("theme", theme);
-      navigate("/login");
-      console.error("Error fetching data:", error);
-    }
-  };
+    setUserData(usersData);
+  } catch (error) {
+    let theme = localStorage.getItem("theme");
+    localStorage.clear();
+    localStorage.setItem("theme", theme);
+    navigate("/login");
+    console.error("Error fetching data:", error);
+  }
+};
 
   const createInviteLink = async () => {
     try {
@@ -102,10 +127,10 @@ const Dashboard = () => {
       console.error("Error fetching link token:", error);
     }
   };
-   
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
+  const countUsers = userData.length;
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const totalPages = Math.ceil(userData.length / usersPerPage);
@@ -131,7 +156,7 @@ const Dashboard = () => {
                 <div className="flex items-start mix-blend-multiply">
                   <div className="flex px-2 py-0.5 justify-center items-center rounded-2xl bg=[#F9F5FF]">
                     <span className="text-[#6941C6] text-sm font-medium leading-4">
-                      {currentUsers.length} users
+                      {countUsers} users
                     </span>
                   </div>
                 </div>
