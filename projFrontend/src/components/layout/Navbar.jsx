@@ -102,7 +102,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     //TODO API call
-
     //localStorage.clear();
     //navigate("/login");
   };
@@ -120,7 +119,7 @@ const Navbar = () => {
       )}
 
       {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
-        <Link to="/user">
+        <Link to="/profile">
           <h2 className="text-xl font-bold">Profile</h2>
         </Link>
       )}
@@ -152,6 +151,15 @@ const Navbar = () => {
         {userType === "TEAM_LEADER" && (
           <button className="btn m-2 p-2" onClick={handleNotificationToggle}>
             <RiNotification3Line className="text-xl" />
+            {notifications.length > 0 && (
+              <div
+                style={{ background: "red", color: "white" }}
+                class="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
+              >
+                {notifications.length}
+              </div>
+            )}
+
             <RiArrowDownSLine
               className={`text-xl ${
                 showDropdown ? "transform rotate-180" : ""
@@ -187,10 +195,7 @@ const Navbar = () => {
           <div className="dropdown">
             <button className="btn m-2 p-2">Account</button>
             <div className="dropdown-content">
-              <button
-                className="btn m-2 p-2 btn-accent" 
-                onClick={handleLogout}
-              >
+              <button className="btn m-2 p-2 btn-accent" onClick={handleLogout}>
                 Logout
               </button>
             </div>

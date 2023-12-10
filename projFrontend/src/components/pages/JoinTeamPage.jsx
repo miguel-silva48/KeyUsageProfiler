@@ -26,7 +26,7 @@ const JoinTeam = () => {
         if (joinTeamResponse.ok) {
           await joinTeamResponse.json();
           localStorage.setItem("userType", "TEAM_MEMBER");
-          navigate("/user");
+          navigate("/profile");
         } else {
           console.error("Failed to join team - ", joinTeamResponse.statusText);
         }
