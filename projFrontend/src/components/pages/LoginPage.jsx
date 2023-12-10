@@ -41,11 +41,12 @@ const LoginPage = () => {
 
       if (signInResponse.ok) {
         console.log("LOGIN: Sign in successful!");
-        const { id, token, username, email, userType } = await signInResponse.json();
+        const { id, token, refreshToken, username, email, userType } = await signInResponse.json();
 
         // Store the token securely
         localStorage.setItem("userId", id)
         localStorage.setItem("authToken", token);
+        localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("email", email);
         localStorage.setItem("username", username);
         localStorage.setItem("userType", userType);

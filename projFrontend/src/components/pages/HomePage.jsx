@@ -7,6 +7,8 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 
+import refreshToken from "../../utils/refreshToken";
+
 const HomePage = () => {
   const [state, setState] = useState(false); // Destructuring assignment
   const navigate = useNavigate();
@@ -16,17 +18,18 @@ const HomePage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-      if (!token || !userType) {
-        navigate("/login");
-      } else if (userType === "TEAM_MEMBER") {
-        navigate("/user"); // TODO maybe change to profile
-      } else if (userType === "TEAM_LEADER") {
-        navigate("/dashboard");
-      }
+    if (!token || !userType) {
+      navigate("/login");
+    } else if (userType === "TEAM_MEMBER") {
+      navigate("/user"); // TODO maybe change to profile
+    } else if (userType === "TEAM_LEADER") {
+      navigate("/dashboard");
+    }
   }, []);
 
   const createTeamHandler = async () => {
     try {
+      var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
       const response = await fetch("http://localhost:8080/api/teams/create", {
         method: "POST",
@@ -39,6 +42,23 @@ const HomePage = () => {
         }),
       });
 
+      if (response.status === 403) {
+        const newToken = await refreshToken();
+        setToken(newToken);
+
+        if (newToken !== null) {
+          createTeamHandler();
+          return;
+        }
+        console.error("Error refreshing token:", refreshError.message);
+
+        // Handle the error appropriately, for now, just log it
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/login");
+      }
+
       if (response.ok) {
         // Handle successful response (team creation)
         console.log("Team created successfully!");
@@ -47,7 +67,9 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to create team:", response.statusText);
-        setErrorMessage(errorData.message || "Failed to create team. Please try again.");
+        setErrorMessage(
+          errorData.message || "Failed to create team. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error creating team:", error);
@@ -64,17 +86,30 @@ const HomePage = () => {
             <p className="w-[34rem] font-sans text-6xl not-italic font-extrabold leading-[4.125rem] bg-gradient-to-b from-[#6941C6] to-[#27164F] bg-clip-text text-transparent">
               A service made for teams and groups of friends.
             </p>
-            <p className="w-[31.37rem] text-base text-gray-600">Join the community and start tracking your statistics as well!</p>
+            <p className="w-[31.37rem] text-base text-gray-600">
+              Join the community and start tracking your statistics as well!
+            </p>
             <div className="flex items-center gap-3 self-stretch p-5">
               <p>You can join a team through an Invite Link</p>
             </div>
             <form className="w-[34.5rem] h-[4.3rem] shrink-0">
               <div className="flex w-full h-full flex-col justify-center items-start gap-2.5 shrink-0">
                 <div className="flex p-5 pr-6 items-center gap-3 flex-[1_0_0] self-stretch rounded-2xl border border-gray-400 bg-gray-50">
-                  <input id="team-name" placeholder="Enter team name" value={teamName} onChange={(e) => setTeamName(e.target.value)}></input>
-                  <button type="button" onClick={createTeamHandler} className="flex w-[13rem] h-[3.35rem] p-4 flex-col justify-center items-center gap-2.5 shrink-0 rounded-[0.625rem] bg-gray-950">
+                  <input
+                    id="team-name"
+                    placeholder="Enter team name"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                  ></input>
+                  <button
+                    type="button"
+                    onClick={createTeamHandler}
+                    className="flex w-[13rem] h-[3.35rem] p-4 flex-col justify-center items-center gap-2.5 shrink-0 rounded-[0.625rem] bg-gray-950"
+                  >
                     <div className="flex justify-center items-center gap-2">
-                      <p className="text-white text-base font-bold text-white">Create a Team</p>
+                      <p className="text-white text-base font-bold text-white">
+                        Create a Team
+                      </p>
                     </div>
                   </button>
                 </div>
@@ -89,7 +124,11 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <img className="w-[22rem] h-[22rem] absolute right-80 top-56" src={typing_image} alt="Typing" />
+        <img
+          className="w-[22rem] h-[22rem] absolute right-80 top-56"
+          src={typing_image}
+          alt="Typing"
+        />
       </div>
       <Footer />
     </div>

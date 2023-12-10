@@ -70,7 +70,6 @@ public class JwtServiceImpl implements JwtService {
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSigningKey.getBytes();
-        System.out.println("length of key in bytes: " + keyBytes.length);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
