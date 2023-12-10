@@ -47,6 +47,7 @@ const JoinTeam = () => {
 
             if (newToken !== null) {
               joinTeamCall();
+              return;
             } else {
               throw new Error("Failed to refresh token");
             }

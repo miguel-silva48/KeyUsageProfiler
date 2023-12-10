@@ -28,6 +28,8 @@ const HomePage = () => {
   }, []);
 
   const joinTeamHandler = async () => {
+    var token = localStorage.getItem("authToken");
+
     if (!inviteLink) {
       setErrorMessage("Please enter an invite link and try again.");
       return;
@@ -56,6 +58,16 @@ const HomePage = () => {
         console.log("Team joined successfully!");
         localStorage.setItem("userType", "TEAM_MEMBER");
         navigate("/profile");
+      } else if (response.status == 403) {
+        const newToken = await refreshToken();
+
+        if (newToken !== null) {
+          setToken(newToken);
+          joinTeamHandler();
+          return;
+        } else {
+          throw new Error("Failed to refresh token");
+        }
       } else {
         // Handle error response
         console.error("Failed to join team:", response.statusText);
@@ -86,9 +98,9 @@ const HomePage = () => {
 
       if (response.status === 403) {
         const newToken = await refreshToken();
-        setToken(newToken);
 
         if (newToken !== null) {
+          setToken(newToken);
           createTeamHandler();
           return;
         }

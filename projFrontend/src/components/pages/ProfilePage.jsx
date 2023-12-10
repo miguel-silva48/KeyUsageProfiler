@@ -137,7 +137,7 @@ const ProfilePage = () => {
         <div className="ml-4">
           <p className="font-semibold text-lg">Profile</p>
           <p className="text-gray-900">
-            {userData ? userData.username : "Loading..."}
+            {userData ? userData.name : "Loading..."}
           </p>
           <p className="text-gray-500 text-sm">
             {userData ? userData.email : "Loading..."}

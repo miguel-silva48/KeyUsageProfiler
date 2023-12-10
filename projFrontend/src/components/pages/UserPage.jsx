@@ -71,6 +71,7 @@ const UserPage = () => {
           if (newToken !== null) {
             setToken(newToken);
             fetchUserStatistics(userId);
+            return;
           } else {
             throw new Error("Failed to refresh token");
           }
@@ -90,6 +91,7 @@ const UserPage = () => {
 
   const handleLeaveTeam = async () => {
     try {
+      var token = localStorage.getItem("authToken");
       const response = await fetch(
         `http://localhost:8080/api/users/leaveteam`,
         {
@@ -105,6 +107,16 @@ const UserPage = () => {
         console.log("USERPAGE: Team left successfully!");
         localStorage.setItem("userType", "USER");
         navigate("/");
+      } else if (response.status == 403) {
+        const newToken = await refreshToken();
+
+        if (newToken !== null) {
+          setToken(newToken);
+          handleLeaveTeam();
+          return;
+        } else {
+          throw new Error("Failed to refresh token");
+        }
       } else {
         console.error("USERPAGE: Failed to leave team - ", response.statusText);
       }
@@ -122,7 +134,7 @@ const UserPage = () => {
         <div className="ml-4">
           <p className="font-semibold text-lg">Profile</p>
           <p className="text-gray-900">
-            {userData ? userData.username : "Loading..."}
+            {userData ? userData.name : "Loading..."}
           </p>
           <p className="text-gray-500 text-sm">
             {userData ? userData.email : "Loading..."}

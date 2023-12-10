@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
-  const [inviteLink, setInviteLink] = useState("");
+  const [inviteLink, setInviteLink] = useState(null);
   const usersPerPage = 10;
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const Dashboard = () => {
             const statistics = await statisticsResponse.json();
             return {
               id: statistics.author.id,
-              username: statistics.author.username,
+              username: statistics.author.name,
               email: statistics.author.email,
               minutesTyping: statistics.minutesTyping,
               awpm: statistics.awpm,
@@ -84,7 +84,7 @@ const Dashboard = () => {
           } else if (statisticsResponse.status === 404) {
             return {
               id: member.id,
-              username: member.username,
+              username: member.name,
               email: member.email,
               minutesTyping: 0,
               awpm: 0,
@@ -105,7 +105,9 @@ const Dashboard = () => {
         const newToken = await refreshToken();
 
         if (newToken !== null) {
+          setToken(newToken);
           fetchData();
+          return;
         } else {
           throw new Error("Failed to refresh token");
         }
@@ -123,6 +125,7 @@ const Dashboard = () => {
 
   const createInviteLink = async () => {
     try {
+      var token = localStorage.getItem("authToken");
       const fetchLinkToken = await fetch(
         "http://localhost:8080/api/teams/invite",
         {
@@ -134,16 +137,33 @@ const Dashboard = () => {
         let { token } = await fetchLinkToken.json();
 
         setInviteLink(`http://localhost:5173/teams/join/${token}`);
+      } else if (fetchLinkToken.status == 403) {
+        const newToken = await refreshToken();
+
+        if (newToken !== null) {
+          setToken(newToken);
+          createInviteLink();
+          return;
+        } else {
+          throw new Error("Failed to refresh token");
+        }
       } else {
         console.log("Error creating invite link");
       }
     } catch (error) {
-      console.error("Error fetching link token:", error);
+      console.error("Error refreshing token:", error.message);
+      // Handle the error appropriately, for now, just log it
+      let theme = localStorage.getItem("theme");
+      localStorage.clear();
+      localStorage.setItem("theme", theme);
+      navigate("/login");
     }
   };
 
   const removeFromTeam = async (userId) => {
     try {
+      var token = localStorage.getItem("authToken");
+
       const response = await fetch(
         `http://localhost:8080/api/users/removefromteam/${userId}`,
         {
@@ -158,11 +178,25 @@ const Dashboard = () => {
       if (response.ok) {
         // Handle successful response (team creation)
         fetchData();
+      } else if (response.status == 403) {
+        const newToken = await refreshToken();
+        if (newToken !== null) {
+          setToken(newToken);
+          removeFromTeam(userId);
+          return;
+        } else {
+          throw new Error("Failed to refresh token");
+        }
       } else {
         console.error("Couldn't delete user", response.statusText);
       }
     } catch (error) {
-      console.error("Error deleting user from team:", error);
+      console.error("Error refreshing token:", error.message);
+      // Handle the error appropriately, for now, just log it
+      let theme = localStorage.getItem("theme");
+      localStorage.clear();
+      localStorage.setItem("theme", theme);
+      navigate("/login");
     }
   };
 
