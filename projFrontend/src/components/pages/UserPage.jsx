@@ -7,6 +7,8 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import Keyboard from "../layout/Keyboard";
 
+import refreshToken from "../../utils/refreshToken";
+
 import {
   RiTimeLine,
   RiKeyboardFill,
@@ -23,39 +25,68 @@ const UserPage = () => {
   const [userStatistics, setUserStatistics] = useState(null);
 
   useEffect(() => {
-    //If user is not team member or leader, redirect to homepage
     if (!userType || userType === "USER") {
       navigate("/");
       return;
     }
-
-    fetch(`http://localhost:8080/api/statistics/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Assuming the data structure contains both user and statistics information
-        if (!data) {
-          console.error("Invalid response format");
-          return;
-        }
-
-        const statistics = {
-          awpm: data.awpm,
-          maxWpm: data.maxWpm,
-          minutesTyping: data.minutesTyping,
-        };
-        setUserData(data.author);
-        setUserStatistics(statistics);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data and statistics:", error);
-      });
+    if (userId) fetchUserStatistics(userId);
   }, []);
+
+  const fetchUserStatistics = async (userId) => {
+    var authtoken = localStorage.getItem("authToken");
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/statistics/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authtoken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        var error = new Error(
+          `Error fetching user statistics: ${response.statusText}`
+        );
+        error.code = response.status;
+        throw error;
+      }
+      const data = await response.json();
+
+      const statistics = {
+        awpm: data.awpm,
+        maxWpm: data.maxWpm,
+        minutesTyping: data.minutesTyping,
+      };
+      setUserData(data.author);
+      setUserStatistics(statistics);
+      return;
+    } catch (error) {
+      if (error.code === 403) {
+        try {
+          const newToken = await refreshToken();
+
+          if (newToken !== null) {
+            setToken(newToken);
+            fetchUserStatistics(userId);
+          } else {
+            throw new Error("Failed to refresh token");
+          }
+        } catch (refreshError) {
+          console.error("Error refreshing token:", refreshError.message);
+
+          // Handle the error appropriately, for now, just log it
+          let theme = localStorage.getItem("theme");
+          localStorage.clear();
+          localStorage.setItem("theme", theme);
+          navigate("/login");
+        }
+      }
+      console.error("Error in fetchUserStatistics:", error);
+    }
+  };
 
   const handleLeaveTeam = async () => {
     try {
@@ -148,7 +179,7 @@ const UserPage = () => {
 
       <div className="mb-20">
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
-        <Keyboard userId={userId} />
+        <Keyboard />
       </div>
       <Footer />
     </div>
