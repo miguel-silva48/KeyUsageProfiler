@@ -24,30 +24,6 @@ public class UserController {
 
   private UserService userService;
 
-  @GetMapping
-  public ResponseEntity<List<User>> getAllUsers() {
-    List<User> users = userService.getAllUsers();
-    return new ResponseEntity<>(users, HttpStatus.OK);
-  }
-
-  @GetMapping("{id}")
-  public ResponseEntity<User> getUserById(@PathVariable("id") Long userId) {
-    Optional<User> user = userService.getUserById(userId);
-    if (user.isEmpty())
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    return new ResponseEntity<>(user.get(), HttpStatus.OK);
-  }
-
-  @PostMapping
-  public ResponseEntity<User> createUser(@RequestBody User user) {
-    try {
-      User savedUser = userService.createUser(user);
-      return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-    } catch (DataIntegrityViolationException e) {
-      return new ResponseEntity<>(HttpStatus.CONFLICT);
-    }
-  }
-
   @PutMapping("/leaveteam")
   public ResponseEntity<User> leaveTeam() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
