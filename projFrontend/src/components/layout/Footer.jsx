@@ -3,7 +3,7 @@ import { RiGithubFill, RiInstagramFill,RiFacebookBoxFill } from 'react-icons/ri'
 
 const Footer = () => {
   return (
-    <footer className="footer p-10 bg-neutral text-neutral-content bottom-0">
+    <footer className="footer p-10 bg-neutral text-neutral-content bottom-0 mt-auto">
       <aside>
         <img className='w-[10vw] bg-slate-300' src={logo} />
         <h2>

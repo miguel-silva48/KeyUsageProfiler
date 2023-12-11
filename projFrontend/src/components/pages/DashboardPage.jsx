@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { Fragment, useRef, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Dialog, Transition } from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 import {
-  RiUser3Line,
-  RiArrowRightLine,
   RiArrowLeftLine,
+  RiArrowRightLine,
   RiDeleteBinLine,
-  RiShareForwardLine,
   RiLink,
+  RiShareForwardLine,
+  RiUser3Line,
 } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -15,8 +17,6 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 import GamingBadge from "../layout/StatusBadges/GamingBadge";
-import CodingBadge from "../layout/StatusBadges/CodingBadge";
-import InactiveBadge from "../layout/StatusBadges/InactiveBadge";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -30,6 +30,8 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [inviteLink, setInviteLink] = useState(null);
   const usersPerPage = 10;
+  const [open, setOpen] = useState(false);
+  const cancelButtonRef = useRef(null);
 
   useEffect(() => {
     if (!token || !userType) {
@@ -60,7 +62,13 @@ const Dashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      if (teamDataResponse.status === 403) {
+        let error = new Error("Forbidden.");
+        error.status = 403;
+        throw error;
+      }
       const teamData = await teamDataResponse.json();
+
       setTeamName(teamData.name);
 
       const usersData = await Promise.all(
@@ -74,6 +82,7 @@ const Dashboard = () => {
 
           if (statisticsResponse.ok) {
             const statistics = await statisticsResponse.json();
+            console.log(statistics);
             return {
               id: statistics.author.id,
               username: statistics.author.name,
@@ -89,6 +98,10 @@ const Dashboard = () => {
               minutesTyping: 0,
               awpm: 0,
             };
+          } else if (statisticsResponse.status === 403) {
+            let error = new Error("Forbidden.");
+            error.status = 403;
+            throw error;
           } else {
             throw new Error(
               `Statistics API returned an error: ${statisticsResponse.statusText}`
@@ -101,24 +114,26 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error in fetchData:", error);
 
-      try {
-        const newToken = await refreshToken();
+      if (error.status === 403) {
+        try {
+          const newToken = await refreshToken();
 
-        if (newToken !== null) {
-          setToken(newToken);
-          fetchData();
-          return;
-        } else {
-          throw new Error("Failed to refresh token");
+          if (newToken !== null) {
+            setToken(newToken);
+            fetchData();
+            return;
+          } else {
+            throw new Error("Failed to refresh token");
+          }
+        } catch (refreshError) {
+          console.error("Error refreshing token:", refreshError.message);
+
+          // Handle the error appropriately, for now, just log it
+          let theme = localStorage.getItem("theme");
+          localStorage.clear();
+          localStorage.setItem("theme", theme);
+          navigate("/login");
         }
-      } catch (refreshError) {
-        console.error("Error refreshing token:", refreshError.message);
-
-        // Handle the error appropriately, for now, just log it
-        let theme = localStorage.getItem("theme");
-        localStorage.clear();
-        localStorage.setItem("theme", theme);
-        navigate("/login");
       }
     }
   };
@@ -200,6 +215,38 @@ const Dashboard = () => {
     }
   };
 
+  const deleteTeam = async () => {
+    try {
+      var token = localStorage.getItem("authToken");
+      const response = await fetch(`http://localhost:8080/api/teams/delete`, {
+        method: "DEL",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Handle successful response (team creation)
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/");
+      } else if (response.status == 403) {
+        const newToken = await refreshToken();
+        if (newToken !== null) {
+          setToken(newToken);
+          deleteTeam();
+          return;
+        } else {
+          throw new Error("Failed to refresh token");
+        }
+      }
+    } catch (error) {
+      console.log("Failed to delete team", error.message);
+    }
+  };
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
@@ -212,16 +259,97 @@ const Dashboard = () => {
   return (
     <div>
       <Navbar />
+      <div>
+        <Transition.Root show={open} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-10"
+            initialFocus={cancelButtonRef}
+            onClose={setOpen}
+          >
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  enterTo="opacity-100 translate-y-0 sm:scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                  leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                >
+                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                      <div className="sm:flex sm:items-start">
+                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                          <ExclamationTriangleIcon
+                            className="h-6 w-6 text-red-600"
+                            aria-hidden="true"
+                          />
+                        </div>
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-base font-semibold leading-6 text-gray-900"
+                          >
+                            Delete team
+                          </Dialog.Title>
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-500">
+                              Are you sure you want to delete your team? All of
+                              your data will be permanently removed. This action
+                              cannot be undone.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                      <button
+                        type="button"
+                        className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                        onClick={deleteTeam}
+                      >
+                        Delete
+                      </button>
+                      <button
+                        type="button"
+                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                        onClick={() => setOpen(false)}
+                        ref={cancelButtonRef}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
+      </div>
       <div
         id="body"
-        className="flex w-screen mt-2 pb-0 flex-col items-center gap-5"
+        className="flex w-screen mt-2 pb-0 flex-col items-center gap-5 min-h-[52.3vh]"
       >
         <div
           id="table-team-members"
           className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]"
         >
           <div className="flex items-center self-stretch">
-            <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-10/12">
+            <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-9/12">
               <div className="flex items-center flex-[1_0_0] gap-2">
                 <h2 className="text-2xl font-normal leading-7">
                   Team Members of {teamName}
@@ -242,6 +370,13 @@ const Dashboard = () => {
             >
               <RiLink className="text-xl" />
               <span className="text-[#12B76A] text-l">Invite Link</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex ml-3 px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-red-500"
+            >
+              <span className="text-white text-l">Delete Team</span>
             </button>
           </div>
           <div className="flex items-start self-stretch">
