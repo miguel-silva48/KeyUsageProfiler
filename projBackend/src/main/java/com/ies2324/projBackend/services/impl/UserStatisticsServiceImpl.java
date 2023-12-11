@@ -1,4 +1,4 @@
-package com.ies2324.projBackend.services;
+package com.ies2324.projBackend.services.impl;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.UserStatisticsRepository;
+import com.ies2324.projBackend.services.UserStatisticsService;
 
 import lombok.AllArgsConstructor;
 import java.lang.Math;
@@ -15,6 +16,11 @@ import java.lang.Math;
 public class UserStatisticsServiceImpl implements UserStatisticsService {
 
   UserStatisticsRepository userStatisticsRepository;
+
+  @Override
+  public UserStatistics createUserStatistics(UserStatistics u) {
+    return userStatisticsRepository.save(u);
+  }
 
   @Override
   public UserStatistics createOrAddUserStatistics(Long authorId, Float interval, String writtenText) {

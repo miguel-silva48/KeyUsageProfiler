@@ -10,14 +10,16 @@ services:
       MYSQL_ROOT_PASSWORD: 'password_root'
     ports:
       - '3306:3306'
-    expose:
-      - '3306'
     volumes:
       - my-db:/var/lib/mysql
+    networks:
+      - default
   redis:
     image: "redis:alpine"
     ports:
       - '6379:6379'
+    networks:
+      - default
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
@@ -27,8 +29,26 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - default
+  backend:
+    image: maven:3-openjdk-17
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    volumes: 
+      - .:/app
+    command: bash -c "cd app/projBackend/; mvn spring-boot:run"
+    restart: on-failure
+    ports:
+      - 8080:8080
+    networks:
+      - default
+  
 volumes:
   my-db:
+  
 networks:
   default:
     driver: bridge

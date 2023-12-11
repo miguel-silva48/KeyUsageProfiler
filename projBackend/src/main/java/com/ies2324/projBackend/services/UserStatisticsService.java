@@ -8,4 +8,6 @@ public interface UserStatisticsService {
   UserStatistics createOrAddUserStatistics(Long authorId, Float interval, String writtenText);
 
   Optional<UserStatistics> getUserStatisticsByAuthorId(Long authorId);
+
+  UserStatistics createUserStatistics(UserStatistics userStatistics);
 }
