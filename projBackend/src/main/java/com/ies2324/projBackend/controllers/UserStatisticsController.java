@@ -30,8 +30,8 @@ public class UserStatisticsController {
     UserStatistics userStatistics = optStatistics.get();
     // only get data if you're a team member and its your data
     // or you're the team leader of this user
-    if ((requester.getRole() == Role.TEAM_LEADER && userStatistics.getAuthor().getTeam().getLeader().getId() != requester.getId())
-        || (requester.getRole() == Role.TEAM_MEMBER && userStatistics.getAuthor().getId() == requester.getId()))
+    if ((requester.getRole() == Role.TEAM_LEADER && userStatistics.getAuthor().getTeam().getLeader().getId() == requester.getId())
+        || (requester.getRole() == Role.TEAM_MEMBER && userId == requester.getId()))
       return new ResponseEntity<>(userStatistics, HttpStatus.OK);
     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
   }
