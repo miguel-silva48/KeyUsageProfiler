@@ -21,9 +21,7 @@ export default {
         bold: '700',
       },
     },
-    colors: {
-      '-card-color': 'var(--color-card)',
-    },
+
   },
   plugins: [require('daisyui')],
   darkMode: 'class', // enable dark mode
