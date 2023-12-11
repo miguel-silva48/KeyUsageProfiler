@@ -66,6 +66,11 @@ const Dashboard = () => {
         let error = new Error("Forbidden.");
         error.status = 403;
         throw error;
+      } else if (teamDataResponse.status === 404) {
+        let theme = localStorage.getItem("theme");
+        localStorage.clear();
+        localStorage.setItem("theme", theme);
+        navigate("/");
       }
       const teamData = await teamDataResponse.json();
 
