@@ -49,10 +49,10 @@ public class UserController {
   }
 
   @PutMapping("/leaveteam")
-  public ResponseEntity<User> leaveTeam(){
+  public ResponseEntity<User> leaveTeam() {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (user.getRole() != Role.TEAM_MEMBER)
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     userService.removeFromTeam(user);
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
@@ -63,9 +63,11 @@ public class UserController {
     User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     Optional<User> expeledToBe = userService.getUserById(Long.parseLong(userId));
 
-    // always return FORBIDDEN (can't return NOT FOUND when expeledToBe isEmpty because we then would be which users don't have a team)
-    if (user.getRole() != Role.TEAM_LEADER || expeledToBe.isEmpty() || !user.getTeam().equals(expeledToBe.get().getTeam()))
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    return new ResponseEntity<>( userService.removeFromTeam(expeledToBe.get()), HttpStatus.OK);
+    // always return UNAUTHORIZED (can't return NOT FOUND when expeledToBe isEmpty
+    // because we then would be which users don't have a team)
+    if (user.getRole() != Role.TEAM_LEADER || expeledToBe.isEmpty()
+        || !user.getTeam().equals(expeledToBe.get().getTeam()))
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    return new ResponseEntity<>(userService.removeFromTeam(expeledToBe.get()), HttpStatus.OK);
   }
 }

@@ -43,7 +43,7 @@ public class TeamController {
     public ResponseEntity<InviteLinkResponse> generateInviteLink() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() != Role.TEAM_LEADER)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));
     }
 
@@ -51,7 +51,7 @@ public class TeamController {
     public ResponseEntity<JoinTeamResponse> join(@PathVariable("token") String token) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getTeam() != null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         JoinTeamResponse res = teamService.joinTeam(user, token);
         if (res == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -82,7 +82,7 @@ public class TeamController {
         Team team;
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() != Role.TEAM_LEADER || (team = user.getTeam()) == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         teamService.deleteTeam(team);
         return ResponseEntity.ok().build();
     }
