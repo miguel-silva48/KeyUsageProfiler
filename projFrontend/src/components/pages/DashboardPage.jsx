@@ -76,6 +76,7 @@ const Dashboard = () => {
 
           if (statisticsResponse.ok) {
             const statistics = await statisticsResponse.json();
+            console.log(statistics);
             return {
               id: statistics.author.id,
               username: statistics.author.name,
@@ -91,6 +92,10 @@ const Dashboard = () => {
               minutesTyping: 0,
               awpm: 0,
             };
+          } else if (statisticsResponse.status === 403) {
+            let error = new Error("Forbidden.");
+            error.status = 403;
+            throw error;
           } else {
             throw new Error(
               `Statistics API returned an error: ${statisticsResponse.statusText}`
@@ -103,24 +108,26 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error in fetchData:", error);
 
-      try {
-        const newToken = await refreshToken();
+      if (error.status === 403) {
+        try {
+          const newToken = await refreshToken();
 
-        if (newToken !== null) {
-          setToken(newToken);
-          fetchData();
-          return;
-        } else {
-          throw new Error("Failed to refresh token");
+          if (newToken !== null) {
+            setToken(newToken);
+            fetchData();
+            return;
+          } else {
+            throw new Error("Failed to refresh token");
+          }
+        } catch (refreshError) {
+          console.error("Error refreshing token:", refreshError.message);
+
+          // Handle the error appropriately, for now, just log it
+          let theme = localStorage.getItem("theme");
+          localStorage.clear();
+          localStorage.setItem("theme", theme);
+          navigate("/login");
         }
-      } catch (refreshError) {
-        console.error("Error refreshing token:", refreshError.message);
-
-        // Handle the error appropriately, for now, just log it
-        let theme = localStorage.getItem("theme");
-        localStorage.clear();
-        localStorage.setItem("theme", theme);
-        navigate("/login");
       }
     }
   };
