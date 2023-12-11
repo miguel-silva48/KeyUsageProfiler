@@ -62,7 +62,13 @@ const Dashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      if (teamDataResponse.status === 403) {
+        let error = new Error("Forbidden.");
+        error.status = 403;
+        throw error;
+      }
       const teamData = await teamDataResponse.json();
+
       setTeamName(teamData.name);
 
       const usersData = await Promise.all(
