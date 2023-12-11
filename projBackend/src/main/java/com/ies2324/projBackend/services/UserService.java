@@ -23,4 +23,8 @@ public interface UserService {
   void deleteUser(Long userId);
 
   Team removeFromTeam(User user);
+
+  // updates users' team status, used when we
+  // delete a whole team
+  User clearTeamFromUser(User user);
 }
