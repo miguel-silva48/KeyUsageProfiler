@@ -101,9 +101,8 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    //TODO API call
-    //localStorage.clear();
-    //navigate("/login");
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
