@@ -35,6 +35,8 @@ public class TeamController {
     @PostMapping("create")
     public ResponseEntity<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getTeam() != null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Team team = Team.builder().leader(user).name(request.getName()).build();
         return ResponseEntity.ok(teamService.createTeam(team));
     }
@@ -73,7 +75,7 @@ public class TeamController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // only team leader can get team statistics
         if (user.getRole() != Role.TEAM_LEADER)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(teamService.getUserStatisticsTeam(user.getTeam()), HttpStatus.OK);
     }
 
