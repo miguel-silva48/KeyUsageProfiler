@@ -70,4 +70,12 @@ public class UserServiceImpl implements UserService {
     team.getMembers().remove(user);
     return team;
   }
+
+  @Override
+  public User clearTeamFromUser(User user) {
+    user.setRole(Role.USER);
+    user.setTeam(null);
+    updateUser(user);
+    return user;
+  }
 }

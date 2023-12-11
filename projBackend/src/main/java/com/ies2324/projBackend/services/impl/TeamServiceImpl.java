@@ -1,6 +1,7 @@
 package com.ies2324.projBackend.services.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,8 +79,11 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public void deleteTeam(Team team) {
         if (team != null) {
-            for (User u : team.getMembers()) {
-                userService.removeFromTeam(u);
+            User u;
+            Iterator<User> teamIterator =  team.getMembers().iterator();
+            while (teamIterator.hasNext()) {
+                u = teamIterator.next();
+                userService.clearTeamFromUser(u);
             }
             teamRepository.delete(team);
         }

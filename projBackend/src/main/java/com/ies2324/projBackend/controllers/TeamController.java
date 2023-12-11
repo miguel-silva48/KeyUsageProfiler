@@ -35,6 +35,8 @@ public class TeamController {
     @PostMapping("create")
     public ResponseEntity<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getTeam() != null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Team team = Team.builder().leader(user).name(request.getName()).build();
         return ResponseEntity.ok(teamService.createTeam(team));
     }
@@ -43,7 +45,7 @@ public class TeamController {
     public ResponseEntity<InviteLinkResponse> generateInviteLink() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() != Role.TEAM_LEADER)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));
     }
 
@@ -51,7 +53,7 @@ public class TeamController {
     public ResponseEntity<JoinTeamResponse> join(@PathVariable("token") String token) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getTeam() != null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         JoinTeamResponse res = teamService.joinTeam(user, token);
         if (res == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -73,7 +75,7 @@ public class TeamController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // only team leader can get team statistics
         if (user.getRole() != Role.TEAM_LEADER)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(teamService.getUserStatisticsTeam(user.getTeam()), HttpStatus.OK);
     }
 
@@ -82,7 +84,7 @@ public class TeamController {
         Team team;
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user.getRole() != Role.TEAM_LEADER || (team = user.getTeam()) == null)
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         teamService.deleteTeam(team);
         return ResponseEntity.ok().build();
     }
