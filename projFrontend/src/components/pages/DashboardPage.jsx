@@ -219,7 +219,7 @@ const Dashboard = () => {
     try {
       var token = localStorage.getItem("authToken");
       const response = await fetch(`http://localhost:8080/api/teams/delete`, {
-        method: "DEL",
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
