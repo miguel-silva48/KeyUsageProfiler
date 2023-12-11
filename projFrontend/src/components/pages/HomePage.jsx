@@ -16,6 +16,7 @@ const HomePage = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [errorMessage, setErrorMessage] = useState("");
+  const storageInviteToken = localStorage.getItem("inviteToken");
 
   useEffect(() => {
     if (!token || !userType) {
@@ -25,19 +26,28 @@ const HomePage = () => {
     } else if (userType === "TEAM_LEADER") {
       navigate("/dashboard");
     }
+    if (storageInviteToken !== null) {
+      joinTeamHandler();
+    }
   }, []);
 
   const joinTeamHandler = async () => {
+    let link = "";
+    if (storageInviteToken !== null) {
+      localStorage.removeItem("inviteToken");
+      link = storageInviteToken;
+    } else link = inviteLink;
+
     var token = localStorage.getItem("authToken");
 
-    if (!inviteLink) {
+    if (!link) {
       setErrorMessage("Please enter an invite link and try again.");
       return;
     }
     const path = window.location.href + "teams/join/";
-    var realLink = inviteLink;
+    var realLink = link;
     console.log("my window:", window.location.href);
-    if (inviteLink.startsWith(path)) {
+    if (link.startsWith(path)) {
       realLink = realLink.replace(path, "");
     }
 
