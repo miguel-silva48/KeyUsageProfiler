@@ -236,7 +236,7 @@ const Dashboard = () => {
         const newToken = await refreshToken();
         if (newToken !== null) {
           setToken(newToken);
-          removeFromTeam(userId);
+          deleteTeam();
           return;
         } else {
           throw new Error("Failed to refresh token");
