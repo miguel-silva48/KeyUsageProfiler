@@ -26,7 +26,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
   UserStatisticsRepository userStatisticsRepository;
   @Autowired
   private NotificationService notificationService;
-  private static final float gamingthreshold = 0.25f;
+  private static final float gamingthreshold = 0.30f;
 
   @Override
   public UserStatistics createUserStatistics(UserStatistics u) {
@@ -38,28 +38,30 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
     Optional<UserStatistics> optUserStatistics = userStatisticsRepository.findByAuthorId(authorId);
     UserStatistics userStatistics = new UserStatistics();
     Float thisMinuteWPM = Float.valueOf(writtenText.split("\\s+").length);
-    User author = new User();
-    author.setId(authorId);
-    userStatistics.setAuthor(author);
-    userStatistics.setStatus(getUserStatusAndNotify(author, keystrokes));
+    User author;
     if (optUserStatistics.isEmpty()) {
+      author = new User();
+      author.setId(authorId);
+      userStatistics.setAuthor(author);
       userStatistics.setMinutesTyping(interval);
       userStatistics.setAwpm(thisMinuteWPM / interval);
       userStatistics.setMaxWpm(thisMinuteWPM / interval);
     } else {
       userStatistics = optUserStatistics.get();
+      author = userStatistics.getAuthor();
       Float minutesTyping = userStatistics.getMinutesTyping();
       userStatistics.setAwpm((userStatistics.getAwpm() * minutesTyping + thisMinuteWPM) / (minutesTyping + interval));
       userStatistics.setMinutesTyping(minutesTyping + interval);
       userStatistics.setMaxWpm(Math.max(userStatistics.getMaxWpm(), thisMinuteWPM / interval));
     }
+    userStatistics.setStatus(getUserStatusAndNotify(author, keystrokes));
     userStatisticsRepository.save(userStatistics);
     return userStatistics;
   }
 
   public Status getUserStatusAndNotify(User user, List<Keystroke> keystrokes){
     Map<String, Long> keyCounter = keystrokes.stream().collect(Collectors.groupingBy(Keystroke::getPressedKey, Collectors.counting()));
-    float gamingPercentage = 100 * (keyCounter.getOrDefault("A", 0l) + keyCounter.getOrDefault("W", 0l) + keyCounter.getOrDefault("S", 0l) + keyCounter.getOrDefault("D", 0l))/keystrokes.size();
+    float gamingPercentage = (keyCounter.getOrDefault("A", 0l) + keyCounter.getOrDefault("W", 0l) + keyCounter.getOrDefault("S", 0l) + keyCounter.getOrDefault("D", 0l))/ (float) keystrokes.size();
     if (gamingPercentage > gamingthreshold){
       Team team = user.getTeam();
       if (team != null){
