@@ -32,6 +32,7 @@ const Dashboard = () => {
   const usersPerPage = 10;
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     if (!token || !userType) {
@@ -51,6 +52,16 @@ const Dashboard = () => {
       clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    if (copiedLink) {
+      const timer = setTimeout(() => {
+        setCopiedLink(false);
+      }, 3000);
+   
+      return () => clearTimeout(timer);
+    }
+   }, [copiedLink]);
 
   const fetchData = async () => {
     try {
@@ -261,6 +272,11 @@ const Dashboard = () => {
   const totalPages = Math.ceil(userData.length / usersPerPage);
   const showPagination = totalPages > 1;
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setCopiedLink(true);
+  }
+
   return (
     <div>
       <Navbar />
@@ -367,10 +383,11 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
+              {copiedLink && (<p className="text-gray-500 text-sm ml-2">Copied to clipboard!</p>)}
             </div>
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(inviteLink)}
+              onClick={() => copyToClipboard()}
               className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]"
             >
               <RiLink className="text-xl" />
