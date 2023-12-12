@@ -16,12 +16,10 @@ import org.springframework.data.redis.core.RedisKeyExpiredEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
 import com.ies2324.projBackend.entities.Notification;
-import com.ies2324.projBackend.entities.NotificationType;
 import com.ies2324.projBackend.entities.Status;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
@@ -34,8 +32,6 @@ public class RedisService {
   private NotificationService notificationService;
   @Autowired
   private UserService userService;
-  @Autowired
-  private SimpMessagingTemplate simpMessagingTemplate;
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
 
@@ -99,15 +95,11 @@ public class RedisService {
       Team userTeam = u.getTeam();
       if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
         Notification n = new Notification();
-        n.setType(NotificationType.INACTIVE);
+        n.setStatus(Status.INACTIVE);
         n.setUser(u);
         u.getUserStatistics().setStatus(Status.INACTIVE);
         userService.updateUser(u);
-        n = notificationService.createNotification(n);
-        simpMessagingTemplate.convertAndSendToUser(
-            userTeam.getLeader().getUsername(),
-            "/topic/notifications",
-            n);
+        notificationService.createAndSendNotification(n);
       }
     }
   }
