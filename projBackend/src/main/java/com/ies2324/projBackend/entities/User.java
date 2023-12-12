@@ -21,6 +21,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -58,9 +59,13 @@ public class User implements UserDetails {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "user")
   @JsonIgnore
   private List<Notification> notifications; // notifications that refer to him
+
+  @OneToOne(mappedBy = "author")
+  @JsonIgnore
+  private UserStatistics userStatistics; // statistics that refer to him
 
   @ManyToOne(optional = true)
   @JoinColumn(name = "team_id", nullable = true)
