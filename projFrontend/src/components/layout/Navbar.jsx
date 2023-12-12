@@ -124,7 +124,7 @@ const Navbar = () => {
       )}
 
       {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
-        <Link to="/#">
+        <Link to="/leaderboards">
           <h2 className="text-xl font-bold">Leaderboard</h2>
         </Link>
       )}
