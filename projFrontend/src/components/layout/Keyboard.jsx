@@ -76,7 +76,7 @@ function Keyboard({ userId }) {
   return (
     <div className="kb-main-container">
       <div className="kb-row">
-        <div className="kb-col" id="esc">
+        <div className="kb-col" id="escape">
           Esc
         </div>
         {/* empty space between keys */}
@@ -120,10 +120,10 @@ function Keyboard({ userId }) {
           F12
         </div>
         <div className="kb-empty"></div>
-        <div className="kb-col" id="print">
+        <div className="kb-col" id="print screen">
           Print <span>Screen</span>
         </div>
-        <div className="kb-col" id="scroll">
+        <div className="kb-col" id="scroll lock">
           Scroll <span>Lock</span>
         </div>
         <div className="kb-col" id="pause">
