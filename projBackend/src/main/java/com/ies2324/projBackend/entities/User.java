@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,7 +63,7 @@ public class User implements UserDetails {
   @JsonIgnore
   private List<Notification> notifications; // notifications that refer to him
 
-  @OneToOne(mappedBy = "author")
+  @OneToOne(mappedBy = "author", cascade = CascadeType.ALL)
   @JsonIgnore
   private UserStatistics userStatistics; // statistics that refer to him
 

@@ -91,14 +91,16 @@ public class RedisService {
     Long userid = Long.parseLong(userId);
     Optional<User> user = userService.getUserById(userid);
     if (user.isPresent()) {
+      // update user state
       User u = user.get();
+      u.getUserStatistics().setStatus(Status.INACTIVE);
+      userService.updateUser(u);
+      // notify team leader
       Team userTeam = u.getTeam();
       if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
         Notification n = new Notification();
         n.setStatus(Status.INACTIVE);
         n.setUser(u);
-        u.getUserStatistics().setStatus(Status.INACTIVE);
-        userService.updateUser(u);
         notificationService.createAndSendNotification(n);
       }
     }
