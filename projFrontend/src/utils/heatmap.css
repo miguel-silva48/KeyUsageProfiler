@@ -1,0 +1,6 @@
+.Heatmap {
+    position:relative;
+    width:600px;
+    height:223px;
+    background-image:url(../assets/real-keyboard-600.png);
+}
