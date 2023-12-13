@@ -45,7 +45,7 @@ public class KeystrokesConsumer {
                         team.getLeader().getUsername(),
                         "/topic/keystrokes",
                         k);
-                System.out.printf("sent to this guy %s: %s\n", team.getLeader().getUsername(), k);
+                // System.out.printf("sent to this guy %s: %s\n", team.getLeader().getUsername(), k);
             }
         }
 
