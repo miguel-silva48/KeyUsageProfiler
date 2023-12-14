@@ -68,7 +68,7 @@ public class MyKeyEvent extends NativeKeyEvent{
 
 			// Begin Alphanumeric Zone
 			case VC_BACKQUOTE:
-				return Toolkit.getProperty("AWT.backQuote", "Back Quote");
+				return Toolkit.getProperty("AWT.backQuote", "BackQuote");
 
 			case VC_1:
 				return "1";
@@ -101,7 +101,7 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_TAB:
 				return "\\t";
 			case VC_CAPS_LOCK:
-				return Toolkit.getProperty("AWT.capsLock", "Caps Lock");
+				return Toolkit.getProperty("AWT.capsLock", "CapsLock");
 
 			case VC_A:
 				return "A";
@@ -161,7 +161,7 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_CLOSE_BRACKET:
 				return "}";
 			case VC_BACK_SLASH:
-				return Toolkit.getProperty("AWT.backSlash", "Back Slash");
+				return Toolkit.getProperty("AWT.backSlash", "BackSlash");
 
 			case VC_SEMICOLON:
 				return ";";
@@ -182,9 +182,9 @@ public class MyKeyEvent extends NativeKeyEvent{
 			// End Alphanumeric Zone
 
 			case VC_PRINTSCREEN:
-				return Toolkit.getProperty("AWT.printScreen", "Print Screen");
+				return Toolkit.getProperty("AWT.printScreen", "PrintScreen");
 			case VC_SCROLL_LOCK:
-				return Toolkit.getProperty("AWT.scrollLock", "Scroll Lock");
+				return Toolkit.getProperty("AWT.scrollLock", "ScrollLock");
 			case VC_PAUSE:
 				return Toolkit.getProperty("AWT.pause", "Pause");
 
@@ -198,9 +198,9 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_END:
 				return Toolkit.getProperty("AWT.end", "End");
 			case VC_PAGE_UP:
-				return Toolkit.getProperty("AWT.pgup", "Page Up");
+				return Toolkit.getProperty("AWT.pgup", "PageUp");
 			case VC_PAGE_DOWN:
-				return Toolkit.getProperty("AWT.pgdn", "Page Down");
+				return Toolkit.getProperty("AWT.pgdn", "PageDown");
 			// End Edit Key Zone
 
 
@@ -220,9 +220,9 @@ public class MyKeyEvent extends NativeKeyEvent{
 
 			// Begin Numeric Zone
 			case VC_NUM_LOCK:
-				return Toolkit.getProperty("AWT.numLock", "Num Lock");
+				return Toolkit.getProperty("AWT.numLock", "NumLock");
 			case VC_SEPARATOR:
-				return Toolkit.getProperty("AWT.separator", "NumPad ,");
+				return Toolkit.getProperty("AWT.separator", "NumPad,");
 			// End Numeric Zone
 
 			// Begin Modifier and Control Keys
@@ -235,7 +235,7 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_META:
 				return Toolkit.getProperty("AWT.meta", "Meta");
 			case VC_CONTEXT_MENU:
-				return Toolkit.getProperty("AWT.context", "Context Menu");
+				return Toolkit.getProperty("AWT.context", "ContextMenu");
 			// End Modifier and Control Keys
 
 
@@ -263,33 +263,33 @@ public class MyKeyEvent extends NativeKeyEvent{
 			case VC_VOLUME_MUTE:
 				return Toolkit.getProperty("AWT.mute", "Mute");
 			case VC_VOLUME_UP:
-				return Toolkit.getProperty("AWT.volup", "Volume Up");
+				return Toolkit.getProperty("AWT.volup", "VolumeUp");
 			case VC_VOLUME_DOWN:
-				return Toolkit.getProperty("AWT.voldn", "Volume Down");
+				return Toolkit.getProperty("AWT.voldn", "VolumeDown");
 
 			case VC_APP_MAIL:
-				return Toolkit.getProperty("AWT.app_mail", "App Mail");
+				return Toolkit.getProperty("AWT.app_mail", "AppMail");
 			case VC_APP_CALCULATOR:
-				return Toolkit.getProperty("AWT.app_calculator", "App Calculator");
+				return Toolkit.getProperty("AWT.app_calculator", "AppCalculator");
 			case VC_APP_MUSIC:
-				return Toolkit.getProperty("AWT.app_music", "App Music");
+				return Toolkit.getProperty("AWT.app_music", "AppMusic");
 			case VC_APP_PICTURES:
-				return Toolkit.getProperty("AWT.app_pictures", "App Pictures");
+				return Toolkit.getProperty("AWT.app_pictures", "AppPictures");
 
 			case VC_BROWSER_SEARCH:
-				return Toolkit.getProperty("AWT.search", "Browser Search");
+				return Toolkit.getProperty("AWT.search", "BrowserSearch");
 			case VC_BROWSER_HOME:
-				return Toolkit.getProperty("AWT.homepage", "Browser Home");
+				return Toolkit.getProperty("AWT.homepage", "BrowserHome");
 			case VC_BROWSER_BACK:
-				return Toolkit.getProperty("AWT.back", "Browser Back");
+				return Toolkit.getProperty("AWT.back", "BrowserBack");
 			case VC_BROWSER_FORWARD:
-				return Toolkit.getProperty("AWT.forward", "Browser Forward");
+				return Toolkit.getProperty("AWT.forward", "BrowserForward");
 			case VC_BROWSER_STOP:
-				return Toolkit.getProperty("AWT.stop", "Browser Stop");
+				return Toolkit.getProperty("AWT.stop", "BrowserStop");
 			case VC_BROWSER_REFRESH:
-				return Toolkit.getProperty("AWT.refresh", "Browser Refresh");
+				return Toolkit.getProperty("AWT.refresh", "BrowserRefresh");
 			case VC_BROWSER_FAVORITES:
-				return Toolkit.getProperty("AWT.favorites", "Browser Favorites");
+				return Toolkit.getProperty("AWT.favorites", "BrowserFavorites");
 			// End Media Control Keys
 
 			// Begin Japanese Language Keys
@@ -310,26 +310,26 @@ public class MyKeyEvent extends NativeKeyEvent{
 
 			// Begin Sun keyboards
 			case VC_SUN_HELP:
-				return Toolkit.getProperty("AWT.sun_help", "Sun Help");
+				return Toolkit.getProperty("AWT.sun_help", "SunHelp");
 
 			case VC_SUN_STOP:
-				return Toolkit.getProperty("AWT.sun_stop", "Sun Stop");
+				return Toolkit.getProperty("AWT.sun_stop", "SunStop");
 			case VC_SUN_PROPS:
-				return Toolkit.getProperty("AWT.sun_props", "Sun Props");
+				return Toolkit.getProperty("AWT.sun_props", "SunProps");
 			case VC_SUN_FRONT:
-				return Toolkit.getProperty("AWT.sun_front", "Sun Front");
+				return Toolkit.getProperty("AWT.sun_front", "SunFront");
 			case VC_SUN_OPEN:
-				return Toolkit.getProperty("AWT.sun_open", "Sun Open");
+				return Toolkit.getProperty("AWT.sun_open", "SunOpen");
 			case VC_SUN_FIND:
-				return Toolkit.getProperty("AWT.sun_find", "Sun Find");
+				return Toolkit.getProperty("AWT.sun_find", "SunFind");
 			case VC_SUN_AGAIN:
-				return Toolkit.getProperty("AWT.sun_again", "Sun Again");
+				return Toolkit.getProperty("AWT.sun_again", "SunAgain");
 			case VC_SUN_COPY:
-				return Toolkit.getProperty("AWT.sun_copy", "Sun Copy");
+				return Toolkit.getProperty("AWT.sun_copy", "SunCopy");
 			case VC_SUN_INSERT:
-				return Toolkit.getProperty("AWT.sun_insert", "Sun Insert");
+				return Toolkit.getProperty("AWT.sun_insert", "SunInsert");
 			case VC_SUN_CUT:
-				return Toolkit.getProperty("AWT.sun_cut", "Sun Cut");
+				return Toolkit.getProperty("AWT.sun_cut", "SunCut");
 			// End Sun keyboards
 
 			case VC_UNDEFINED:
