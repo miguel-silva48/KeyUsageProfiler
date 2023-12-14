@@ -63,7 +63,6 @@
 	display: inline-block;
 	text-transform: capitalize;
 	font-weight: 600;
-	animation: press 0.4s linear;
 	background-color: #999999;
 }
 
@@ -80,19 +79,9 @@
 	display: inline-block;
 	text-transform: capitalize;
 	font-weight: 600;
-	animation: unpress 0.4s linear;
 	background-color: #eeeeee;
 }
 
-@keyframes press {
-	0% { background-color: #eeeeee; }
-	100% { background-color: #999999; }
-}
-
-@keyframes unpress {
-	0% { background-color: #999999; }
-	100% { background-color: #eeeeee; }
-}
 
 .kb-main-container .kb-col span{
 	display: block;
