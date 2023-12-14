@@ -31,20 +31,6 @@ function Keyboard({ userId }) {
     };
   }, []);
 
-  const updatePressedKey = useCallback(() => {
-    const elem = document.getElementById(lastKey[0]);
-    console.log("lastKey", lastKey);
-    if (elem) {
-      elem.classList.add("kb-pressed");
-      setTimeout(() => {
-        elem.classList.remove("kb-pressed");
-      }, 400);
-    }
-  }, [lastKey]);
-
-  useEffect(() => {
-    updatePressedKey();
-  }, [lastKey, updatePressedKey]);
 
   useEffect(() => {
     if (stompClient) {
@@ -52,11 +38,7 @@ function Keyboard({ userId }) {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/keystrokes", (message) => {
           const keypress = JSON.parse(message.body);
-          if (keypress.author.id == userId)
-            setLastKey((prevState) => [
-              keypress.pressedKey.toLowerCase(),
-              (prevState[1] + 1) % 10,
-            ]);
+          keystrokeCallback(keypress);
         });
       };
 
@@ -73,10 +55,38 @@ function Keyboard({ userId }) {
     }
   }, [stompClient]);
 
+  const keystrokeCallback = (keypress) => {
+    console.log("received keypress:", keypress);
+    if (keypress.author.id == userId)  {
+      var elem;
+      if (keypress.keyValue == "\t"){
+        elem = document.getElementById("tab");
+      } else if (keypress.keyValue == "\n") {
+        elem = document.getElementById("enter");
+      } else {
+        elem = document.getElementById(keypress.keyValue.toLowerCase());
+      }
+      if (elem) { // because of unsupported keys (right shift, for example)
+        if (keypress.isKeyPress) {
+          if (elem.classList.contains("kb-pressed")) {
+            console.log("test");
+          } else {
+            elem.classList.add("kb-pressed");
+            elem.classList.remove("kb-not-pressed");
+          }
+        } else {
+          elem.classList.add("kb-not-pressed");
+          elem.classList.remove("kb-pressed");
+        }
+      }
+      
+    }
+  }
+
   return (
     <div className="kb-main-container">
       <div className="kb-row">
-        <div className="kb-col" id="esc">
+        <div className="kb-col" id="escape">
           Esc
         </div>
         {/* empty space between keys */}
@@ -120,10 +130,10 @@ function Keyboard({ userId }) {
           F12
         </div>
         <div className="kb-empty"></div>
-        <div className="kb-col" id="print">
+        <div className="kb-col" id="print screen">
           Print <span>Screen</span>
         </div>
-        <div className="kb-col" id="scroll">
+        <div className="kb-col" id="scroll lock">
           Scroll <span>Lock</span>
         </div>
         <div className="kb-col" id="pause">
@@ -185,7 +195,7 @@ function Keyboard({ userId }) {
         </div>
       </div>
       <div className="kb-row">
-        <div className="kb-col kb-tab" id="\\t">
+        <div className="kb-col kb-tab" id="tab">
           Tab
         </div>
         <div className="kb-col kb-col-key" id="q">
@@ -280,7 +290,7 @@ function Keyboard({ userId }) {
           <span>"</span>
           <span>'</span>
         </div>
-        <div className="kb-col kb-enter" id="\\n">
+        <div className="kb-col kb-enter" id="enter">
           Enter
         </div>
         <div className="kb-empty"></div>
@@ -334,7 +344,7 @@ function Keyboard({ userId }) {
         <div className="kb-empty"></div>
       </div>
       <div className="kb-row">
-        <div className="kb-col ctrl" id="control">
+        <div className="kb-col ctrl" id="ctrl">
           Ctrl
         </div>
         <div className="kb-col" id="meta">
