@@ -30,7 +30,7 @@ public class KeystrokeSaver {
       keystrokes = new ArrayList<>();
       keystrokes = redisService.popAllKeystrokes(user_id);
       for (Keystroke k : keystrokes) {
-        sb.append(k.getPressedKey());
+        sb.append(k.getKeyValue());
       }
       if (sb.length() != 0){
         userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString(), keystrokes);

