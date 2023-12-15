@@ -74,7 +74,6 @@ const Leaderboards = () => {
 
           if (statisticsResponse.ok) {
             const statistics = await statisticsResponse.json();
-            console.log(statistics);
             return {
               id: statistics.author.id,
               username: statistics.author.name,
@@ -138,22 +137,32 @@ const Leaderboards = () => {
     });
   };
 
+  const getMedalStyle = (index) => {
+    if (index === 0) return "gold";
+    if (index === 1) return "silver";
+    if (index === 2) return "bronze";
+    return "";
+  };
+
   return (
     <div>
       <Navbar />
+      <div id="header" className="flex w-screen gap-5 justify-center mt-4">
+        <h1 className="text-3xl font-bold mb-4">Leaderboards of {teamName}</h1>
+      </div>
       <div
         id="body"
         className="flex w-screen mt-2 pb-0 flex-row items-center gap-5 min-h-[52.3vh] justify-center"
       >
         <div
-          id="leaderboars-awpm"
+          id="leaderboards-awpm"
           className="flex w-3.5/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]"
         >
           <div className="flex items-center self-stretch">
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-full">
               <div className="flex items-center flex-[1_0_0] gap-2">
                 <h2 className="text-xl font-normal leading-7">
-                  {teamName} by Average Words Per Minute
+                  Average Words Per Minute
                 </h2>
               </div>
             </div>
@@ -172,11 +181,18 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  sortUserData(userData, "awpm").map((user) => (
+                  sortUserData(userData, "awpm").map((user, index) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
                     >
+                      <td
+                        className={`medal ${getMedalStyle(
+                          index
+                        )} flex items-center justify-center text-center`}
+                      >
+                        <span className="text-center">{index + 1}</span>
+                      </td>
                       <td>
                         <Link to={`/user/${user.id}`}>
                           <RiUser3Line className="text-2xl" />
@@ -207,7 +223,7 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "awpm").map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm items-center">
                         {user ? user.awpm : "Loading..."}
                       </td>
@@ -225,7 +241,7 @@ const Leaderboards = () => {
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-full">
               <div className="flex items-center flex-[1_0_0] gap-2">
                 <h2 className="text-xl font-normal leading-7">
-                  {teamName} by Minutes Typing
+                  Minutes Typing
                 </h2>
               </div>
             </div>
@@ -244,11 +260,18 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  sortUserData(userData, "minutesTyping").map((user) => (
+                  sortUserData(userData, "minutesTyping").map((user, index) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
                     >
+                      <td
+                        className={`medal ${getMedalStyle(
+                          index
+                        )} flex items-center justify-center text-center`}
+                      >
+                        <span className="text-center">{index + 1}</span>
+                      </td>
                       <td>
                         <Link to={`/user/${user.id}`}>
                           <RiUser3Line className="text-2xl" />
@@ -279,7 +302,7 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "minutesTyping").map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
                       </td>
@@ -297,7 +320,7 @@ const Leaderboards = () => {
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-full">
               <div className="flex items-center flex-[1_0_0] gap-2">
                 <h2 className="text-xl font-normal leading-7">
-                  {teamName} by Max. Words Per Minute
+                  Max. Words Per Minute
                 </h2>
               </div>
             </div>
@@ -316,11 +339,18 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  sortUserData(userData, "maxWpm").map((user) => (
+                  sortUserData(userData, "maxWpm").map((user, index) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
                     >
+                      <td
+                        className={`medal ${getMedalStyle(
+                          index
+                        )} flex items-center justify-center text-center`}
+                      >
+                        <span className="text-center">{index + 1}</span>
+                      </td>
                       <td>
                         <Link to={`/user/${user.id}`}>
                           <RiUser3Line className="text-2xl" />
@@ -351,7 +381,7 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "maxWpm").map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm">
                         {user ? user.maxWpm : "Loading..."}
                       </td>
