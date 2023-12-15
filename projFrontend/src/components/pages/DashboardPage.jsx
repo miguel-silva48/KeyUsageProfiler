@@ -49,7 +49,7 @@ const Dashboard = () => {
     fetchData();
     createInviteLink();
 
-    var intervalId = setInterval(fetchData, 15000);
+    var intervalId = setInterval(fetchData, 5000);
 
     return () => {
       clearInterval(intervalId);
@@ -296,7 +296,6 @@ const Dashboard = () => {
     }
   }
 
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [gamingUsers, setGamingUsers] = useState([]);
   const [idleUsers, setIdleUsers] = useState([]);
@@ -304,6 +303,9 @@ const Dashboard = () => {
 
   const handleViewGraph = () => {
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+      return;
+    }
     const selectedUserIds = Array.from(checkboxes)
       .filter((checkbox) => checkbox.checked)
       .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
@@ -313,7 +315,6 @@ const Dashboard = () => {
     setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
     setIdleUsers(selectedUsersData.filter((user) => (!user.status || user.status === "IDLE")));
     setCodingUsers(selectedUsersData.filter((user) => user.status === "CODING"));
-    setSelectedUsers(selectedUsersData);
     setShowGraphModal(true);
   };
 
