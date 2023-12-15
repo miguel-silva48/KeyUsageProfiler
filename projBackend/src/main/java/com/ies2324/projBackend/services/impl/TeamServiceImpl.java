@@ -11,6 +11,7 @@ import com.ies2324.projBackend.dao.CreateTeamResponse;
 import com.ies2324.projBackend.dao.InviteLinkResponse;
 import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.dao.TeamLeaderDTO;
+import com.ies2324.projBackend.entities.Notification;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
@@ -91,6 +92,20 @@ public class TeamServiceImpl implements TeamService {
 
     public List<UserStatistics> getUserStatisticsTeam(Team t) {
         List<UserStatistics> userStats = new ArrayList<>();
+        Optional<UserStatistics> stat;
+        for (User user : t.getMembers()) {
+            if (t.getLeader().getId() == user.getId())
+                continue;
+            stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
+            if (stat.isPresent())
+                userStats.add(stat.get());
+        }
+        return userStats;
+    }
+
+    @Override
+    public List<Notification> getNotificationsTeam(Team t) {
+        List<Notification> notifications = new ArrayList<>();
         Optional<UserStatistics> stat;
         for (User user : t.getMembers()) {
             if (t.getLeader().getId() == user.getId())

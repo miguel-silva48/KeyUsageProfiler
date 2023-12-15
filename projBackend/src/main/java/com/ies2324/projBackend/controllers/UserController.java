@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.UserService;
 
 import java.util.List;
