@@ -32,19 +32,35 @@ public class KeystrokeController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
     Optional<User> optUser = userService.getUserById(userId);
-    if (optUser.isEmpty()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    if (optUser.isEmpty())
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     if ((requester.getRole() == Role.TEAM_LEADER && optUser.get().getTeam().getLeader().getId() == requester.getId())
         || (requester.getRole() == Role.TEAM_MEMBER && optUser.get().getId() == requester.getId())) {
-          List<Keystroke> keystrokes = keystrokeService.getKeystrokesByAuthorId(userId);
-          return new ResponseEntity<>(keystrokes, HttpStatus.OK);
-        }
+      List<Keystroke> keystrokes = keystrokeService.getKeystrokesByAuthorId(userId);
+      return new ResponseEntity<>(keystrokes, HttpStatus.OK);
+    }
     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
   }
 
-  @GetMapping("frequencies")
-  public ResponseEntity<List<KeystrokeFrequency>> getKeystrokeFrequencies() {
+  @GetMapping("frequencies/{id}")
+  public ResponseEntity<List<KeystrokeFrequency>> getKeystrokeFrequencies(@PathVariable("id") Long userId) {
     User requester = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    List<KeystrokeFrequency> frequencies = keystrokeService.getKeystrokeFrequencies(requester);
+    if (requester.getRole() != Role.TEAM_LEADER)
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+    Optional<User> optRequestedUser = userService.getUserById(userId);
+    if (optRequestedUser.isEmpty())
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    User requestedUser = optRequestedUser.get();
+    // access control - only his team leader may see his data
+    System.out.println("requester: " + requester);
+    System.out.println("team leader: " + requestedUser.getTeam().getLeader());
+
+    if (requestedUser.getTeam().getLeader().getId() != requester.getId())
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+    List<KeystrokeFrequency> frequencies = keystrokeService.getKeystrokeFrequencies(requestedUser);
     return ResponseEntity.ok(frequencies);
   }
 }
