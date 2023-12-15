@@ -1,20 +1,12 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import {
-  RiArrowLeftLine,
-  RiArrowRightLine,
-  RiDeleteBinLine,
-  RiLink,
-  RiShareForwardLine,
-  RiUser3Line,
-} from "react-icons/ri";
+import { RiUser3Line } from "react-icons/ri";
 
 import "./../../utils/styles.css";
 
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
-import GamingBadge from "../layout/StatusBadges/GamingBadge";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -89,7 +81,7 @@ const Leaderboards = () => {
               email: statistics.author.email,
               minutesTyping: statistics.minutesTyping,
               awpm: statistics.awpm,
-              maxWpm: statistics.maxWpm
+              maxWpm: statistics.maxWpm,
             };
           } else if (statisticsResponse.status === 404) {
             return {
@@ -98,7 +90,7 @@ const Leaderboards = () => {
               email: member.email,
               minutesTyping: 0,
               awpm: 0,
-              maxWpm: 0
+              maxWpm: 0,
             };
           } else if (statisticsResponse.status === 403) {
             let error = new Error("Forbidden.");
@@ -140,6 +132,12 @@ const Leaderboards = () => {
     }
   };
 
+  const sortUserData = (data, sortBy) => {
+    return data.slice().sort((a, b) => {
+      return b[sortBy] - a[sortBy];
+    });
+  };
+
   return (
     <div>
       <Navbar />
@@ -174,7 +172,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "awpm").map((user) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
@@ -208,7 +206,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "awpm").map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm items-center">
                         {user ? user.awpm : "Loading..."}
@@ -246,7 +244,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "minutesTyping").map((user) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
@@ -280,7 +278,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "minutesTyping").map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
@@ -318,7 +316,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "maxWpm").map((user) => (
                     <tr
                       key={user.id}
                       className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
@@ -352,7 +350,7 @@ const Leaderboards = () => {
               </thead>
               <tbody className="w-full">
                 {userData &&
-                  userData.map((user) => (
+                  sortUserData(userData, "maxWpm").map((user) => (
                     <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
                       <td className="text-gray-500 text-sm">
                         {user ? user.maxWpm : "Loading..."}
