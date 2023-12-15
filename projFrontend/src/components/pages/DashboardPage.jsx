@@ -663,7 +663,7 @@ const Dashboard = () => {
                     <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
                         {user.status === "GAMING" && <GamingBadge />}
-                        {(!user.sttatus || user.status === "IDLE") && <InactiveBadge />}
+                        {(!user.status || user.status === "IDLE") && <InactiveBadge />}
                         {user.status === "CODING" && <CodingBadge />}
                       </td>
                     </tr>
