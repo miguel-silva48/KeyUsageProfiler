@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.ies2324.projBackend.dao.KeystrokeFrequency;
 import com.ies2324.projBackend.entities.Keystroke;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.User;
@@ -38,5 +39,12 @@ public class KeystrokeController {
           return new ResponseEntity<>(keystrokes, HttpStatus.OK);
         }
     return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+  }
+
+  @GetMapping("frequencies")
+  public ResponseEntity<List<KeystrokeFrequency>> getKeystrokeFrequencies() {
+    User requester = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    List<KeystrokeFrequency> frequencies = keystrokeService.getKeystrokeFrequencies(requester);
+    return ResponseEntity.ok(frequencies);
   }
 }
