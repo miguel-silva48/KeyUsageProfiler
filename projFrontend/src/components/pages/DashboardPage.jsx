@@ -10,6 +10,9 @@ import {
   RiLink,
   RiShareForwardLine,
   RiUser3Line,
+  RiPieChartFill,
+  RiFilterFill,
+  RiFilterOffFill
 } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -36,6 +39,9 @@ const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
+  const [viewFilter, setViewFilter] = useState(false);
+  const [userDataCopy, setUserDataCopy] = useState([]);
 
   useEffect(() => {
     if (!token || !userType) {
@@ -49,7 +55,8 @@ const Dashboard = () => {
     fetchData();
     createInviteLink();
 
-    var intervalId = setInterval(fetchData, 5000);
+    if (!viewFilter)
+      setIntervalId(setInterval(fetchData, 5000));
 
     return () => {
       clearInterval(intervalId);
@@ -130,6 +137,7 @@ const Dashboard = () => {
       );
 
       setUserData(usersData);
+      setUserDataCopy(usersData);
     } catch (error) {
       console.error("Error in fetchData:", error);
 
@@ -296,21 +304,45 @@ const Dashboard = () => {
     }
   }
 
+  const handleFilteredView = () => {
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+      return;
+    }
+    clearInterval(intervalId);  //prevent updates while viewing the filtered view
+    const selectedUserIds = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
+    
+    const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+    setUserData(selectedUsersData);
+    setViewFilter(true);
+  };
+
+  const clearFilteredView = () => {
+    setUserData(userDataCopy);
+    setViewFilter(false);
+    setIntervalId(setInterval(fetchData, 5000));  //resume updates
+  };
+
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [gamingUsers, setGamingUsers] = useState([]);
   const [inactiveUsers, setInactiveUsers] = useState([]);
   const [codingUsers, setCodingUsers] = useState([]);
 
   const handleViewGraph = () => {
+    clearInterval(intervalId);  //prevent updates while viewing the graph
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    let selectedUsersData = [];
     if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
-      return;
-    }
+      selectedUsersData = userData;
+    } else {
     const selectedUserIds = Array.from(checkboxes)
       .filter((checkbox) => checkbox.checked)
       .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
 
-    const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+    selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+    }
 
     setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
     setInactiveUsers(selectedUsersData.filter((user) => (!user.status || user.status === "INACTIVE")));
@@ -320,6 +352,7 @@ const Dashboard = () => {
 
   const handleCloseGraphModal = () => {
     setShowGraphModal(false);
+    setIntervalId(setInterval(fetchData, 5000));  //resume updates
   };
 
   return (
@@ -567,10 +600,28 @@ const Dashboard = () => {
                 <tr className="flex items-center gap-1">
                   <th>
                     <span className="text-[#667085]">Toggle All</span>
-                    <button 
+                    {!viewFilter && (
+                      <button
+                        className="btn btn-sm ml-4 text-[#667085] text-sm"
+                        onClick={() => handleFilteredView()}
+                      >
+                        <RiFilterFill className="text-base" /> Filter Selected
+                      </button>
+                    )}
+                    {viewFilter && (
+                      <button
+                        className="btn btn-sm ml-4 text-[#667085] text-sm"
+                        onClick={() => clearFilteredView()}
+                      >
+                        <RiFilterOffFill className="text-base" /> Clear Filter
+                      </button>
+                    )}
+                    <button
                       className="btn btn-sm ml-4 text-[#667085] text-sm"
                       onClick={() => handleViewGraph()}
-                    >View selected
+                    >
+                      <RiPieChartFill className="text-base" />
+                      Status Chart
                     </button>
                   </th>
                 </tr>
