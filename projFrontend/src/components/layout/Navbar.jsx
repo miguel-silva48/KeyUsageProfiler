@@ -21,6 +21,7 @@ const Navbar = () => {
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
   const [notifications, setNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const maxNotifications = 5;
 
@@ -55,6 +56,7 @@ const Navbar = () => {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/notifications", (message) => {
+          setUnreadNotifications(unreadNotifications + 1)
           const newNotification = JSON.parse(message.body);
           console.log("received new notification: ", newNotification);
           setNotifications((prevNotifications) => {
@@ -89,6 +91,7 @@ const Navbar = () => {
 
   const handleNotificationToggle = () => {
     setShowDropdown(!showDropdown);
+    setUnreadNotifications(0)
   };
 
   const handleToggle = (e) => {
@@ -148,46 +151,33 @@ const Navbar = () => {
         </label>
 
         {userType === "TEAM_LEADER" && (
-          <button className="btn m-2 p-2" onClick={handleNotificationToggle}>
+          <details className="dropdown">
+          <summary className="m-1 btn" onClick={handleNotificationToggle}>
             <RiNotification3Line className="text-xl" />
-            {notifications.length > 0 && (
+            {unreadNotifications > 0 && notifications.length > 0 && (
               <div
                 style={{ background: "red", color: "white" }}
                 class="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
               >
-                {notifications.length}
+                {unreadNotifications}
               </div>
             )}
-
             <RiArrowDownSLine
               className={`text-xl ${
                 showDropdown ? "transform rotate-180" : ""
               }`}
             />
-          </button>
-        )}
-
-        {/* Dropdown content */}
-        {showDropdown && (
-          <div
-            style={{ background: "#f0f0f5" }}
-            className="absolute top-14 right-24 mt-2 rounded-md shadow-md border border-gray-300"
-          >
+          </summary>
+          <ul className="p-2 bg- menu dropdown-content z-[1] bg-base-100 rounded-box w-52 right-0">
             {notifications.length === 0 ? (
-              <div className="p-2 border border-gray-300">
-                There's no notifications
-              </div>
+              <li className="text-center"><a style={{"text-align":"center", "display":"block"}}>There's no notifications.</a></li>
             ) : (
               notifications.map((notification, index) => (
-                <div
-                  key={index}
-                  className="p-2 border border-gray-300 font-semibold"
-                >
-                  {notification.user.name} - {notification.type}
-                </div>
+                <li className="text-center"><a style={{"text-align":"center", "display":"block"}}><b>{notification.ts} - {notification.user.name}</b> is <b>{notification.status}</b>.</a></li>
               ))
             )}
-          </div>
+          </ul>
+          </details>
         )}
 
         {userType && (

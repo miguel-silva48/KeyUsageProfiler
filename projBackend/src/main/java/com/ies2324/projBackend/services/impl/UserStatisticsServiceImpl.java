@@ -18,6 +18,7 @@ import com.ies2324.projBackend.repositories.UserStatisticsRepository;
 import com.ies2324.projBackend.services.NotificationService;
 import com.ies2324.projBackend.services.UserStatisticsService;
 import java.lang.Math;
+import java.sql.Timestamp;
 
 @Service
 public class UserStatisticsServiceImpl implements UserStatisticsService {
@@ -68,6 +69,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         Notification n = new Notification();
         n.setStatus(Status.GAMING);
         n.setUser(user);
+        n.setTs(new Timestamp(System.currentTimeMillis()));
         notificationService.createAndSendNotification(n);
       }
       return Status.GAMING;
