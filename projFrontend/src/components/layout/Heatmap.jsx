@@ -1,11 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import h337 from "@mars3d/heatmap.js";
-import { useNavigate } from "react-router-dom";
-
+import HeatmapChart from "./HeatmapChart";
 import "../../utils/heatmap.css";
 
 function Heatmap() {
-  const navigate = useNavigate();
+  const [heatmapData, setHeatmapData] = useState(null);
+
+  // Returns proper values for keys and filters out invalid keyCodes.
+  const filterKey = (key) => {
+    if (key === "Unknown keyCode: 0xe36") return "Right Shift";
+
+    if (key === " ") return "Spacebar";
+
+    if (key === "\n") return "Enter";
+
+    if (key === "\t") return "Tab";
+
+    if (key.startsWith("Unknown keyCode:")) return null;
+
+    return key;
+  };
 
   const fetchHeatmapData = async () => {
     var token = localStorage.getItem("authToken");
@@ -25,9 +39,12 @@ function Heatmap() {
         // Handle successful response (team joining)
         const data = await response.json();
         const result = data.reduce((acc, item) => {
-          acc[item.keyValue] = item.numPresses;
-          return acc;
+          var k = filterKey(item.keyValue);
+          if (k)
+            acc[k] = item.numPresses;
+            return acc;
         }, {});
+        setHeatmapData(result);
         return result;
       } else if (response.status == 403) {
         const newToken = await refreshToken();
@@ -179,7 +196,7 @@ function Heatmap() {
       x: 570,
       y: 62,
     },
-    "\t": {
+    "Tab": {
       x: 37,
       y: 94,
     },
@@ -296,7 +313,7 @@ function Heatmap() {
       x: 389,
       y: 127,
     },
-    "\n": {
+    "Enter": {
       x: 420,
       y: 127,
     },
@@ -344,7 +361,7 @@ function Heatmap() {
       x: 374,
       y: 159,
     },
-    "Unknown keyCode: 0xe36": {
+    "Right Shift": {
       x: 420,
       y: 159,
     },
@@ -368,7 +385,7 @@ function Heatmap() {
       x: 230,
       y: 191,
     },
-    " ": {
+    "Spacebar": {
       x: 230,
       y: 191,
     },
@@ -433,7 +450,22 @@ function Heatmap() {
     }
   }, []);
 
-  return <div className="Heatmap"></div>;
+  return (
+    <div className="row p-2 flex items-center justify-center content-center">
+      <div className="column p-2">
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Keypress Heatmap
+        </h2>
+        <div className="Heatmap"></div>
+      </div>
+      <div className="column p-2">
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Keypress Histogram
+        </h2>
+        <HeatmapChart heatmapData={heatmapData} />
+      </div>
+    </div>
+  );
 }
 
 export default Heatmap;
