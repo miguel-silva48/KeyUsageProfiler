@@ -44,13 +44,7 @@ const HomePage = () => {
       setErrorMessage("Please enter an invite link and try again.");
       return;
     }
-    const path = window.location.href + "teams/join/";
-    var realLink = link;
-    console.log("my window:", window.location.href);
-    if (link.startsWith(path)) {
-      realLink = realLink.replace(path, "");
-    }
-
+    var realLink = link.substring(link.lastIndexOf("/")+1, link.length);
     try {
       const response = await fetch(
         `http://localhost:8080/api/teams/join/${realLink}`,

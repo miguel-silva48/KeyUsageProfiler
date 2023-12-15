@@ -1,5 +1,6 @@
 package com.ies2324.projBackend.services;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -101,6 +102,7 @@ public class RedisService {
       if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
         Notification n = new Notification();
         n.setStatus(Status.INACTIVE);
+        n.setTs(new Timestamp(System.currentTimeMillis()));
         n.setUser(u);
         notificationService.createAndSendNotification(n);
       }
