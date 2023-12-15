@@ -168,12 +168,12 @@ const Navbar = () => {
               }`}
             />
           </summary>
-          <ul className="p-2 bg- menu dropdown-content z-[1] bg-base-100 rounded-box w-52 right-0">
+          <ul className="p-2 bg- menu dropdown-content z-[1] bg-base-100 rounded-box w-56 right-0">
             {notifications.length === 0 ? (
               <li className="text-center"><a style={{"text-align":"center", "display":"block"}}>There's no notifications.</a></li>
             ) : (
               notifications.map((notification, index) => (
-                <li className="text-center"><a style={{"text-align":"center", "display":"block"}}><b>{notification.ts} - {notification.user.name}</b> is <b>{notification.status}</b>.</a></li>
+                <li className="text-center"><a style={{"text-align":"center", "display":"block"}}><b>{new Date(notification.ts).toLocaleString("pt-PT",{year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"})} - {notification.user.name}</b> is <b>{notification.status}</b>.</a></li>
               ))
             )}
           </ul>
