@@ -298,7 +298,7 @@ const Dashboard = () => {
 
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [gamingUsers, setGamingUsers] = useState([]);
-  const [idleUsers, setIdleUsers] = useState([]);
+  const [inactiveUsers, setInactiveUsers] = useState([]);
   const [codingUsers, setCodingUsers] = useState([]);
 
   const handleViewGraph = () => {
@@ -313,7 +313,7 @@ const Dashboard = () => {
     const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
 
     setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
-    setIdleUsers(selectedUsersData.filter((user) => (!user.status || user.status === "IDLE")));
+    setInactiveUsers(selectedUsersData.filter((user) => (!user.status || user.status === "INACTIVE")));
     setCodingUsers(selectedUsersData.filter((user) => user.status === "CODING"));
     setShowGraphModal(true);
   };
@@ -450,7 +450,7 @@ const Dashboard = () => {
                     </div>
                     <div className="modal-content flex">
                       <div className="flex-1">
-                        <PieChart grafData={[gamingUsers.length, idleUsers.length, codingUsers.length]} />
+                        <PieChart grafData={[gamingUsers.length, inactiveUsers.length, codingUsers.length]} />
                       </div>
                       <div className="w-40 ml-4">
                         <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">Gaming:</h3>
@@ -464,12 +464,12 @@ const Dashboard = () => {
                               </li>
                             ))}
                         </ul>
-                        <h3 className="text-base font-semibold mb-2 mt-2">Idle:</h3>
+                        <h3 className="text-base font-semibold mb-2 mt-2">Inactive:</h3>
                         <ul className="list-disc">
-                          {idleUsers.length === 0 && (
-                            <li className="text-xs text-gray-600">No team members are currently idle</li>
+                          {inactiveUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently inactive</li>
                           )}
-                          {idleUsers.map((user) => (
+                          {inactiveUsers.map((user) => (
                               <li key={user.id} className="text-xs text-gray-600">
                                 {user.username}
                               </li>
@@ -663,7 +663,7 @@ const Dashboard = () => {
                     <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
                         {user.status === "GAMING" && <GamingBadge />}
-                        {(!user.status || user.status === "IDLE") && <InactiveBadge />}
+                        {(!user.status || user.status === "INACTIVE") && <InactiveBadge />}
                         {user.status === "CODING" && <CodingBadge />}
                       </td>
                     </tr>
