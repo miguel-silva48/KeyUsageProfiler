@@ -298,15 +298,22 @@ const Dashboard = () => {
 
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showGraphModal, setShowGraphModal] = useState(false);
+  const [gamingUsers, setGamingUsers] = useState([]);
+  const [idleUsers, setIdleUsers] = useState([]);
+  const [codingUsers, setCodingUsers] = useState([]);
 
   const handleViewGraph = () => {
-    // Lógica para determinar usuários selecionados e exibir o modal
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
     const selectedUserIds = Array.from(checkboxes)
       .filter((checkbox) => checkbox.checked)
-      .map((checkbox) => checkbox.id);
+      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
 
-    setSelectedUsers(selectedUserIds);
+    const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+
+    setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
+    setIdleUsers(selectedUsersData.filter((user) => (!user.status || user.status === "IDLE")));
+    setCodingUsers(selectedUsersData.filter((user) => user.status === "CODING"));
+    setSelectedUsers(selectedUsersData);
     setShowGraphModal(true);
   };
 
@@ -430,11 +437,11 @@ const Dashboard = () => {
                   leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                   leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
-                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl max-w-3xl max-h-screen">
                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                       <div className="sm:flex sm:items-start">
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                          <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                          <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                             Selected users' status
                           </Dialog.Title>
                         </div>
@@ -442,32 +449,42 @@ const Dashboard = () => {
                     </div>
                     <div className="modal-content flex">
                       <div className="flex-1">
-                        <PieChart grafData={[50, 30, 20]} />
+                        <PieChart grafData={[gamingUsers.length, idleUsers.length, codingUsers.length]} />
                       </div>
                       <div className="w-40 ml-4">
                         <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">Gaming:</h3>
                         <ul className="list-disc">
-                          {selectedUsers.map((userId) => (
-                            <li key={userId} className="text-xs text-gray-600">
-                              {userId}
-                            </li>
-                          ))}
+                          {gamingUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently gaming</li>
+                          )}
+                          {gamingUsers.map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
                         </ul>
                         <h3 className="text-base font-semibold mb-2 mt-2">Idle:</h3>
                         <ul className="list-disc">
-                          {selectedUsers.map((userId) => (
-                            <li key={userId} className="text-xs text-gray-600">
-                              {userId}
-                            </li>
-                          ))}
+                          {idleUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently idle</li>
+                          )}
+                          {idleUsers.map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
                         </ul>
                         <h3 className="text-base text-[#027A48] font-semibold mb-2 mt-2">Coding:</h3>
                         <ul className="list-disc">
-                          {selectedUsers.map((userId) => (
-                            <li key={userId} className="text-xs text-gray-600">
-                              {userId}
-                            </li>
-                          ))}
+                          {codingUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently coding</li>
+                          )}
+                          {codingUsers
+                            .map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
                         </ul>
                       </div>
                     </div>
@@ -569,6 +586,7 @@ const Dashboard = () => {
                           id="select-member"
                           type="checkbox"
                           className="w-5 h-5 rounded-md border"
+                          data-user-id={user.id}
                         ></input>
                       </td>
                       <td>
