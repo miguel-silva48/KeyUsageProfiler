@@ -1,6 +1,8 @@
 package com.ies2324.projBackend.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,6 +39,9 @@ public class UserStatistics {
 
   @NotNull(message = "maxWpm is mandatory")
   private Float maxWpm;
+
+  @Enumerated(EnumType.STRING)
+  private Status status;
 
   @Override
   public String toString() {

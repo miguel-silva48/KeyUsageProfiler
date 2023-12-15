@@ -34,9 +34,9 @@ public class KeystrokesConsumer {
     @RabbitHandler
     public void receive(byte[] in) throws JsonProcessingException, JsonMappingException {
         Keystroke k = mapper.readValue(new String(in, StandardCharsets.UTF_8), Keystroke.class);
-        keystrokeSaver.addKeyStroke(String.valueOf(k.getAuthor().getId()), k);
         Optional<User> optAuthor = userService.getUserById(k.getAuthor().getId());
         if (optAuthor.isPresent()) {
+            keystrokeSaver.addKeyStroke(String.valueOf(k.getAuthor().getId()), k);
             User author = optAuthor.get();
             Team team = author.getTeam();
             k.setAuthor(author);
@@ -45,7 +45,7 @@ public class KeystrokesConsumer {
                         team.getLeader().getUsername(),
                         "/topic/keystrokes",
                         k);
-                System.out.printf("sent to this guy %s: %s\n", team.getLeader().getUsername(), k);
+                // System.out.printf("sent to this guy %s: %s\n", team.getLeader().getUsername(), k);
             }
         }
 

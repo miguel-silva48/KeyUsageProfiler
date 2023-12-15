@@ -32,6 +32,6 @@ public class Notification {
     private User user; // notification refers to this user
 
     @Enumerated(EnumType.STRING)
-    private NotificationType type;
+    private Status status;
 
 }

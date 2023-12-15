@@ -81,9 +81,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to join team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to join team. Please try again."
-        );
+        setErrorMessage("Failed to join team. Please try again.");
       }
     } catch (error) {
       console.error("Error joining team:", error);
@@ -92,6 +90,10 @@ const HomePage = () => {
   };
 
   const createTeamHandler = async () => {
+    if (!teamName) {
+      setErrorMessage("Please enter a team name and try again.");
+      return;
+    }
     try {
       var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
@@ -131,9 +133,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to create team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to create team. Please try again."
-        );
+        setErrorMessage("Failed to create team. Please try again.");
       }
     } catch (error) {
       console.error("Error creating team:", error);

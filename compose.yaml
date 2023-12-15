@@ -45,6 +45,17 @@ services:
       - 8080:8080
     networks:
       - default
+  frontend:
+    build: ./projFrontend
+    depends_on:
+      - backend
+    volumes:
+      - ./projFrontend/src:/projFrontend/src
+      - /project/node_modules
+    ports:
+      - 5173:5173
+    networks:
+      - default
   
 volumes:
   my-db:
