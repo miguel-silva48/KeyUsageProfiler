@@ -10,6 +10,10 @@ const JoinTeam = () => {
   const { token } = useParams();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [errorTitle, setErrorTitle] = useState("Invalid Link");
+  const [errorMessage, setErrorMessage] = useState(
+    "Link to join team is invalid."
+  );
 
   useEffect(() => {
     if (!authToken) {
@@ -19,12 +23,14 @@ const JoinTeam = () => {
         navigate("/login");
       }, 0);
 
-      const timeoutId2 = setTimeout(() => {
-        setOpen(true);
-      }, 5000);
-
       return () => clearTimeout(timeoutId);
     }
+
+    const timeoutId2 = setTimeout(() => {
+      setErrorTitle("Connection Timeout");
+      setErrorMessage("Please try again later.");
+      setOpen(true);
+    }, 5000);
 
     joinTeamCall();
   }, [authToken, navigate, token]);
@@ -81,6 +87,11 @@ const JoinTeam = () => {
         }
       } else if (error.code === 400) {
         setOpen(true);
+      } else {
+        console.error("Error joining team:", error.message);
+        setErrorTitle("Unknown Error");
+        setErrorMessage("Please try again later.");
+        setOpen(true);
       }
     }
   };
@@ -132,11 +143,11 @@ const JoinTeam = () => {
                             as="h3"
                             className="text-base font-semibold leading-6 text-gray-900"
                           >
-                            Invalid Link
+                            {errorTitle}
                           </Dialog.Title>
                           <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                              Link to join team is invalid.
+                              {errorMessage}
                             </p>
                           </div>
                         </div>
