@@ -194,17 +194,7 @@ const UserPage = () => {
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
         <Keyboard userId={userId} />
       </div>
-      <div className="grid grid-cols-4 p-2 grid-cols-2 gap-2">
-        <div className="col-1 col-span-3 row-span-2 p-2 ml-40">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Keypress Heatmap
-          </h2>
-          <Heatmap />
-        </div>
-        <div className="col-2 p-2 row-span-2 mr-40">
-          
-        </div>
-      </div>
+      <Heatmap />
       <Footer />
     </div>
   );
