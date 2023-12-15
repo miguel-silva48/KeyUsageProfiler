@@ -76,7 +76,8 @@ public class RedisService {
 
   public String validateTokenAndGetTeamId(String token) {
     String teamId = token.substring(token.lastIndexOf("-") + 1);
-    if (valueOps.get(invitetoken + teamId).equals(token))
+    String tokenFromTeam = valueOps.get(invitetoken + teamId);
+    if (tokenFromTeam != null && tokenFromTeam.equals(token))
       return teamId;
     return null;
   }
