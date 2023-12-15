@@ -24,7 +24,7 @@ const JoinTeam = () => {
 
   const joinTeamCall = async () => {
     try {
-      var token = localStorage.getItem("authToken");
+      var authToken = localStorage.getItem("authToken");
       const joinTeamResponse = await fetch(
         `http://localhost:8080/api/teams/join/${token}`,
         {

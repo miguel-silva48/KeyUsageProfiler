@@ -3,6 +3,7 @@ package com.ies2324.projBackend.entities;
 import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,8 +32,12 @@ public class Keystroke {
   @ManyToOne
   private User author;
 
-  @NotNull(message = "pressedKey is mandatory")
-  private String pressedKey;
+  @NotNull(message = "keyValue is mandatory")
+  private String keyValue;
+
+  @NotNull(message = "isKeyPress is mandatory")
+  @JsonProperty(value="isKeyPress") // because jackson by default removes 'is'
+  private boolean isKeyPress;
 
   @NotNull(message = "Timestamp is mandatory")
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
@@ -40,7 +45,7 @@ public class Keystroke {
 
   @Override
   public String toString() {
-    return String.format("%s pressed by (%s) at %s", pressedKey, author, ts.toString());
+    return String.format("%s %s by (%s) at %s", keyValue, isKeyPress ? "pressed" : "released",author, ts.toString());
   }
 
 }

@@ -6,5 +6,5 @@ import com.ies2324.projBackend.entities.Notification;
 
 @Service
 public interface NotificationService {
-    Notification createNotification(Notification notification);
+    Notification createAndSendNotification(Notification notification);
 }

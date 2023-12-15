@@ -23,15 +23,18 @@ public class KeystrokeSaver {
 
   @Scheduled(fixedRate = 15000)
   private void flushToSql() {
-    StringBuilder sb = new StringBuilder();
-    List<Keystroke> keystrokes = new ArrayList<>();
+    StringBuilder sb;
+    List<Keystroke> keystrokes; 
     for (String user_id : redisService.getAllUserIds()) {
+      sb = new StringBuilder();
+      keystrokes = new ArrayList<>();
       keystrokes = redisService.popAllKeystrokes(user_id);
       for (Keystroke k : keystrokes) {
-        sb.append(k.getPressedKey());
+        if (k.isKeyPress())
+          sb.append(k.getKeyValue());
       }
       if (sb.length() != 0){
-        userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString());
+        userStatisticsService.createOrAddUserStatistics(Long.parseLong(user_id), 0.25f, sb.toString(), keystrokes);
         keystrokeService.createKeystrokes(keystrokes);
       }
     }

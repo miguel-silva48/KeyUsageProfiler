@@ -16,12 +16,11 @@ import org.springframework.data.redis.core.RedisKeyExpiredEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Keystroke;
 import com.ies2324.projBackend.entities.Notification;
-import com.ies2324.projBackend.entities.NotificationType;
+import com.ies2324.projBackend.entities.Status;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 
@@ -33,8 +32,6 @@ public class RedisService {
   private NotificationService notificationService;
   @Autowired
   private UserService userService;
-  @Autowired
-  private SimpMessagingTemplate simpMessagingTemplate;
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
 
@@ -78,7 +75,8 @@ public class RedisService {
 
   public String validateTokenAndGetTeamId(String token) {
     String teamId = token.substring(token.lastIndexOf("-") + 1);
-    if (valueOps.get(invitetoken + teamId).equals(token))
+    String tokenFromTeam = valueOps.get(invitetoken + teamId);
+    if (tokenFromTeam != null && tokenFromTeam.equals(token))
       return teamId;
     return null;
   }
@@ -94,17 +92,17 @@ public class RedisService {
     Long userid = Long.parseLong(userId);
     Optional<User> user = userService.getUserById(userid);
     if (user.isPresent()) {
+      // update user state
       User u = user.get();
+      u.getUserStatistics().setStatus(Status.INACTIVE);
+      userService.updateUser(u);
+      // notify team leader
       Team userTeam = u.getTeam();
       if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
         Notification n = new Notification();
-        n.setType(NotificationType.INACTIVE);
+        n.setStatus(Status.INACTIVE);
         n.setUser(u);
-        n = notificationService.createNotification(n);
-        simpMessagingTemplate.convertAndSendToUser(
-            userTeam.getLeader().getUsername(),
-            "/topic/notifications",
-            n);
+        notificationService.createAndSendNotification(n);
       }
     }
   }
