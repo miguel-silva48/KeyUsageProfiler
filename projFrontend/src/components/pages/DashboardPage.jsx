@@ -17,6 +17,9 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 import GamingBadge from "../layout/StatusBadges/GamingBadge";
+import InactiveBadge from "../layout/StatusBadges/InactiveBadge";
+import CodingBadge from "../layout/StatusBadges/CodingBadge";
+import PieChart from "../layout/PieChart";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -46,7 +49,7 @@ const Dashboard = () => {
     fetchData();
     createInviteLink();
 
-    var intervalId = setInterval(fetchData, 5000);
+    var intervalId = setInterval(fetchData, 15000);
 
     return () => {
       clearInterval(intervalId);
@@ -277,9 +280,44 @@ const Dashboard = () => {
     setCopiedLink(true);
   }
 
+  const toggleAll = () => {
+    const main_checkbox = document.querySelector('input[id="select-all-members"]');
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    
+    //if all checkboxes are checked, uncheck them
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === true)) {
+      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = false;});
+      main_checkbox.checked = false;
+    }
+    //if at least 1 is not checked, check all of them
+    else {
+      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = true;});
+      main_checkbox.checked = true;
+    }
+  }
+
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [showGraphModal, setShowGraphModal] = useState(false);
+
+  const handleViewGraph = () => {
+    // Lógica para determinar usuários selecionados e exibir o modal
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    const selectedUserIds = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => checkbox.id);
+
+    setSelectedUsers(selectedUserIds);
+    setShowGraphModal(true);
+  };
+
+  const handleCloseGraphModal = () => {
+    setShowGraphModal(false);
+  };
+
   return (
     <div>
       <Navbar />
+      {/*Dialog to delete a team*/}
       <div>
         <Transition.Root show={open} as={Fragment}>
           <Dialog
@@ -361,6 +399,97 @@ const Dashboard = () => {
           </Dialog>
         </Transition.Root>
       </div>
+
+      {/*Dialog for the Chart*/}
+      <div>
+        <Transition.Root show={showGraphModal} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-10"
+            onClose={handleCloseGraphModal}
+          >
+            <Transition.Child as={Fragment}
+              enter="ease-out duration-100"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-100"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  enterTo="opacity-100 translate-y-0 sm:scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                  leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                >
+                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                      <div className="sm:flex sm:items-start">
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                          <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                            Selected users' status
+                          </Dialog.Title>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-content flex">
+                      <div className="flex-1">
+                        <PieChart grafData={[50, 30, 20]} />
+                      </div>
+                      <div className="w-40 ml-4">
+                        <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">Gaming:</h3>
+                        <ul className="list-disc">
+                          {selectedUsers.map((userId) => (
+                            <li key={userId} className="text-xs text-gray-600">
+                              {userId}
+                            </li>
+                          ))}
+                        </ul>
+                        <h3 className="text-base font-semibold mb-2 mt-2">Idle:</h3>
+                        <ul className="list-disc">
+                          {selectedUsers.map((userId) => (
+                            <li key={userId} className="text-xs text-gray-600">
+                              {userId}
+                            </li>
+                          ))}
+                        </ul>
+                        <h3 className="text-base text-[#027A48] font-semibold mb-2 mt-2">Coding:</h3>
+                        <ul className="list-disc">
+                          {selectedUsers.map((userId) => (
+                            <li key={userId} className="text-xs text-gray-600">
+                              {userId}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                      <button
+                        type="button"
+                        className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:ml-3 sm:w-auto"
+                        onClick={handleCloseGraphModal}
+                        ref={cancelButtonRef}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
+      </div>
+
       <div
         id="body"
         className="flex w-screen mt-2 pb-0 flex-col items-center gap-5 min-h-[52.3vh]"
@@ -410,14 +539,21 @@ const Dashboard = () => {
                 <tr className="flex justify-center items-center">
                   <th>
                     <input
+                      id="select-all-members"
                       type="checkbox"
                       className="w-5 h-5 rounded-md border"
+                      onClick={() => toggleAll()}
                     ></input>
                   </th>
                 </tr>
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Member</span>
+                    <span className="text-[#667085]">Toggle All</span>
+                    <button 
+                      className="btn btn-sm ml-4 text-[#667085] text-sm"
+                      onClick={() => handleViewGraph()}
+                    >View selected
+                    </button>
                   </th>
                 </tr>
               </thead>
@@ -430,6 +566,7 @@ const Dashboard = () => {
                     >
                       <td className="flex justify-center items-center">
                         <input
+                          id="select-member"
                           type="checkbox"
                           className="w-5 h-5 rounded-md border"
                         ></input>
@@ -464,7 +601,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.awpm : "Loading..."}
                       </td>
@@ -484,7 +621,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
                       </td>
@@ -504,8 +641,9 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
+                        {/*TODO change to user.status and add logic to select component*/}
                         <GamingBadge />
                       </td>
                     </tr>
@@ -522,7 +660,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
                       <td className="flex items-start rounded-lg">
                         {(user.id != userId && (
                           <button
