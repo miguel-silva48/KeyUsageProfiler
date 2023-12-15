@@ -3,7 +3,7 @@ import h337 from "@mars3d/heatmap.js";
 import HeatmapChart from "./HeatmapChart";
 import "../../utils/heatmap.css";
 
-function Heatmap() {
+function Heatmap({ userId }) {
   const [heatmapData, setHeatmapData] = useState(null);
 
   // Returns proper values for keys and filters out invalid keyCodes.
@@ -25,7 +25,7 @@ function Heatmap() {
     var token = localStorage.getItem("authToken");
     try {
       const response = await fetch(
-        `http://localhost:8080/api/keystrokes/frequencies`,
+        `http://localhost:8080/api/keystrokes/frequencies/${userId}`,
         {
           method: "GET",
           headers: {
