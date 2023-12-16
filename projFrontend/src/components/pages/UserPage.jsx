@@ -15,6 +15,7 @@ import {
   RiKeyboardFill,
   RiShieldStarLine,
   RiUser3Line,
+  RiEyeLine
 } from "react-icons/ri";
 
 const UserPage = () => {
@@ -60,6 +61,7 @@ const UserPage = () => {
         awpm: data.awpm,
         maxWpm: data.maxWpm,
         minutesTyping: data.minutesTyping,
+        status: data.status,
       };
       setUserData(data.author);
       setUserStatistics(statistics);
@@ -183,6 +185,18 @@ const UserPage = () => {
           {userStatistics ? (
             <p className="text-gray-500">
               {userStatistics.maxWpm} words/minute
+            </p>
+          ) : (
+            <p className="text-gray-500">Loading...</p>
+          )}
+        </div>
+
+        <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
+          <RiEyeLine className="text-2xl text-gray-500 mb-5" />
+          <p className="font-semibold text-lg mb-2">Current Status</p>
+          {userStatistics ? (
+            <p className="text-gray-500">
+              {userStatistics.status}
             </p>
           ) : (
             <p className="text-gray-500">Loading...</p>

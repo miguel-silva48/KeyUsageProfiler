@@ -381,10 +381,6 @@ function Heatmap({ userId }) {
       x: 88,
       y: 191,
     },
-    Left: {
-      x: 230,
-      y: 191,
-    },
     "Spacebar": {
       x: 230,
       y: 191,
@@ -444,7 +440,6 @@ function Heatmap({ userId }) {
           data: points2,
         };
 
-        console.log("my data: ", data1);
         heatmapInstance.setData(data1);
       });
     }
