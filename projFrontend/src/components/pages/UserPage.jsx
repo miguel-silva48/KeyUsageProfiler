@@ -154,7 +154,7 @@ const UserPage = () => {
       </div>
 
       {/* Estatísticas do User */}
-      <div className="flex justify-center mt-20 space-x-4 mb-40">
+      <div className="flex justify-center mt-20 space-x-4 mb-20">
         <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
           <RiKeyboardFill className="text-2xl text-gray-500 mb-5" />
           <p className="font-semibold text-lg mb-2">Average Typing Speed</p>
@@ -190,7 +190,7 @@ const UserPage = () => {
         </div>
       </div>
 
-      <div className="mb-20">
+      <div className="mb-10">
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
         <Keyboard userId={userId} />
       </div>
