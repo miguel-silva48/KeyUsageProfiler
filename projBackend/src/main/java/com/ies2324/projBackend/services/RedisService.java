@@ -1,5 +1,6 @@
 package com.ies2324.projBackend.services;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +76,8 @@ public class RedisService {
 
   public String validateTokenAndGetTeamId(String token) {
     String teamId = token.substring(token.lastIndexOf("-") + 1);
-    if (valueOps.get(invitetoken + teamId).equals(token))
+    String tokenFromTeam = valueOps.get(invitetoken + teamId);
+    if (tokenFromTeam != null && tokenFromTeam.equals(token))
       return teamId;
     return null;
   }
@@ -100,6 +102,7 @@ public class RedisService {
       if (userTeam != null && u.getId() != userTeam.getLeader().getId()) {
         Notification n = new Notification();
         n.setStatus(Status.INACTIVE);
+        n.setTs(new Timestamp(System.currentTimeMillis()));
         n.setUser(u);
         notificationService.createAndSendNotification(n);
       }

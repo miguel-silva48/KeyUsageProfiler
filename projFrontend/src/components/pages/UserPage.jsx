@@ -6,6 +6,7 @@ import "./../../utils/styles.css";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import Keyboard from "../layout/Keyboard";
+import Heatmap from "../layout/Heatmap";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -193,6 +194,7 @@ const UserPage = () => {
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
         <Keyboard userId={userId} />
       </div>
+      <Heatmap userId={userId}/>
       <Footer />
     </div>
   );

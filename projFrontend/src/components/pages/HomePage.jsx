@@ -44,13 +44,7 @@ const HomePage = () => {
       setErrorMessage("Please enter an invite link and try again.");
       return;
     }
-    const path = window.location.href + "teams/join/";
-    var realLink = link;
-    console.log("my window:", window.location.href);
-    if (link.startsWith(path)) {
-      realLink = realLink.replace(path, "");
-    }
-
+    var realLink = link.substring(link.lastIndexOf("/")+1, link.length);
     try {
       const response = await fetch(
         `http://localhost:8080/api/teams/join/${realLink}`,
@@ -81,9 +75,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to join team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to join team. Please try again."
-        );
+        setErrorMessage("Failed to join team. Please try again.");
       }
     } catch (error) {
       console.error("Error joining team:", error);
@@ -92,6 +84,10 @@ const HomePage = () => {
   };
 
   const createTeamHandler = async () => {
+    if (!teamName) {
+      setErrorMessage("Please enter a team name and try again.");
+      return;
+    }
     try {
       var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
@@ -131,9 +127,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to create team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to create team. Please try again."
-        );
+        setErrorMessage("Failed to create team. Please try again.");
       }
     } catch (error) {
       console.error("Error creating team:", error);

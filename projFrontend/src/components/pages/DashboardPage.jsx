@@ -10,6 +10,9 @@ import {
   RiLink,
   RiShareForwardLine,
   RiUser3Line,
+  RiPieChartFill,
+  RiFilterFill,
+  RiFilterOffFill
 } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -17,6 +20,9 @@ import "./../../utils/styles.css";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 import GamingBadge from "../layout/StatusBadges/GamingBadge";
+import InactiveBadge from "../layout/StatusBadges/InactiveBadge";
+import CodingBadge from "../layout/StatusBadges/CodingBadge";
+import PieChart from "../layout/PieChart";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -32,6 +38,10 @@ const Dashboard = () => {
   const usersPerPage = 10;
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
+  const [viewFilter, setViewFilter] = useState(false);
+  const [userDataCopy, setUserDataCopy] = useState([]);
 
   useEffect(() => {
     if (!token || !userType) {
@@ -45,12 +55,23 @@ const Dashboard = () => {
     fetchData();
     createInviteLink();
 
-    var intervalId = setInterval(fetchData, 5000);
+    if (!viewFilter)
+      setIntervalId(setInterval(fetchData, 5000));
 
     return () => {
       clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    if (copiedLink) {
+      const timer = setTimeout(() => {
+        setCopiedLink(false);
+      }, 3000);
+   
+      return () => clearTimeout(timer);
+    }
+   }, [copiedLink]);
 
   const fetchData = async () => {
     try {
@@ -116,6 +137,7 @@ const Dashboard = () => {
       );
 
       setUserData(usersData);
+      setUserDataCopy(usersData);
     } catch (error) {
       console.error("Error in fetchData:", error);
 
@@ -261,9 +283,82 @@ const Dashboard = () => {
   const totalPages = Math.ceil(userData.length / usersPerPage);
   const showPagination = totalPages > 1;
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setCopiedLink(true);
+  }
+
+  const toggleAll = () => {
+    const main_checkbox = document.querySelector('input[id="select-all-members"]');
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    
+    //if all checkboxes are checked, uncheck them
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === true)) {
+      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = false;});
+      main_checkbox.checked = false;
+    }
+    //if at least 1 is not checked, check all of them
+    else {
+      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = true;});
+      main_checkbox.checked = true;
+    }
+  }
+
+  const handleFilteredView = () => {
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+      return;
+    }
+    clearInterval(intervalId);  //prevent updates while viewing the filtered view
+    const selectedUserIds = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
+    
+    const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+    setUserData(selectedUsersData);
+    setViewFilter(true);
+  };
+
+  const clearFilteredView = () => {
+    setUserData(userDataCopy);
+    setViewFilter(false);
+    setIntervalId(setInterval(fetchData, 5000));  //resume updates
+  };
+
+  const [showGraphModal, setShowGraphModal] = useState(false);
+  const [gamingUsers, setGamingUsers] = useState([]);
+  const [inactiveUsers, setInactiveUsers] = useState([]);
+  const [codingUsers, setCodingUsers] = useState([]);
+
+  const handleViewGraph = () => {
+    clearInterval(intervalId);  //prevent updates while viewing the graph
+    const checkboxes = document.querySelectorAll('input[id="select-member"]');
+    let selectedUsersData = [];
+    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+      selectedUsersData = userData;
+    } else {
+    const selectedUserIds = Array.from(checkboxes)
+      .filter((checkbox) => checkbox.checked)
+      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
+
+    selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+    }
+
+    setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
+    setInactiveUsers(selectedUsersData.filter((user) => (!user.status || user.status === "INACTIVE")));
+    setCodingUsers(selectedUsersData.filter((user) => user.status === "CODING"));
+    setShowGraphModal(true);
+  };
+
+  const handleCloseGraphModal = () => {
+    setShowGraphModal(false);
+    setIntervalId(setInterval(fetchData, 5000));  //resume updates
+  };
+
   return (
     <div>
       <Navbar />
+      {/*Dialog to delete a team*/}
       <div>
         <Transition.Root show={open} as={Fragment}>
           <Dialog
@@ -345,6 +440,107 @@ const Dashboard = () => {
           </Dialog>
         </Transition.Root>
       </div>
+
+      {/*Dialog for the Chart*/}
+      <div>
+        <Transition.Root show={showGraphModal} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-10"
+            onClose={handleCloseGraphModal}
+          >
+            <Transition.Child as={Fragment}
+              enter="ease-out duration-100"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-100"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  enterTo="opacity-100 translate-y-0 sm:scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                  leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                >
+                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl max-w-3xl max-h-screen">
+                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                      <div className="sm:flex sm:items-start">
+                        <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                          <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
+                            Selected users' status
+                          </Dialog.Title>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-content flex">
+                      <div className="flex-1">
+                        <PieChart grafData={[gamingUsers.length, inactiveUsers.length, codingUsers.length]} />
+                      </div>
+                      <div className="w-40 ml-4">
+                        <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">Gaming:</h3>
+                        <ul className="list-disc">
+                          {gamingUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently gaming</li>
+                          )}
+                          {gamingUsers.map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
+                        </ul>
+                        <h3 className="text-base font-semibold mb-2 mt-2">Inactive:</h3>
+                        <ul className="list-disc">
+                          {inactiveUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently inactive</li>
+                          )}
+                          {inactiveUsers.map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
+                        </ul>
+                        <h3 className="text-base text-[#027A48] font-semibold mb-2 mt-2">Coding:</h3>
+                        <ul className="list-disc">
+                          {codingUsers.length === 0 && (
+                            <li className="text-xs text-gray-600">No team members are currently coding</li>
+                          )}
+                          {codingUsers
+                            .map((user) => (
+                              <li key={user.id} className="text-xs text-gray-600">
+                                {user.username}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                      <button
+                        type="button"
+                        className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:ml-3 sm:w-auto"
+                        onClick={handleCloseGraphModal}
+                        ref={cancelButtonRef}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition.Root>
+      </div>
+
       <div
         id="body"
         className="flex w-screen mt-2 pb-0 flex-col items-center gap-5 min-h-[52.3vh]"
@@ -367,10 +563,11 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
+              {copiedLink && (<p className="text-gray-500 text-sm ml-2">Copied to clipboard!</p>)}
             </div>
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(inviteLink)}
+              onClick={() => copyToClipboard()}
               className="flex px-5 py-3 justify-center items-center gap-2.5 rounded-xl bg-[#12B76A26]"
             >
               <RiLink className="text-xl" />
@@ -393,14 +590,39 @@ const Dashboard = () => {
                 <tr className="flex justify-center items-center">
                   <th>
                     <input
+                      id="select-all-members"
                       type="checkbox"
                       className="w-5 h-5 rounded-md border"
+                      onClick={() => toggleAll()}
                     ></input>
                   </th>
                 </tr>
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Member</span>
+                    <span className="text-[#667085]">Toggle All</span>
+                    {!viewFilter && (
+                      <button
+                        className="btn btn-sm ml-4 text-[#667085] text-sm"
+                        onClick={() => handleFilteredView()}
+                      >
+                        <RiFilterFill className="text-base" /> Filter Selected
+                      </button>
+                    )}
+                    {viewFilter && (
+                      <button
+                        className="btn btn-sm ml-4 text-[#667085] text-sm"
+                        onClick={() => clearFilteredView()}
+                      >
+                        <RiFilterOffFill className="text-base" /> Clear Filter
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-sm ml-4 text-[#667085] text-sm"
+                      onClick={() => handleViewGraph()}
+                    >
+                      <RiPieChartFill className="text-base" />
+                      Status Chart
+                    </button>
                   </th>
                 </tr>
               </thead>
@@ -413,8 +635,10 @@ const Dashboard = () => {
                     >
                       <td className="flex justify-center items-center">
                         <input
+                          id="select-member"
                           type="checkbox"
                           className="w-5 h-5 rounded-md border"
+                          data-user-id={user.id}
                         ></input>
                       </td>
                       <td>
@@ -447,7 +671,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.awpm : "Loading..."}
                       </td>
@@ -467,7 +691,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
                       </td>
@@ -487,9 +711,11 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
-                        <GamingBadge />
+                        {user.status === "GAMING" && <GamingBadge />}
+                        {(!user.status || user.status === "INACTIVE") && <InactiveBadge />}
+                        {user.status === "CODING" && <CodingBadge />}
                       </td>
                     </tr>
                   ))}
@@ -505,7 +731,7 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
+                    <tr key={user.id} className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
                       <td className="flex items-start rounded-lg">
                         {(user.id != userId && (
                           <button
