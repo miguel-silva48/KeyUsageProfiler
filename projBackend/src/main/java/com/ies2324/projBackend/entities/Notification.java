@@ -36,7 +36,7 @@ public class Notification {
     private User user; // notification refers to this user
 
     @NotNull(message = "Timestamp is mandatory")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss.SSSSSS")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
     private Timestamp ts;
 
     @Enumerated(EnumType.STRING)

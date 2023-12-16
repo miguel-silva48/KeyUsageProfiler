@@ -179,7 +179,7 @@ const Notifications = () => {
                   teamNotificationData.map((notification) => (
                     <tr key={notification.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td className="text-gray-600 text-base">
-                      { new Date(notification.ts).toLocaleString("pt-PT",{year: "numeric", month: "2-digit", day: "2-digit"}) }
+                      { new Date(notification.ts).toLocaleString("pt-PT",{hour: "2-digit", minute: "2-digit"}) }
                       </td>
                     </tr>
                   ))}
