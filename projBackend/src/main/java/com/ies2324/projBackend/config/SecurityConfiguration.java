@@ -32,7 +32,7 @@ public class SecurityConfiguration {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/auth/**", "/index.html", "/app.js", "websocket**")
+                        request -> request.requestMatchers("/api/auth/**", "docs/**", "/swagger-ui/**" , "websocket**")
                                 .permitAll().anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
