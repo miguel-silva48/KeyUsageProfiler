@@ -8,9 +8,9 @@ function Keyboard({ userId }) {
 
   // state to save last keys pressed by user
   const [lastKeys, setLastKeys] = useState("");
-  const [shiftPressed, setShiftPressed] = useState(false);
-  const [ctrlPressed, setCtrlPressed] = useState(false);
-
+  var shiftPressed = false;
+  var ctrlPressed = false;
+  var capsLock = false;
 
   useEffect(() => {
     const headers = {
@@ -56,7 +56,6 @@ function Keyboard({ userId }) {
   }, [stompClient]);
 
   const keystrokeCallback = (keypress) => {
-    console.log("received keypress:", keypress);
     if (keypress.author.id == userId) {
       var elem;
       const keyValue = keypress.keyValue.toLowerCase();
@@ -64,14 +63,16 @@ function Keyboard({ userId }) {
         elem = document.getElementById("tab");
       } else if (keyValue == "\n") {
         elem = document.getElementById("enter");
-      } else if (keyValue == "Unknown keyCode: 0xe36") {
-        // TODO: test this better in linux
+      } else if (keyValue == "unknown keycode: 0xe36") {
+        // right shift
         elem = document.getElementById("rshift");
       } else {
         elem = document.getElementById(keyValue);
       }
+      updateKeyStates(keyValue, keypress.isKeyPress);
+      // check if HTML element exists because of unsupported keys (numpad stuff)
       if (!elem) return;
-      // because of unsupported keys (right shift, for example)
+
       if (keypress.isKeyPress) {
         updateLastKey(keyValue);
         elem.classList.add("kb-pressed");
@@ -83,13 +84,95 @@ function Keyboard({ userId }) {
     }
   };
 
+  const updateKeyStates = (keyValue, isKeyPress) => {
+    if (keyValue == "shift" || keyValue == "unknown keycode: 0xe36") {
+      shiftPressed = isKeyPress;
+      return;
+    }
+      
+    if (keyValue == "ctrl") {
+      ctrlPressed = isKeyPress;
+      return;
+    }
+
+    // only update caps lock when key is released
+    if (keyValue == "caps lock" && !isKeyPress) {
+      capsLock = !capsLock;
+      return;
+    }
+  };
+
   const updateLastKey = (keyValue) => {
     setLastKeys((prevKeys) => {
-      if (keyValue == "backspace") return prevKeys.substring(0, prevKeys.length - 1); // remove last key
-      if (prevKeys.length == 70) return prevKeys.substring(1) + keyValue; // keep length at 200 max
-      return prevKeys + keyValue;
+      const actualKey = getActualKey(keyValue);
+      if (keyValue == "backspace")
+        return prevKeys.substring(0, prevKeys.length - 1); // remove last key
+      // keep length at 120 max
+      if (prevKeys.length >= 120) {
+        if (actualKey.length > 1)
+          return prevKeys.substring(prevKeys.length - 120) + " " + actualKey + " ";
+        return prevKeys.substring(prevKeys.length - 120) + actualKey;
+      }
+      if (actualKey.length > 1) 
+        return prevKeys + " " + actualKey + " ";
+
+      return prevKeys + actualKey;
     });
   };
+
+  // gets key pressed after checking shift, control and caps lock + transforms wrong keys into right keys 
+  const getActualKey = (keyValue) => {
+    const upperCase = capsLock ^ shiftPressed; // xor
+    // handle single letter keystrokes
+    if (keyValue.length == 1 && keyValue.match(/[a-z]/)) {
+      if (upperCase)
+        return keyValue.toUpperCase();
+      return keyValue;
+    }
+
+    if (shiftPressed) {
+      return getShiftKey(keyValue);
+    }
+
+    if (ctrlPressed && keyValue != "ctrl" && keyValue.length == 1) {
+      return "Ctrl+" + keyValue;
+    }
+
+    if (keyValue == "back quote") return "`";
+    if (keyValue == "back slash") return "\\";
+
+    return keyValue;
+  };
+
+  const getShiftKey = (keyValue) => {
+    const shiftMap = {
+      "1": "!",
+      "2": "@",
+      "3": "#",
+      "4": "$",
+      "5": "%",
+      "6": "^",
+      "7": "&",
+      "8": "*",
+      "9": "(",
+      "0": ")",
+      "-": "_",
+      "=": "+",
+      "{": "[",
+      "}": "]",
+      "back slash": "|",
+      ";": ":",
+      "'": "\"",
+      ",": "<",
+      ".": ">",
+      "/": "?",
+      "back quote": "~",
+    };
+
+    if (keyValue in shiftMap)
+      return shiftMap[keyValue];
+    return "";
+  }
 
   return (
     <div>
