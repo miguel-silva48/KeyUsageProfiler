@@ -162,7 +162,7 @@ const Navbar = () => {
             {unreadNotifications > 0 && notifications.length > 0 && (
               <div
                 style={{ background: "red", color: "white" }}
-                class="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
+                className="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
               >
                 {unreadNotifications}
               </div>
@@ -178,7 +178,7 @@ const Navbar = () => {
               <a>
                 <span>Notifications</span>
                 <span style={{display: 'block'}}>
-                  <button onClick={handleNotifClick} type="button" style={{float: 'right'}} class="text-white-700 border border-black-900 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-black-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-black-500 dark:text-black-500 dark:hover:text-white dark:focus:ring-black-800 dark:hover:bg-black-500">
+                  <button onClick={handleNotifClick} type="button" style={{float: 'right'}} className="text-white-700 border border-black-900 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-black-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-black-500 dark:text-black-500 dark:hover:text-white dark:focus:ring-black-800 dark:hover:bg-black-500">
                     <RiListCheck style={{fontSize: 15}}/>
                   </button>
                 </span>

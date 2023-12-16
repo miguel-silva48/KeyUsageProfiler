@@ -102,18 +102,4 @@ public class TeamServiceImpl implements TeamService {
         }
         return userStats;
     }
-
-    @Override
-    public List<Notification> getNotificationsTeam(Team t) {
-        List<Notification> notifications = new ArrayList<>();
-        Optional<UserStatistics> stat;
-        for (User user : t.getMembers()) {
-            if (t.getLeader().getId() == user.getId())
-                continue;
-            stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
-            if (stat.isPresent())
-                userStats.add(stat.get());
-        }
-        return userStats;
-    }
 }
