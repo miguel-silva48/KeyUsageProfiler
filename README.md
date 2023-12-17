@@ -1,12 +1,14 @@
-# KeyUsageProfiler
+# Project abstract
+
+## Title: *KeyUsageProfiler*
 
 ## Description
 
-An app that tracks the usage of keys in a keyboard while giving some users statistics about them (may not be GDPR compliant).
+An app that tracks the usage of keys in a keyboard while giving some users statistics about them in intuitive ways.
 
 Made for the IES course on school year 23/24
 
-## Team
+# Project Team
 
 *Team Manager* - Miguel Pinto miguel.silva48@ua.pt
 
@@ -16,62 +18,41 @@ Made for the IES course on school year 23/24
 
 *Architect* - João Dourado joao.dourado1@ua.pt
 
-## Important Notes
-
-To test  [user story #2](https://github.com/miguel-silva48/KeyUsageProfiler/issues/2) it's necessary to create an user with id 1. For instance posting the endpoint http://localhost:8080/api/users with the following body: 
-
-```json
-{
-  "username" : "Miguel",
-  "email": "miguel.belchior@ua.pt"
-}
-```
-
-### How to run
+# How to run
 
 ```bash
-git clone git@github.com:miguel-silva48/KeyUsageProfiler.git;
+#clone repository locally
+git clone git@github.com:miguel-silva48/KeyUsageProfiler.git; 
 cd KeyUsageProfiler;
 ```
 
-#### Running backend
+### Running the App (requires Docker)
 
 ```bash
-docker compose up -d;     # run backend services (DBs, MQ)
-cd projBackend;
-./mvnw spring-boot:run;   # run spring backend
+docker compose up -d;     # create docker containers
 ```
 
-#### Running frontend
-
-```bash
-cd projFrontend;
-npm install;
-npm run dev;   # run frontend
-```
-
-#### Running Keylogger
+### Running Keylogger Sensor (requires Maven)
 ```bash
 cd projSensor/keylogger_sensor/;
 mvn package;
 mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
 ```
 
-
-## Architecture Diagram
+# Architecture Diagram
 
 ![Architecture Diagram](ArchitectureDiagram.png)
 
-## Bookmarks
+# Bookmarks
 
-### Management Board
+## Management Board
 An overall view of the user stories and their status can be found in the following link:
 
 https://github.com/users/miguel-silva48/projects/1
 
-### Cloud versions of reports and others
+## Cloud versions of reports and others
 
-Project_Specification_Report: 
+Project_Specification_Report:
 
 https://docs.google.com/document/d/1QzRJoO-oqjjJ1CPPHerlChldXcHeHqTO6yjKa63GLKo/edit
 
@@ -79,5 +60,13 @@ Prototype (Figma):
 
 https://www.figma.com/file/obImDvzy220l7wHxBSFWRW/KeyUsageProfiler?type=design&node-id=0%3A1&mode=design&t=VuI7D2o2buKyOZtO-1
 
-### Entry point to the API documentation
-#todo
+Presentation:
+
+https://uapt33090-my.sharepoint.com/:p:/g/personal/miguel_silva48_ua_pt/ERWlUb28TctClTy3tQ5ZVDoBAm1qZnAHgZtkv3IM4jm14w?e=7qN5bp
+
+## Entry point to the API documentation
+
+```bash
+# While running the App
+http://localhost:8080/swagger-ui/index.html#/
+```
