@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="footer p-10 bg-neutral text-neutral-content bottom-0 mt-auto">
       <aside>
-        <img className='w-[10vw] bg-slate-300' src={logo} />
+        <img className='w-[10vw]' src={logo} />
         <h2>
           Key Usage Profiler
           <br />

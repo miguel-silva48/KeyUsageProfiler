@@ -21,7 +21,6 @@ export default {
         bold: '700',
       },
     },
-
   },
   plugins: [require('daisyui')],
   darkMode: 'class', // enable dark mode
@@ -29,18 +28,18 @@ export default {
     themes: [
       {
         light: {
-          primary: '#65de4a',
-          secondary: '#cfc9ca',
-          accent: '#8c7469',
-          neutral: '#1c1c30',
+          primary: '#6941C6',
+          secondary: '#FFFFFF',
+          accent: '#F9FAFB',
+          neutral: '#181A1B',
           'base-100': '#ffffff',
           '--color-card': '#f5f5f5',
         },
         dark: {
-          primary: '#3cb521',
-          secondary: '#363031',
-          accent: '#967e73',
-          neutral: '#1d1d30',
+          primary: '#6941C6',
+          secondary: '#181A1B',
+          accent: '#3C247B',
+          neutral: '#999999',
           'base-100': '#181A1B',
           '--color-card': '#2f3132',
         },

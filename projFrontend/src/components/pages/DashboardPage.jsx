@@ -514,7 +514,7 @@ const Dashboard = () => {
       >
         <div
           id="table-team-members"
-          className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)]"
+          className="flex w-10/12 mt-3 mx-3 flex-col items-start rounded-lg border shadow-[0_2px_4px_-2px_rgba(16,24,40,0.06)] bg-secondary"
         >
           <div className="flex items-center self-stretch">
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-9/12">
@@ -553,7 +553,7 @@ const Dashboard = () => {
               id="table-name-column"
               className="flex flex-col items-start flex-[1_0_0]"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-accent">
                 <tr className="flex justify-center items-center">
                   <th>
                     <input
@@ -566,9 +566,9 @@ const Dashboard = () => {
                 </tr>
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Toggle All</span>
+                    <span>Toggle All</span>
                     <button 
-                      className="btn btn-sm ml-4 text-[#667085] text-sm"
+                      className="btn btn-sm ml-4 text-sm"
                       onClick={() => handleViewGraph()}
                     >View selected
                     </button>
@@ -612,9 +612,9 @@ const Dashboard = () => {
               id="table-awpm-column"
               className="flex w-32 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-accent">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Avg. WPM</th>
+                  <th>Avg. WPM</th>
                 </tr>
               </thead>
               <tbody className="w-full">
@@ -632,9 +632,9 @@ const Dashboard = () => {
               id="table-minutes-typing-column"
               className="flex w-36 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-accent">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Min. Typing</th>
+                  <th>Min. Typing</th>
                 </tr>
               </thead>
               <tbody className="w-full">
@@ -652,9 +652,9 @@ const Dashboard = () => {
               id="table-status-column"
               className="flex w-28 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-accent">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Status</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody className="w-full">
@@ -674,7 +674,7 @@ const Dashboard = () => {
               id="table-remove/view-column"
               className="flex flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-accent">
                 <tr className="flex items-center gap-1"></tr>
               </thead>
               <tbody className="w-full">

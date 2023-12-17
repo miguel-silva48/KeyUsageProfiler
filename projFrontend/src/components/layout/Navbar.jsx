@@ -109,34 +109,38 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar bg-secondary w-full flex justify-between items-center p-2 top-0">
+    <div className="navbar bg-secondary w-full flex justify-between items-center p-2 top-0 shadow">
       <Link to="/">
-        <img src={logo} className="max-h-5 pl-5"></img>
+      <img
+        src={logo}
+        className="max-h-5 pl-5"
+      />
       </Link>
 
       {(!userType || userType === "USER") && (
         <Link to="/">
-          <h2 className="text-xl font-bold">HomePage</h2>
-        </Link>
-      )}
-
-      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
-        <Link to="/profile">
-          <h2 className="text-xl font-bold">Profile</h2>
-        </Link>
-      )}
-
-      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
-        <Link to="/leaderboards">
-          <h2 className="text-xl font-bold">Leaderboard</h2>
+          <h2 className="text-l font-bold">HomePage</h2>
         </Link>
       )}
 
       {userType === "TEAM_LEADER" && (
         <Link to="/dashboard">
-          <h2 className="text-xl font-bold">Dashboard</h2>
+          <h2 className="text-l font-bold">Dashboard</h2>
         </Link>
       )}
+
+      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
+        <Link to="/profile">
+          <h2 className="text-l font-bold">Profile</h2>
+        </Link>
+      )}
+
+      {(userType === "TEAM_MEMBER" || userType === "TEAM_LEADER") && (
+        <Link to="/leaderboards">
+          <h2 className="text-l font-bold">Leaderboards</h2>
+        </Link>
+      )}
+
 
       <div className="flex">
         <label className="swap swap-rotate m-2 p-2 ">
