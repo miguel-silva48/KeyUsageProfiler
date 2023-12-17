@@ -1,68 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import h337 from "@mars3d/heatmap.js";
-import HeatmapChart from "./HeatmapChart";
 import "../../utils/heatmap.css";
 
-function Heatmap({ userId }) {
-  const [heatmapData, setHeatmapData] = useState(null);
+const Heatmap = ({ heatmapData }) => {
+  const heatmapInstanceRef = useRef(null);
 
-  // Returns proper values for keys and filters out invalid keyCodes.
-  const filterKey = (key) => {
-    if (key === "Unknown keyCode: 0xe36") return "Right Shift";
-
-    if (key === " ") return "Spacebar";
-
-    if (key === "\n") return "Enter";
-
-    if (key === "\t") return "Tab";
-
-    if (key.startsWith("Unknown keyCode:")) return null;
-
-    return key;
-  };
-
-  const fetchHeatmapData = async () => {
-    var token = localStorage.getItem("authToken");
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/keystrokes/frequencies/${userId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Handle successful response (team joining)
-        const data = await response.json();
-        const result = data.reduce((acc, item) => {
-          var k = filterKey(item.keyValue);
-          if (k)
-            acc[k] = item.numPresses;
-            return acc;
-        }, {});
-        setHeatmapData(result);
-        return result;
-      } else if (response.status == 403) {
-        const newToken = await refreshToken();
-
-        if (newToken !== null) {
-          fetchHeatmapData();
-          return;
-        } else {
-          throw new Error("Failed to refresh token");
-        }
-      } else {
-        // Handle error response
-        console.error("Failed to fetch data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching heatmap data:", error);
-    }
-  };
   const coordinates = {
     Escape: {
       x: 25,
@@ -196,7 +138,7 @@ function Heatmap({ userId }) {
       x: 570,
       y: 62,
     },
-    "Tab": {
+    Tab: {
       x: 37,
       y: 94,
     },
@@ -313,7 +255,7 @@ function Heatmap({ userId }) {
       x: 389,
       y: 127,
     },
-    "Enter": {
+    Enter: {
       x: 420,
       y: 127,
     },
@@ -381,7 +323,7 @@ function Heatmap({ userId }) {
       x: 88,
       y: 191,
     },
-    "Spacebar": {
+    Spacebar: {
       x: 230,
       y: 191,
     },
@@ -405,62 +347,54 @@ function Heatmap({ userId }) {
 
   useEffect(() => {
     const heatmap = document.querySelector(".Heatmap");
+    console.log("heatmap", heatmap);
     if (heatmap) {
-      var heatmapInstance = h337.create({
-        container: heatmap,
-        radius: 35,
-        maxOpacity: 0.5,
-        minOpacity: 0.0,
-        blur: 0.75,
-      });
-      fetchHeatmapData().then((data) => {
-        var points2 = [];
-        var max = 0;
-        var min = 1000000000;
-        for (const k in data) {
-          if (k in coordinates) {
-            var v = Math.floor(data[k]);
-            points2.push({
-              x: coordinates[k].x,
-              y: coordinates[k].y,
-              value: data[k],
-            });
-            if (v > max) {
-              max = v;
-            }
-            if (v < min) {
-              min = v;
-            }
+      if (!heatmapInstanceRef.current) {
+        console.log("setting new heatmapInstance")
+        heatmapInstanceRef.current = h337.create({
+          container: heatmap,
+          radius: 35,
+          maxOpacity: 0.5,
+          minOpacity: 0.0,
+          blur: 0.75,
+        });
+      }
+        
+      var points2 = [];
+      var max = 0;
+      var min = 1000000000;
+      console.log("heatmap data in heatmap.jsx: ", heatmapData);
+      for (const k in heatmapData) {
+        if (k in coordinates) {
+          var v = Math.floor(heatmapData[k]);
+          points2.push({
+            x: coordinates[k].x,
+            y: coordinates[k].y,
+            value: heatmapData[k],
+          });
+          if (v > max) {
+            max = v;
+          }
+          if (v < min) {
+            min = v;
           }
         }
-        // heatmap data format
-        var data1 = {
-          max: max,
-          min: min - Math.floor(max / 5),
-          data: points2,
-        };
-
-        heatmapInstance.setData(data1);
-      });
+      }
+      // heatmap data format
+      var data1 = {
+        max: max,
+        min: min - Math.floor(max / 5),
+        data: points2,
+      };
+      console.log("setting heatmap data: ", data1);
+      heatmapInstanceRef.current.setData(data1);
+      heatmapInstanceRef.current.repaint();
     }
-  }, []);
+    return () => {
+    };
+  }, [heatmapData]);
 
-  return (
-    <div className="row p-2 flex items-center justify-center content-center">
-      <div className="column p-2">
-        <h2 className="text-3xl font-bold text-center mb-10">
-          Keypress Heatmap
-        </h2>
-        <div className="Heatmap"></div>
-      </div>
-      <div className="column p-2">
-        <h2 className="text-3xl font-bold text-center mb-10">
-          Keypress Histogram
-        </h2>
-        <HeatmapChart heatmapData={heatmapData} />
-      </div>
-    </div>
-  );
-}
+  return <div className="Heatmap"></div>;
+};
 
 export default Heatmap;

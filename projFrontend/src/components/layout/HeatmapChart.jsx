@@ -9,7 +9,7 @@ const HeatmapChart = ({ heatmapData }) => {
     // Function to create or update the chart
     const createOrUpdateChart = () => {
       const ctx = graficoRef.current.getContext("2d");
-
+      console.log("@heatmapChart heatmapData: ", heatmapData)
       // Destroy existing chart if it exists
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
