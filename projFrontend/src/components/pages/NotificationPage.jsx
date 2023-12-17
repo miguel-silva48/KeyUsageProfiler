@@ -64,6 +64,7 @@ const Notifications = () => {
         setTimestamp(newTeamData.map(notification => notification.ts).reduce(function(prev, curr) {
           return prev.ts < curr.ts ? prev : curr;
         }))
+        setNoMoreData(false)
       }else{
         setNoMoreData(true)
       }
@@ -236,11 +237,12 @@ const Notifications = () => {
             </table>
           </div>
         </div>
-      <button className="btn btn-outline btn-sm" onClick={fetchData}>Load More</button>
-      { noMoreData && (
-        <div role="alert" className="alert" style={{width: "294px"}}>
-          <span>No More Data at the moment.</span>
+      { noMoreData? (
+        <div role="alert" className="alert" style={{width: "172px"}}>
+          <span>No More Data.</span>
         </div>
+      ) : (
+        <button className="btn btn-outline btn-sm" onClick={fetchData}>Load More</button>
       )}
       </div>
       <Footer />
