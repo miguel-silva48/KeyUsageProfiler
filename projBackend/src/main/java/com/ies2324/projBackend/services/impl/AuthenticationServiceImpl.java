@@ -12,6 +12,7 @@ import com.ies2324.projBackend.dao.JwtRefreshResponse;
 import com.ies2324.projBackend.dao.SignInRequest;
 import com.ies2324.projBackend.dao.SignUpRequest;
 import com.ies2324.projBackend.entities.Role;
+import com.ies2324.projBackend.entities.Status;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.UserRepository;
@@ -40,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 userRepository.save(user);
                 // Create user statistics with values at 0
                 userStatisticsService.createUserStatistics(UserStatistics.builder().author(user).awpm(0f).maxWpm(0f)
-                                .minutesTyping(0f).build());
+                                .minutesTyping(0f).status(Status.INACTIVE).build());
                 var jwt = jwtService.generateToken(user);
                 var refreshJwt = jwtService.generateRefreshToken(user);
                 long id = user.getId();
