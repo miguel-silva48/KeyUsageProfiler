@@ -1,5 +1,9 @@
 package com.ies2324.projBackend.services.impl;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +17,7 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
+
     private SimpMessagingTemplate simpMessagingTemplate;
     private NotificationRepository notificationRepository;
 
@@ -27,6 +32,17 @@ public class NotificationServiceImpl implements NotificationService {
                 n);
         }
         return n;
+    }
+
+    @Override
+    public List<Notification> getFirst10NotifAfterTs(Team t, Timestamp ts) {
+        List<Notification> notifications;
+        if (t == null)
+            notifications = new ArrayList<>();
+        else {
+            notifications = notificationRepository.findFirst10NotifAfterTs(t, ts);
+        }
+        return notifications;
     }
 
 }

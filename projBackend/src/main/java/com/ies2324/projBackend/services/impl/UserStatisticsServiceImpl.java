@@ -65,7 +65,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
     float gamingPercentage = (keyCounter.getOrDefault("A", 0l) + keyCounter.getOrDefault("W", 0l) + keyCounter.getOrDefault("S", 0l) + keyCounter.getOrDefault("D", 0l))/ (float) keystrokes.size();
     if (gamingPercentage > gamingthreshold){
       Team team = user.getTeam();
-      if (team != null){
+      if (team != null && user.getUserStatistics().getStatus() != Status.GAMING){
         Notification n = new Notification();
         n.setStatus(Status.GAMING);
         n.setUser(user);

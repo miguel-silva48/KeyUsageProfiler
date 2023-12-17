@@ -7,6 +7,7 @@ import RegisterPage from "./components/pages/RegisterPage";
 import JoinTeamPage from "./components/pages/JoinTeamPage";
 import ProfilePage from "./components/pages/ProfilePage";
 import Leaderboards from "./components/pages/LeaderboardsPage";
+import Notifications from "./components/pages/NotificationPage";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/dashboard" element={<DashboardPage />}></Route>
         <Route path="/teams/join/:token" element={<JoinTeamPage />}></Route>
         <Route path="/leaderboards" element={<Leaderboards />}></Route>
+        <Route path="/notifications" element={<Notifications />}></Route>
       </Routes>
     </BrowserRouter>
   );

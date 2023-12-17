@@ -8,6 +8,7 @@ import {
   RiNotification3Line,
   RiMoonClearFill,
   RiSunFill,
+  RiListCheck,
 } from "react-icons/ri";
 
 import logo from "../../assets/key_usage_profiler_logo_cut.svg";
@@ -15,7 +16,6 @@ import logo from "../../assets/key_usage_profiler_logo_cut.svg";
 const Navbar = () => {
   const token = localStorage.getItem("authToken");
   const [stompClient, setStompClient] = useState(null);
-
   const navigate = useNavigate();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
@@ -56,7 +56,7 @@ const Navbar = () => {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/notifications", (message) => {
-          setUnreadNotifications(unreadNotifications + 1)
+          setUnreadNotifications(prevCount => prevCount + 1)
           const newNotification = JSON.parse(message.body);
           console.log("received new notification: ", newNotification);
           setNotifications((prevNotifications) => {
@@ -108,6 +108,10 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const handleNotifClick = () => {
+    navigate("/notifications");
+  };
+
   return (
     <div className="navbar bg-secondary w-full flex justify-between items-center p-2 top-0">
       <Link to="/">
@@ -157,7 +161,7 @@ const Navbar = () => {
             {unreadNotifications > 0 && notifications.length > 0 && (
               <div
                 style={{ background: "red", color: "white" }}
-                class="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
+                className="inline-flex items-center justify-center w-7 h-7 text-base font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
               >
                 {unreadNotifications}
               </div>
@@ -169,6 +173,16 @@ const Navbar = () => {
             />
           </summary>
           <ul className="p-2 bg- menu dropdown-content z-[1] bg-base-100 rounded-box w-56 right-0">
+            <li className="text-center">
+              <a>
+                <span>Notifications</span>
+                <span style={{display: 'block'}}>
+                  <button onClick={handleNotifClick} type="button" style={{float: 'right'}} className="text-white-700 border border-black-900 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-black-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-black-500 dark:text-black-500 dark:hover:text-white dark:focus:ring-black-800 dark:hover:bg-black-500">
+                    <RiListCheck style={{fontSize: 15}}/>
+                  </button>
+                </span>
+              </a>
+            </li>
             {notifications.length === 0 ? (
               <li className="text-center"><a style={{"textAlign":"center", "display":"block"}}>There's no notifications.</a></li>
             ) : (
