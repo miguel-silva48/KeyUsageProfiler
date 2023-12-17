@@ -11,12 +11,12 @@ import com.ies2324.projBackend.dao.CreateTeamResponse;
 import com.ies2324.projBackend.dao.InviteLinkResponse;
 import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.dao.TeamLeaderDTO;
-import com.ies2324.projBackend.entities.Notification;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.TeamRepository;
+import com.ies2324.projBackend.services.NotificationService;
 import com.ies2324.projBackend.services.RedisService;
 import com.ies2324.projBackend.services.TeamService;
 import com.ies2324.projBackend.services.UserService;
@@ -33,6 +33,7 @@ public class TeamServiceImpl implements TeamService {
     private final UserService userService;
     private final RedisService redisService;
     private final UserStatisticsService userStatisticsService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -85,6 +86,7 @@ public class TeamServiceImpl implements TeamService {
             while (teamIterator.hasNext()) {
                 u = teamIterator.next();
                 userService.clearTeamFromUser(u);
+                notificationService.deleteNotifications(u);
             }
             teamRepository.delete(team);
         }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Notification;
 import com.ies2324.projBackend.entities.Team;
+import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.repositories.NotificationRepository;
 import com.ies2324.projBackend.services.NotificationService;
 
@@ -43,6 +44,11 @@ public class NotificationServiceImpl implements NotificationService {
             notifications = notificationRepository.findFirst10NotifAfterTs(t, ts);
         }
         return notifications;
+    }
+
+    @Override
+    public void deleteNotifications(User u) {
+        notificationRepository.deleteByUser(u);    
     }
 
 }
