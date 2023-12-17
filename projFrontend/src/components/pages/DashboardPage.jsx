@@ -108,6 +108,7 @@ const Dashboard = () => {
               email: statistics.author.email,
               minutesTyping: statistics.minutesTyping,
               awpm: statistics.awpm,
+              status: statistics.status
             };
           } else if (statisticsResponse.status === 404) {
             return {
@@ -116,6 +117,7 @@ const Dashboard = () => {
               email: member.email,
               minutesTyping: 0,
               awpm: 0,
+              status: "INACTIVE"
             };
           } else if (statisticsResponse.status === 403) {
             let error = new Error("Forbidden.");
@@ -662,9 +664,9 @@ const Dashboard = () => {
                   currentUsers.map((user) => (
                     <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
                       <td>
-                        {user.status === "GAMING" && <GamingBadge />}
-                        {(!user.status || user.status === "INACTIVE") && <InactiveBadge />}
-                        {user.status === "CODING" && <CodingBadge />}
+                        {(user.status === "GAMING" && <GamingBadge />) || 
+                        ((!user.status || user.status === "INACTIVE") && <InactiveBadge />) ||
+                        (user.status === "CODING" && <CodingBadge />)}
                       </td>
                     </tr>
                   ))}

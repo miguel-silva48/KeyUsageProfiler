@@ -57,7 +57,7 @@ const Navbar = () => {
       const onConnect = (frame) => {
         console.log("Connected: " + frame);
         stompClient.subscribe("/user/topic/notifications", (message) => {
-          setUnreadNotifications(unreadNotifications + 1)
+          setUnreadNotifications(prevCount => prevCount + 1)
           const newNotification = JSON.parse(message.body);
           console.log("received new notification: ", newNotification);
           setNotifications((prevNotifications) => {
