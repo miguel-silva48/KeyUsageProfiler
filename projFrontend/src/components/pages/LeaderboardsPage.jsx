@@ -14,31 +14,23 @@ const Leaderboards = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState([]);
   const [teamName, setTeamName] = useState("");
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
-  const [currentPage, setCurrentPage] = useState(1);
-  const [open, setOpen] = useState(false);
-  const cancelButtonRef = useRef(null);
-  const [intervalId, setIntervalId] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/leaderboards") {
-      if (!token || !userType) {
-        navigate("/login");
-      } else if (userType === "USER") {
-        navigate("/");
-      }
-
-      fetchData();
-
-      setIntervalId(setInterval(fetchData, 5000));
-
-      return () => {
-        clearInterval(intervalId);
-      };
+    if (!token || !userType) {
+      navigate("/login");
+    } else if (userType === "USER") {
+      navigate("/");
     }
+
+    fetchData();
+    var intervalId = setInterval(fetchData, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const fetchData = async () => {
@@ -46,7 +38,7 @@ const Leaderboards = () => {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/leaderboard",
+        "http://localhost:8080/api/teams/leaderboards",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -61,10 +53,10 @@ const Leaderboards = () => {
             email: member.author.email,
             minutesTyping: member.minutesTyping,
             awpm: member.awpm,
+            maxWpm: member.maxWpm,
           };
         });
         setUserData(members);
-        setUserDataCopy(members);
       } else if (teamDataResponse.status === 403) {
         let error = new Error("Forbidden.");
         error.status = 403;
