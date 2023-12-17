@@ -113,7 +113,7 @@ const Notifications = () => {
             <div className="flex items-center self-stretch px-6 pt-5 pb-5 gap-4 w-9/12">
               <div className="flex items-center flex-[1_0_0] gap-2">
                 <h2 className="text-2xl font-normal leading-7">
-                  All Notifications
+                  Past Notifications
                 </h2>
               </div>
             </div>

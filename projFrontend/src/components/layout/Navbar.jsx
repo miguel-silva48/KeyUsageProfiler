@@ -16,7 +16,6 @@ import logo from "../../assets/key_usage_profiler_logo_cut.svg";
 const Navbar = () => {
   const token = localStorage.getItem("authToken");
   const [stompClient, setStompClient] = useState(null);
-
   const navigate = useNavigate();
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
