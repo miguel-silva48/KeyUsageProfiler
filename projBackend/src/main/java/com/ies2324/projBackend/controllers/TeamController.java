@@ -1,7 +1,6 @@
 package com.ies2324.projBackend.controllers;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
-import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.TeamService;
 
 import lombok.AllArgsConstructor;
@@ -71,7 +69,7 @@ public class TeamController {
     }
 
     @GetMapping("userstatistics")
-    public ResponseEntity<List<UserStatistics>> getUserStatisticsTeam() {
+    public ResponseEntity<Map<String, Object>> getUserStatisticsTeam() {
         // necessary because of new team members
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // only team leader can get team statistics
