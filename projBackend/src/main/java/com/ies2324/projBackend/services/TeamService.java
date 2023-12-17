@@ -21,4 +21,7 @@ public interface TeamService {
     void deleteTeam(Team team);
 
     Map<String, Object> getUserStatisticsTeam(Team t);
+
+    Map<String, Object> getLeaderboardDataTeam(Team t);
+
 }

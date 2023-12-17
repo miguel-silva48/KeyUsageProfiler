@@ -87,4 +87,16 @@ public class TeamController {
         teamService.deleteTeam(team);
         return ResponseEntity.ok().build();
     }
+
+    // Similar to UserStatistics, but available to Team Members aswell, and hides information 
+    // related to user status (it's not needed)
+    @GetMapping("leaderboards")
+    public ResponseEntity<Map<String, Object>> getLeaderboardData() {
+        // necessary because of new team members
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // only team leader can get team statistics
+        if (user.getRole() == Role.USER)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(teamService.getLeaderboardDataTeam(user.getTeam()), HttpStatus.OK);
+    }
 }

@@ -104,4 +104,21 @@ public class TeamServiceImpl implements TeamService {
         document.put("members", userStats);
         return document;
     }
+
+    public Map<String, Object> getLeaderboardDataTeam(Team t) {
+        Map<String, Object> document = new HashMap<>();
+        List<UserStatistics> userStats = new ArrayList<>();
+        Optional<UserStatistics> stat;
+        for (User user : t.getMembers()) {
+            stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
+            if (stat.isPresent()) {
+                UserStatistics statToReturn = stat.get(); 
+                statToReturn.setStatus(null);   // this endpoint hides this information
+                userStats.add(statToReturn);
+            }
+        }
+        document.put("teamName", t.getName());
+        document.put("members", userStats);
+        return document;
+    }
 }
