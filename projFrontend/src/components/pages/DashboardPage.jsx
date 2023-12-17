@@ -44,7 +44,7 @@ const Dashboard = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === '/dashboard') {
+    if (location.pathname === "/dashboard") {
       if (!token || !userType) {
         navigate("/login");
       } else if (userType === "TEAM_MEMBER") {
@@ -56,14 +56,17 @@ const Dashboard = () => {
       fetchData();
 
       if (!viewFilter) {
-        setIntervalId(setInterval(fetchData, 5000));
+        var id = setInterval(fetchData, 5000);
+        setIntervalId(id);
       }
 
       return () => {
+        clearInterval(id);
+        id = intervalId;
         clearInterval(intervalId);
       };
     }
-  }, []);
+  }, [token, userType]);
 
   useEffect(() => {
     if (copiedLink) {
