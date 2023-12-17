@@ -49,15 +49,15 @@ Access the frontend at http://localhost:5173/
 
 Make sure you have both [Maven](https://maven.apache.org/install.html) and [Java 17+](https://openjdk.org/install/) installed.
 
-Running directly:
+Running directly (make sure to provide the USER_ID argument):
 
 ```bash
 cd projSensor/keylogger_sensor/;
 mvn package;
-mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
+mvn exec:java -Dexec.mainClass="com.mibef108287.app.App" -Dexec.args="USER_ID";
 ```
 
-Packaging into a JAR and running:
+Packaging into a JAR and running (make sure to provide the USER_ID argument):
 
 ```bash
 cd projSensor/keylogger_sensor/;
