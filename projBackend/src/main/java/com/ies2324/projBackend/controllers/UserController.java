@@ -2,20 +2,16 @@ package com.ies2324.projBackend.controllers;
 
 import lombok.AllArgsConstructor;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
-import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.UserService;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController

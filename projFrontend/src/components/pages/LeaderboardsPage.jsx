@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { RiUser3Line } from "react-icons/ri";
 
@@ -14,24 +14,18 @@ const Leaderboards = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState([]);
   const [teamName, setTeamName] = useState("");
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
-  const [currentPage, setCurrentPage] = useState(1);
-  const [open, setOpen] = useState(false);
-  const cancelButtonRef = useRef(null);
+  const location = useLocation();
 
   useEffect(() => {
     if (!token || !userType) {
       navigate("/login");
-    } else if (userType === "TEAM_MEMBER") {
-      navigate("/profile");
     } else if (userType === "USER") {
       navigate("/");
     }
 
     fetchData();
-
     var intervalId = setInterval(fetchData, 5000);
 
     return () => {
@@ -44,12 +38,26 @@ const Leaderboards = () => {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/user",
+        "http://localhost:8080/api/teams/leaderboards",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (teamDataResponse.status === 403) {
+      if (teamDataResponse.ok) {
+        const teamData = await teamDataResponse.json();
+        setTeamName(teamData.name);
+        let members = teamData.members.map((member) => {
+          return {
+            id: member.author.id,
+            username: member.author.name,
+            email: member.author.email,
+            minutesTyping: member.minutesTyping,
+            awpm: member.awpm,
+            maxWpm: member.maxWpm,
+          };
+        });
+        setUserData(members);
+      } else if (teamDataResponse.status === 403) {
         let error = new Error("Forbidden.");
         error.status = 403;
         throw error;
@@ -59,51 +67,6 @@ const Leaderboards = () => {
         localStorage.setItem("theme", theme);
         navigate("/");
       }
-      const teamData = await teamDataResponse.json();
-
-      setTeamName(teamData.name);
-
-      const usersData = await Promise.all(
-        teamData.members.map(async (member) => {
-          const statisticsResponse = await fetch(
-            `http://localhost:8080/api/statistics/${member.id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          if (statisticsResponse.ok) {
-            const statistics = await statisticsResponse.json();
-            return {
-              id: statistics.author.id,
-              username: statistics.author.name,
-              email: statistics.author.email,
-              minutesTyping: statistics.minutesTyping,
-              awpm: statistics.awpm,
-              maxWpm: statistics.maxWpm,
-            };
-          } else if (statisticsResponse.status === 404) {
-            return {
-              id: member.id,
-              username: member.name,
-              email: member.email,
-              minutesTyping: 0,
-              awpm: 0,
-              maxWpm: 0,
-            };
-          } else if (statisticsResponse.status === 403) {
-            let error = new Error("Forbidden.");
-            error.status = 403;
-            throw error;
-          } else {
-            throw new Error(
-              `Statistics API returned an error: ${statisticsResponse.statusText}`
-            );
-          }
-        })
-      );
-
-      setUserData(usersData);
     } catch (error) {
       console.error("Error in fetchData:", error);
 
@@ -223,7 +186,10 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "awpm").map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center"
+                    >
                       <td className="text-gray-500 text-sm items-center">
                         {user ? user.awpm : "Loading..."}
                       </td>
@@ -302,7 +268,10 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "minutesTyping").map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center"
+                    >
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
                       </td>
@@ -381,7 +350,10 @@ const Leaderboards = () => {
               <tbody className="w-full">
                 {userData &&
                   sortUserData(userData, "maxWpm").map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b justify-center"
+                    >
                       <td className="text-gray-500 text-sm">
                         {user ? user.maxWpm : "Loading..."}
                       </td>
