@@ -11,6 +11,6 @@ import com.ies2324.projBackend.entities.Team;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-  @Query("SELECT n FROM Notification n WHERE n.user.team=?1 AND n.ts > ?2 ORDER BY n.ts ASC LIMIT 10")
+  @Query("SELECT n FROM Notification n WHERE n.user.team=?1 AND n.ts < ?2 ORDER BY n.ts DESC LIMIT 10")
   List<Notification> findFirst10NotifAfterTs(Team t, Timestamp ts);
 }

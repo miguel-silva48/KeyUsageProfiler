@@ -18,7 +18,8 @@ import refreshToken from "../../utils/refreshToken";
 
 const Notifications = () => {
   const navigate = useNavigate();
-  const timestamp = "1970-01-01 00:00:00.000000"
+  const [timestamp, setTimestamp] = useState("3000-01-01 00:00:00.000000");
+  const [noMoreData, setNoMoreData] = useState(false);
   const [teamNotificationData, setTeamNotificationData] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
@@ -33,12 +34,6 @@ const Notifications = () => {
     }
 
     fetchData();
-
-    var intervalId = setInterval(fetchData, 5000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
   }, []);
 
   const fetchData = async () => {
@@ -61,8 +56,17 @@ const Notifications = () => {
         localStorage.setItem("theme", theme);
         navigate("/");
       }
-      
-      setTeamNotificationData(await teamNotificationResponse.json())
+    
+      const newTeamData = await teamNotificationResponse.json()
+
+      if (newTeamData.length > 0){
+        setTeamNotificationData(prevTeamData => [...prevTeamData, ...newTeamData])
+        setTimestamp(newTeamData.map(notification => notification.ts).reduce(function(prev, curr) {
+          return prev.ts < curr.ts ? prev : curr;
+        }))
+      }else{
+        setNoMoreData(true)
+      }
 
     } catch (error) {
       console.error("Error in fetchData:", error);
@@ -232,6 +236,12 @@ const Notifications = () => {
             </table>
           </div>
         </div>
+      <button className="btn btn-outline btn-sm" onClick={fetchData}>Load More</button>
+      { noMoreData && (
+        <div role="alert" className="alert" style={{width: "294px"}}>
+          <span>No More Data at the moment.</span>
+        </div>
+      )}
       </div>
       <Footer />
     </div>
