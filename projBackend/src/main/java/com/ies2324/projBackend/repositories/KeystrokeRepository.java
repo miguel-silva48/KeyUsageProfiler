@@ -13,4 +13,6 @@ public interface KeystrokeRepository extends JpaRepository<Keystroke, Long> {
 
   @Query("select new com.ies2324.projBackend.dao.KeystrokeFrequency(k.keyValue, COUNT(*)) from Keystroke as k where k.author = ?1 group by k.keyValue order by count(*) desc")
   List<KeystrokeFrequency> findKeystrokeFrequenciesByAuthor(User author);
+
+  void deleteByAuthor(User user);
 }

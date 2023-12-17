@@ -42,4 +42,9 @@ public class KeystrokeServiceImpl implements KeystrokeService {
     return keystrokeRepository.findKeystrokeFrequenciesByAuthor(author);
   }
 
+  @Override
+  public void deleteKeystrokes(User u) {
+    keystrokeRepository.deleteByAuthor(u);
+  }
+
 }

@@ -16,4 +16,6 @@ public interface KeystrokeService {
   void createKeystrokes(List<Keystroke> keystrokes);
 
   List<KeystrokeFrequency> getKeystrokeFrequencies(User author);
+
+  void deleteKeystrokes(User u);
 }

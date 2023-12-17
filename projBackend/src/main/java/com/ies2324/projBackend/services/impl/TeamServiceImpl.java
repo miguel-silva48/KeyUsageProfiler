@@ -16,6 +16,7 @@ import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.TeamRepository;
+import com.ies2324.projBackend.services.KeystrokeService;
 import com.ies2324.projBackend.services.NotificationService;
 import com.ies2324.projBackend.services.RedisService;
 import com.ies2324.projBackend.services.TeamService;
@@ -34,6 +35,7 @@ public class TeamServiceImpl implements TeamService {
     private final RedisService redisService;
     private final UserStatisticsService userStatisticsService;
     private final NotificationService notificationService;
+    private final KeystrokeService keystrokeService;
 
     @Override
     @Transactional
@@ -87,6 +89,7 @@ public class TeamServiceImpl implements TeamService {
                 u = teamIterator.next();
                 userService.clearTeamFromUser(u);
                 notificationService.deleteNotifications(u);
+                keystrokeService.deleteKeystrokes(u);
             }
             teamRepository.delete(team);
         }

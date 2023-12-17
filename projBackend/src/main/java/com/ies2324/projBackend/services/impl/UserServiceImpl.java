@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ies2324.projBackend.entities.Role;
+import com.ies2324.projBackend.entities.Status;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.repositories.UserRepository;
 import com.ies2324.projBackend.services.UserService;
 
@@ -73,6 +75,9 @@ public class UserServiceImpl implements UserService {
   public User clearTeamFromUser(User user) {
     user.setRole(Role.USER);
     user.setTeam(null);
+    UserStatistics us = user.getUserStatistics();
+    us.setAwpm(0f); us.setMaxWpm(0f); us.setMinutesTyping(0f); us.setStatus(Status.INACTIVE);
+    user.setUserStatistics(us);
     updateUser(user);
     return user;
   }
