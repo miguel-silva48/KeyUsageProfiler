@@ -66,7 +66,7 @@ https://uapt33090-my.sharepoint.com/:p:/g/personal/miguel_silva48_ua_pt/ERWlUb28
 
 ## Entry point to the API documentation
 
-```bash
-# While running the App
-http://localhost:8080/swagger-ui/index.html#/
-```
+
+While running the backend service, access the following endpoint:
+[http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
+
