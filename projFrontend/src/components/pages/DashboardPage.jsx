@@ -34,7 +34,6 @@ const Dashboard = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
-  const [inviteLink, setInviteLink] = useState(null);
   const usersPerPage = 10;
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -55,7 +54,6 @@ const Dashboard = () => {
       }
 
       fetchData();
-      createInviteLink();
 
       if (!viewFilter) {
         setIntervalId(setInterval(fetchData, 5000));
@@ -152,14 +150,13 @@ const Dashboard = () => {
       if (fetchLinkToken.ok) {
         let { token } = await fetchLinkToken.json();
 
-        setInviteLink(`http://localhost:5173/teams/join/${token}`);
+        return `http://localhost:5173/teams/join/${token}`;
       } else if (fetchLinkToken.status == 403) {
         const newToken = await refreshToken();
 
         if (newToken !== null) {
           setToken(newToken);
-          createInviteLink();
-          return;
+          return await createInviteLink();
         } else {
           throw new Error("Failed to refresh token");
         }
@@ -258,8 +255,10 @@ const Dashboard = () => {
   const totalPages = Math.ceil(userData.length / usersPerPage);
   const showPagination = totalPages > 1;
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(inviteLink);
+  const copyToClipboard = async () => {
+    var invite = await createInviteLink();
+    console.log("invite link: ", invite);
+    navigator.clipboard.writeText(invite);
     setCopiedLink(true);
   };
 
