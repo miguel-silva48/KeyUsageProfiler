@@ -17,6 +17,7 @@ import {
   RiUser3Line,
   RiEyeLine
 } from "react-icons/ri";
+import HeatmapContainer from "../layout/HeatmapContainer";
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -31,7 +32,15 @@ const UserPage = () => {
       navigate("/");
       return;
     }
-    if (userId) fetchUserStatistics(userId);
+    var interval_id;
+    if (userId) {
+      fetchUserStatistics(userId);
+      interval_id = setInterval(function () {
+        fetchUserStatistics(userId);
+      }, 10000);
+    }
+
+    return () => clearInterval(interval_id);
   }, []);
 
   const fetchUserStatistics = async (userId) => {
@@ -208,7 +217,7 @@ const UserPage = () => {
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
         <Keyboard userId={userId} />
       </div>
-      <Heatmap userId={userId}/>
+      <HeatmapContainer userId={userId}/>
       <Footer />
     </div>
   );
