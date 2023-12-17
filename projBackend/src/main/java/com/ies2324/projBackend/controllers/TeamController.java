@@ -1,7 +1,6 @@
 package com.ies2324.projBackend.controllers;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
-import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.TeamService;
 
 import lombok.AllArgsConstructor;
@@ -71,7 +69,7 @@ public class TeamController {
     }
 
     @GetMapping("userstatistics")
-    public ResponseEntity<List<UserStatistics>> getUserStatisticsTeam() {
+    public ResponseEntity<Map<String, Object>> getUserStatisticsTeam() {
         // necessary because of new team members
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // only team leader can get team statistics
@@ -88,5 +86,17 @@ public class TeamController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         teamService.deleteTeam(team);
         return ResponseEntity.ok().build();
+    }
+
+    // Similar to UserStatistics, but available to Team Members aswell, and hides information 
+    // related to user status (it's not needed)
+    @GetMapping("leaderboards")
+    public ResponseEntity<Map<String, Object>> getLeaderboardData() {
+        // necessary because of new team members
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // only team leader can get team statistics
+        if (user.getRole() == Role.USER)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(teamService.getLeaderboardDataTeam(user.getTeam()), HttpStatus.OK);
     }
 }

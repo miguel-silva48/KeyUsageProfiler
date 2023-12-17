@@ -1,8 +1,10 @@
 package com.ies2324.projBackend.services.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -95,16 +97,34 @@ public class TeamServiceImpl implements TeamService {
         }
     }
 
-    public List<UserStatistics> getUserStatisticsTeam(Team t) {
+    public Map<String, Object> getUserStatisticsTeam(Team t) {
+        Map<String, Object> document = new HashMap<>();
         List<UserStatistics> userStats = new ArrayList<>();
         Optional<UserStatistics> stat;
         for (User user : t.getMembers()) {
-            if (t.getLeader().getId() == user.getId())
-                continue;
             stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
             if (stat.isPresent())
                 userStats.add(stat.get());
         }
-        return userStats;
+        document.put("teamName", t.getName());
+        document.put("members", userStats);
+        return document;
+    }
+
+    public Map<String, Object> getLeaderboardDataTeam(Team t) {
+        Map<String, Object> document = new HashMap<>();
+        List<UserStatistics> userStats = new ArrayList<>();
+        Optional<UserStatistics> stat;
+        for (User user : t.getMembers()) {
+            stat = userStatisticsService.getUserStatisticsByAuthorId(user.getId());
+            if (stat.isPresent()) {
+                UserStatistics statToReturn = stat.get(); 
+                statToReturn.setStatus(null);   // this endpoint hides this information
+                userStats.add(statToReturn);
+            }
+        }
+        document.put("teamName", t.getName());
+        document.put("members", userStats);
+        return document;
     }
 }

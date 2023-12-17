@@ -1,5 +1,5 @@
 import { Fragment, useRef, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
@@ -12,7 +12,7 @@ import {
   RiUser3Line,
   RiPieChartFill,
   RiFilterFill,
-  RiFilterOffFill
+  RiFilterOffFill,
 } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -34,7 +34,6 @@ const Dashboard = () => {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [currentPage, setCurrentPage] = useState(1);
-  const [inviteLink, setInviteLink] = useState(null);
   const usersPerPage = 10;
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -42,48 +41,69 @@ const Dashboard = () => {
   const [intervalId, setIntervalId] = useState(null);
   const [viewFilter, setViewFilter] = useState(false);
   const [userDataCopy, setUserDataCopy] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
-    if (!token || !userType) {
-      navigate("/login");
-    } else if (userType === "TEAM_MEMBER") {
-      navigate("/profile");
-    } else if (userType === "USER") {
-      navigate("/");
+    if (location.pathname === "/dashboard") {
+      if (!token || !userType) {
+        navigate("/login");
+      } else if (userType === "TEAM_MEMBER") {
+        navigate("/profile");
+      } else if (userType === "USER") {
+        navigate("/");
+      }
+
+      fetchData();
+
+      if (!viewFilter) {
+        var id = setInterval(fetchData, 5000);
+        setIntervalId(id);
+      }
+
+      return () => {
+        clearInterval(id);
+        id = intervalId;
+        clearInterval(intervalId);
+      };
     }
-
-    fetchData();
-    createInviteLink();
-
-    if (!viewFilter)
-      setIntervalId(setInterval(fetchData, 5000));
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+  }, [token, userType]);
 
   useEffect(() => {
     if (copiedLink) {
       const timer = setTimeout(() => {
         setCopiedLink(false);
       }, 3000);
-   
+
       return () => clearTimeout(timer);
     }
-   }, [copiedLink]);
+  }, [copiedLink]);
 
   const fetchData = async () => {
     try {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/user",
+        "http://localhost:8080/api/teams/userstatistics",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (teamDataResponse.status === 403) {
+      if (teamDataResponse.ok) {
+        const teamData = await teamDataResponse.json();
+        setTeamName(teamData.name);
+        let members = teamData.members.map((member) => {
+          return {
+            id: member.author.id,
+            username: member.author.name,
+            email: member.author.email,
+            minutesTyping: member.minutesTyping,
+            awpm: member.awpm,
+            status: member.status,
+          };
+        });
+        setUserData(members);
+        setUserDataCopy(members);
+      } else if (teamDataResponse.status === 403) {
         let error = new Error("Forbidden.");
         error.status = 403;
         throw error;
@@ -93,53 +113,6 @@ const Dashboard = () => {
         localStorage.setItem("theme", theme);
         navigate("/");
       }
-      const teamData = await teamDataResponse.json();
-
-      setTeamName(teamData.name);
-
-      const usersData = await Promise.all(
-        teamData.members.map(async (member) => {
-          const statisticsResponse = await fetch(
-            `http://localhost:8080/api/statistics/${member.id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          if (statisticsResponse.ok) {
-            const statistics = await statisticsResponse.json();
-            console.log(statistics);
-            return {
-              id: statistics.author.id,
-              username: statistics.author.name,
-              email: statistics.author.email,
-              minutesTyping: statistics.minutesTyping,
-              awpm: statistics.awpm,
-              status: statistics.status
-            };
-          } else if (statisticsResponse.status === 404) {
-            return {
-              id: member.id,
-              username: member.name,
-              email: member.email,
-              minutesTyping: 0,
-              awpm: 0,
-              status: "INACTIVE"
-            };
-          } else if (statisticsResponse.status === 403) {
-            let error = new Error("Forbidden.");
-            error.status = 403;
-            throw error;
-          } else {
-            throw new Error(
-              `Statistics API returned an error: ${statisticsResponse.statusText}`
-            );
-          }
-        })
-      );
-
-      setUserData(usersData);
-      setUserDataCopy(usersData);
     } catch (error) {
       console.error("Error in fetchData:", error);
 
@@ -180,14 +153,13 @@ const Dashboard = () => {
       if (fetchLinkToken.ok) {
         let { token } = await fetchLinkToken.json();
 
-        setInviteLink(`http://localhost:5173/teams/join/${token}`);
+        return `http://localhost:5173/teams/join/${token}`;
       } else if (fetchLinkToken.status == 403) {
         const newToken = await refreshToken();
 
         if (newToken !== null) {
           setToken(newToken);
-          createInviteLink();
-          return;
+          return await createInviteLink();
         } else {
           throw new Error("Failed to refresh token");
         }
@@ -256,6 +228,7 @@ const Dashboard = () => {
       });
 
       if (response.ok) {
+        clearInterval(intervalId);
         // Handle successful response (team creation)
         let theme = localStorage.getItem("theme");
         localStorage.clear();
@@ -285,38 +258,52 @@ const Dashboard = () => {
   const totalPages = Math.ceil(userData.length / usersPerPage);
   const showPagination = totalPages > 1;
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(inviteLink);
+  const copyToClipboard = async () => {
+    var invite = await createInviteLink();
+    console.log("invite link: ", invite);
+    navigator.clipboard.writeText(invite);
     setCopiedLink(true);
-  }
+  };
 
   const toggleAll = () => {
-    const main_checkbox = document.querySelector('input[id="select-all-members"]');
+    const main_checkbox = document.querySelector(
+      'input[id="select-all-members"]'
+    );
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
-    
+
     //if all checkboxes are checked, uncheck them
     if (Array.from(checkboxes).every((checkbox) => checkbox.checked === true)) {
-      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = false;});
+      Array.from(checkboxes).forEach((checkbox) => {
+        checkbox.checked = false;
+      });
       main_checkbox.checked = false;
     }
     //if at least 1 is not checked, check all of them
     else {
-      Array.from(checkboxes).forEach((checkbox) => {checkbox.checked = true;});
+      Array.from(checkboxes).forEach((checkbox) => {
+        checkbox.checked = true;
+      });
       main_checkbox.checked = true;
     }
-  }
+  };
 
   const handleFilteredView = () => {
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
-    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+    if (
+      Array.from(checkboxes).every((checkbox) => checkbox.checked === false)
+    ) {
       return;
     }
-    clearInterval(intervalId);  //prevent updates while viewing the filtered view
+    clearInterval(intervalId); //prevent updates while viewing the filtered view
     const selectedUserIds = Array.from(checkboxes)
       .filter((checkbox) => checkbox.checked)
-      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
-    
-    const selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+      .map((checkbox) => {
+        return checkbox.getAttribute("data-user-id");
+      });
+
+    const selectedUsersData = userData.filter((user) =>
+      selectedUserIds.includes(String(user.id))
+    );
     setUserData(selectedUsersData);
     setViewFilter(true);
   };
@@ -324,7 +311,7 @@ const Dashboard = () => {
   const clearFilteredView = () => {
     setUserData(userDataCopy);
     setViewFilter(false);
-    setIntervalId(setInterval(fetchData, 5000));  //resume updates
+    setIntervalId(setInterval(fetchData, 5000)); //resume updates
   };
 
   const [showGraphModal, setShowGraphModal] = useState(false);
@@ -333,28 +320,42 @@ const Dashboard = () => {
   const [codingUsers, setCodingUsers] = useState([]);
 
   const handleViewGraph = () => {
-    clearInterval(intervalId);  //prevent updates while viewing the graph
+    clearInterval(intervalId); //prevent updates while viewing the graph
     const checkboxes = document.querySelectorAll('input[id="select-member"]');
     let selectedUsersData = [];
-    if (Array.from(checkboxes).every((checkbox) => checkbox.checked === false)) {
+    if (
+      Array.from(checkboxes).every((checkbox) => checkbox.checked === false)
+    ) {
       selectedUsersData = userData;
     } else {
-    const selectedUserIds = Array.from(checkboxes)
-      .filter((checkbox) => checkbox.checked)
-      .map((checkbox) => {return checkbox.getAttribute("data-user-id");});
+      const selectedUserIds = Array.from(checkboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => {
+          return checkbox.getAttribute("data-user-id");
+        });
 
-    selectedUsersData = userData.filter((user) => selectedUserIds.includes(String(user.id)));
+      selectedUsersData = userData.filter((user) =>
+        selectedUserIds.includes(String(user.id))
+      );
     }
 
-    setGamingUsers(selectedUsersData.filter((user) => user.status === "GAMING"));
-    setInactiveUsers(selectedUsersData.filter((user) => (!user.status || user.status === "INACTIVE")));
-    setCodingUsers(selectedUsersData.filter((user) => user.status === "CODING"));
+    setGamingUsers(
+      selectedUsersData.filter((user) => user.status === "GAMING")
+    );
+    setInactiveUsers(
+      selectedUsersData.filter(
+        (user) => !user.status || user.status === "INACTIVE"
+      )
+    );
+    setCodingUsers(
+      selectedUsersData.filter((user) => user.status === "CODING")
+    );
     setShowGraphModal(true);
   };
 
   const handleCloseGraphModal = () => {
     setShowGraphModal(false);
-    setIntervalId(setInterval(fetchData, 5000));  //resume updates
+    setIntervalId(setInterval(fetchData, 5000)); //resume updates
   };
 
   return (
@@ -451,7 +452,8 @@ const Dashboard = () => {
             className="relative z-10"
             onClose={handleCloseGraphModal}
           >
-            <Transition.Child as={Fragment}
+            <Transition.Child
+              as={Fragment}
               enter="ease-out duration-100"
               enterFrom="opacity-0"
               enterTo="opacity-100"
@@ -477,7 +479,10 @@ const Dashboard = () => {
                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                       <div className="sm:flex sm:items-start">
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                          <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-900">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-xl font-semibold leading-6 text-gray-900"
+                          >
                             Selected users' status
                           </Dialog.Title>
                         </div>
@@ -485,42 +490,59 @@ const Dashboard = () => {
                     </div>
                     <div className="modal-content flex">
                       <div className="flex-1">
-                        <PieChart grafData={[gamingUsers.length, inactiveUsers.length, codingUsers.length]} />
+                        <PieChart
+                          grafData={[
+                            gamingUsers.length,
+                            inactiveUsers.length,
+                            codingUsers.length,
+                          ]}
+                        />
                       </div>
                       <div className="w-40 ml-4">
-                        <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">Gaming:</h3>
+                        <h3 className="text-base text-[#B71230] font-semibold mb-2 mt-2">
+                          Gaming:
+                        </h3>
                         <ul className="list-disc">
                           {gamingUsers.length === 0 && (
-                            <li className="text-xs text-gray-600">No team members are currently gaming</li>
+                            <li className="text-xs text-gray-600">
+                              No team members are currently gaming
+                            </li>
                           )}
                           {gamingUsers.map((user) => (
-                              <li key={user.id} className="text-xs text-gray-600">
-                                {user.username}
-                              </li>
-                            ))}
+                            <li key={user.id} className="text-xs text-gray-600">
+                              {user.username}
+                            </li>
+                          ))}
                         </ul>
-                        <h3 className="text-base font-semibold mb-2 mt-2">Inactive:</h3>
+                        <h3 className="text-base font-semibold mb-2 mt-2">
+                          Inactive:
+                        </h3>
                         <ul className="list-disc">
                           {inactiveUsers.length === 0 && (
-                            <li className="text-xs text-gray-600">No team members are currently inactive</li>
+                            <li className="text-xs text-gray-600">
+                              No team members are currently inactive
+                            </li>
                           )}
                           {inactiveUsers.map((user) => (
-                              <li key={user.id} className="text-xs text-gray-600">
-                                {user.username}
-                              </li>
-                            ))}
+                            <li key={user.id} className="text-xs text-gray-600">
+                              {user.username}
+                            </li>
+                          ))}
                         </ul>
-                        <h3 className="text-base text-[#027A48] font-semibold mb-2 mt-2">Coding:</h3>
+                        <h3 className="text-base text-[#027A48] font-semibold mb-2 mt-2">
+                          Coding:
+                        </h3>
                         <ul className="list-disc">
                           {codingUsers.length === 0 && (
-                            <li className="text-xs text-gray-600">No team members are currently coding</li>
+                            <li className="text-xs text-gray-600">
+                              No team members are currently coding
+                            </li>
                           )}
-                          {codingUsers
-                            .map((user) => (
-                              <li key={user.id} className="text-xs text-gray-600">
-                                {user.username}
-                              </li>
-                            ))}
+                          {codingUsers.map((user) => (
+                            <li key={user.id} className="text-xs text-gray-600">
+                              {user.username}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </div>
@@ -565,7 +587,11 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              {copiedLink && (<p className="text-gray-500 text-sm ml-2">Copied to clipboard!</p>)}
+              {copiedLink && (
+                <p className="text-gray-500 text-sm ml-2">
+                  Copied to clipboard!
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -673,7 +699,10 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
+                    >
                       <td className="text-gray-500 text-sm">
                         {user ? user.awpm : "Loading..."}
                       </td>
@@ -693,7 +722,10 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
+                    >
                       <td className="text-gray-500 text-sm">
                         {user ? user.minutesTyping : "Loading..."}
                       </td>
@@ -713,11 +745,16 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr key={user.id} className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 px-6 py-4 items-center gap-3 self-stretch border-b"
+                    >
                       <td>
-                        {(user.status === "GAMING" && <GamingBadge />) || 
-                        ((!user.status || user.status === "INACTIVE") && <InactiveBadge />) ||
-                        (user.status === "CODING" && <CodingBadge />)}
+                        {(user.status === "GAMING" && <GamingBadge />) ||
+                          ((!user.status || user.status === "INACTIVE") && (
+                            <InactiveBadge />
+                          )) ||
+                          (user.status === "CODING" && <CodingBadge />)}
                       </td>
                     </tr>
                   ))}
@@ -733,7 +770,10 @@ const Dashboard = () => {
               <tbody className="w-full">
                 {currentUsers &&
                   currentUsers.map((user) => (
-                    <tr key={user.id} className="flex h-16 p-4 items-center gap-1 self-stretch border-b">
+                    <tr
+                      key={user.id}
+                      className="flex h-16 p-4 items-center gap-1 self-stretch border-b"
+                    >
                       <td className="flex items-start rounded-lg">
                         {(user.id != userId && (
                           <button
