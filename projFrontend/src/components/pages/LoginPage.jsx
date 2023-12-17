@@ -154,7 +154,7 @@ const LoginPage = () => {
                 <a
                   href=""
                   onClick={() => navigate("/register")}
-                  className="link link-accent"
+                  className="link link-primary"
                 >
                   Sign up
                 </a>{" "}

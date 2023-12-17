@@ -219,7 +219,7 @@ const RegisterPage = () => {
                                 <a
                                     href=""
                                     onClick={() => navigate('/login')}
-                                    className="link link-accent"
+                                    className="link link-primary"
                                 >
                                     Sign in
                                 </a>{' '}

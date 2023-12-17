@@ -172,10 +172,10 @@ const Leaderboards = () => {
               id="table-name-column"
               className="flex flex-col items-start flex-[1_0_0]"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Member</span>
+                    <span>Member</span>
                   </th>
                 </tr>
               </thead>
@@ -215,9 +215,9 @@ const Leaderboards = () => {
               id="table-awpm-column"
               className="flex w-32 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Avg. WPM</th>
+                  <th>Avg. WPM</th>
                 </tr>
               </thead>
               <tbody className="w-full">
@@ -251,10 +251,10 @@ const Leaderboards = () => {
               id="table-name-column"
               className="flex flex-col items-start flex-[1_0_0]"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Member</span>
+                    <span>Member</span>
                   </th>
                 </tr>
               </thead>
@@ -282,7 +282,7 @@ const Leaderboards = () => {
                           to={`/user/${user.id}`}
                           className="flex flex-col items-start"
                         >
-                          <p className="text-gray-900">{user.username}</p>
+                          <p>{user.username}</p>
                           <p className="text-gray-500 text-sm">{user.email}</p>
                         </Link>
                       </td>
@@ -294,9 +294,9 @@ const Leaderboards = () => {
               id="table-minutes-typing-column"
               className="flex w-36 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Min. Typing</th>
+                  <th>Min. Typing</th>
                 </tr>
               </thead>
               <tbody className="w-full">
@@ -330,10 +330,10 @@ const Leaderboards = () => {
               id="table-name-column"
               className="flex flex-col items-start flex-[1_0_0]"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
                   <th>
-                    <span className="text-[#667085]">Member</span>
+                    <span>Member</span>
                   </th>
                 </tr>
               </thead>
@@ -373,9 +373,9 @@ const Leaderboards = () => {
               id="table-minutes-typing-column"
               className="flex w-36 flex-col items-start"
             >
-              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b bg-[#F9FAFB]">
+              <thead className="flex h-10 px-6 py-3 items-center gap-3 self-stretch border-b">
                 <tr className="flex items-center gap-1">
-                  <th className="text-[#667085]">Max. WPM</th>
+                  <th>Max. WPM</th>
                 </tr>
               </thead>
               <tbody className="w-full">
