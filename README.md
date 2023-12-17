@@ -43,7 +43,7 @@ Uses the following *Docker* images:
 docker compose up -d;     # create docker containers
 ```
 
-Access the frontend at http://localhost:5173/
+Access the frontend at <http://localhost:5173/>
 
 ### Running Keylogger Sensor
 
@@ -89,11 +89,9 @@ Prototype (Figma):
 
 Presentation:
 
-<https://uapt33090-my.sharepoint.com/:p:/g/personal/miguel_silva48_ua_pt/ERWlUb28TctClTy3tQ5ZVDoBAm1qZnAHgZtkv3IM4jm14w?e=7qN5bp>
+<https://uapt33090-my.sharepoint.com/:p:/g/personal/miguel_belchior_ua_pt/Ef_fPynL-OtFpRP8IDC1Vl4BPzEYnji-qqcrNiqj78ujZA?e=t7rEqO>
 
 ### Entry point to the API documentation
 
-
 While running the backend service, access the following endpoint:
 [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
-
