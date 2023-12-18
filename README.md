@@ -75,6 +75,16 @@ java -jar target/keylogger_sensor-1.0-SNAPSHOT-jar-with-dependencies.jar;
 
 ![Architecture Diagram](ArchitectureDiagram.png)
 
+- **Keylogger** - [projSensor](projSensor/)
+- **Spring Boot** - [projBackend](projBackend/)
+  - **KeystrokeConsumer** - [KeystrokesConsumer.java](projBackend/src/main/java/com/ies2324/projBackend/consumer/KeystrokesConsumer.java)
+  - **Alarm Aggregator** - [RedisService](projBackend/src/main/java/com/ies2324/projBackend/services/RedisService.java) handleRedisKeyExpiredEvent method and [NotificationService](projBackend/src/main/java/com/ies2324/projBackend/services/NotificationService.java) createAndSendNotification method
+  - **Keystroke Saver** - [KeystrokeSaver](projBackend/src/main/java/com/ies2324/projBackend/services/KeystrokeSaver.java)
+  - **Cache Service** - [RedisService](projBackend/src/main/java/com/ies2324/projBackend/services/RedisService.java)
+  - **Persistence Service** - almost all services on [Services](projBackend/src/main/java/com/ies2324/projBackend/services)
+  - **Rest API Controller** - [Controllers](projBackend/src/main/java/com/ies2324/projBackend/controllers)
+- Frontend - [projFrontend](projFrontend/)
+
 ## Bookmarks
 
 ### Management Board
