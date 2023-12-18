@@ -7,6 +7,8 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import refreshToken from "../../utils/refreshToken";
 
+import { baseUrl } from "../../main"
+
 import {
   RiTimeLine,
   RiKeyboardFill,
