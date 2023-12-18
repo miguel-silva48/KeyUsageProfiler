@@ -12,6 +12,10 @@ import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.KeystrokeService;
 import com.ies2324.projBackend.services.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +27,12 @@ public class KeystrokeController {
   private KeystrokeService keystrokeService;
   private UserService userService;
 
+  @Operation(summary = "Returns a list with pairs (Key, Number of presses) for every key the requested user has pressed.")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Returns keystroke frequencies related to requested user."),
+          @ApiResponse(responseCode = "401", description = "Unauthorized. Only Team Leader may request this data."),
+          @ApiResponse(responseCode = "404", description = "Requested user has no keystroke data at this time."),
+  })
   @GetMapping("frequencies/{id}")
   public ResponseEntity<List<KeystrokeFrequency>> getKeystrokeFrequencies(@PathVariable("id") Long userId) {
     User requester = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
