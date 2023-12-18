@@ -59,15 +59,6 @@ public class TeamController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("user")
-    public ResponseEntity<Team> getUserTeam() {
-        // necessary because of new team members
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user.getRole() == Role.USER)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
-    }
-
     @GetMapping("userstatistics")
     public ResponseEntity<Map<String, Object>> getUserStatisticsTeam() {
         // necessary because of new team members
