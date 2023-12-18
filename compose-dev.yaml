@@ -39,11 +39,11 @@ services:
       - rabbitmq
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url": "$SPRING_DATASOURCE_URL",
+        "spring.datasource.url": "jdbc:mysql://db:3306/$MYSQL_DATABASE",
         "spring.datasource.username": "$SPRING_DATASOURCE_USERNAME",
         "spring.datasource.password": "$SPRING_DATASOURCE_PASSWORD",
-        "spring.jpa.properties.hibernate.dialect": "$SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT",
-        "spring.jpa.hibernate.ddl-auto": "$SPRING_JPA_HIBERNATE_DDL_AUTO",
+        "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.MySQLDialect",
+        "spring.jpa.hibernate.ddl-auto": "update",
         "spring.rabbitmq.host": "rabbitmq",
         "spring.rabbitmq.port": "5672",
         "spring.rabbitmq.username": "$SPRING_RABBITMQ_USERNAME",
