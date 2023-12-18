@@ -1,0 +1,81 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+    ports:
+      - '3306:3306'
+    volumes:
+      - my-db:/var/lib/mysql
+    networks:
+      - default
+  redis:
+    image: "redis:alpine3.19"
+    ports:
+      - '6379:6379'
+    networks:
+      - default
+  rabbitmq:
+    image: rabbitmq:3.9.29-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - default
+  backend:
+    image: maven:3-openjdk-17
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url": "$SPRING_DATASOURCE_URL",
+        "spring.datasource.username": "$SPRING_DATASOURCE_USERNAME",
+        "spring.datasource.password": "$SPRING_DATASOURCE_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect": "$SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT",
+        "spring.jpa.hibernate.ddl-auto": "$SPRING_JPA_HIBERNATE_DDL_AUTO",
+        "spring.rabbitmq.host": "rabbitmq",
+        "spring.rabbitmq.port": "5672",
+        "spring.rabbitmq.username": "$SPRING_RABBITMQ_USERNAME",
+        "spring.rabbitmq.password": "$SPRING_RABBITMQ_PASSWORD",
+        "jwt.secret_key": "$JWT_SECRET_KEY",
+        "jwt.expirationtime.access": "$JWT_EXPIRATIONTIME_ACCESS",
+        "jwt.expirationtime.refresh": "$JWT_EXPIRATIONTIME_REFRESH",
+        "springdoc.api-docs.path": "$SPRINGDOC_API_DOCS_PATH"
+      }'
+    volumes: 
+      - .:/app
+    command: bash -c "cd app/projBackend/; mvn spring-boot:run"
+    restart: on-failure
+    ports:
+      - 8080:8080
+    networks:
+      - default
+  frontend:
+    build: ./projFrontend
+    depends_on:
+      - backend
+    volumes:
+      - ./projFrontend/src:/projFrontend/src
+      - /project/node_modules
+    ports:
+      - 5173:5173
+    networks:
+      - default
+  
+volumes:
+  my-db:
+  
+networks:
+  default:
+    driver: bridge
