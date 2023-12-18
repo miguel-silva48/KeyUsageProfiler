@@ -13,6 +13,8 @@ import com.ies2324.projBackend.services.KeystrokeService;
 import com.ies2324.projBackend.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -29,9 +31,10 @@ public class KeystrokeController {
 
   @Operation(summary = "Returns a list with pairs (Key, Number of presses) for every key the requested user has pressed.")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Returns keystroke frequencies related to requested user."),
-          @ApiResponse(responseCode = "401", description = "Unauthorized. Only Team Leader may request this data."),
-          @ApiResponse(responseCode = "404", description = "Requested user has no keystroke data at this time."),
+          @ApiResponse(responseCode = "200", description = "Returns keystroke frequencies related to requested user.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = KeystrokeFrequency.class)) }),
+          @ApiResponse(responseCode = "401", description = "Unauthorized. Only Team Leader may request this data.", content = @Content),
+          @ApiResponse(responseCode = "404", description = "Requested user has no keystroke data at this time.", content = @Content),
   })
   @GetMapping("frequencies/{id}")
   public ResponseEntity<List<KeystrokeFrequency>> getKeystrokeFrequencies(@PathVariable("id") Long userId) {

@@ -15,6 +15,8 @@ import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.UserStatisticsService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -27,9 +29,10 @@ public class UserStatisticsController {
 
   @Operation(summary = "Returns user statistics information about requested user. Only authorized to Team Leaders & Team Members.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Returns user statistics about requested user."),
-      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders (may request to their teams' members) and members may request this data."),
-      @ApiResponse(responseCode = "404", description = "User statistics not found."),
+      @ApiResponse(responseCode = "200", description = "Returns user statistics about requested user.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = UserStatistics.class)) }),
+      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders (may request to their teams' members) and members may request this data.", content = @Content),
+      @ApiResponse(responseCode = "404", description = "User statistics not found.", content = @Content),
   })
   @GetMapping("{id}")
   public ResponseEntity<UserStatistics> getUserStatisticsByAuthorId(@PathVariable("id") Long userId) {

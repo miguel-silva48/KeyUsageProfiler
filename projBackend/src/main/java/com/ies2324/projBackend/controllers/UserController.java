@@ -13,6 +13,8 @@ import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -27,8 +29,9 @@ public class UserController {
 
   @Operation(summary = "Removes requester from his team. Only authorized to Team Members.")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Successfully removes requester from his own team."),
-      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team members can perform this operation."),
+      @ApiResponse(responseCode = "200", description = "Successfully removes requester from his own team.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }),
+      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team members can perform this operation.", content = @Content),
   })
   @PutMapping("/leaveteam")
   public ResponseEntity<User> leaveTeam() {
@@ -41,8 +44,9 @@ public class UserController {
 
   @Operation(summary = "Kicks requested user from his team. Only authorized to Team Leaders. Requested user must belong to same team as the requester (who is a team leader).")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Successfully removes requested user from requesters' team."),
-      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders can perform this operation and can only remove members from his own team."),
+      @ApiResponse(responseCode = "200", description = "Successfully removes requested user from requesters' team.", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = Team.class)) }),
+      @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders can perform this operation and can only remove members from his own team.", content = @Content),
   })
   @PutMapping("/removefromteam/{id}")
   public ResponseEntity<Team> removeUserFromTeam(@PathVariable("id") String userId) {

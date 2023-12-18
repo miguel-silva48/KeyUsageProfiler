@@ -17,6 +17,8 @@ import com.ies2324.projBackend.entities.User;
 import com.ies2324.projBackend.services.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -30,8 +32,9 @@ public class NotificationController {
 
   @Operation(summary = "Returns the 10 most recent notifications after the requested timestamp (for pagination).")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Returns 10 most recent notifications after requested timestamp."),
-          @ApiResponse(responseCode = "404", description = "Requester has no team, therefore, cannot fetch notifications for his team."),
+          @ApiResponse(responseCode = "200", description = "Returns 10 most recent notifications after requested timestamp.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = Notification.class)) }),
+          @ApiResponse(responseCode = "404", description = "Requester has no team, therefore, cannot fetch notifications for his team.", content = @Content),
   })
   @GetMapping("{timestamp}")
   public ResponseEntity<List<Notification>> getTeamNotifications(@PathVariable("timestamp") Timestamp timestamp) {

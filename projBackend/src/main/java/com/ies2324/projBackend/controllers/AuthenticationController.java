@@ -28,14 +28,16 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @Operation(summary = "Create an account.")
-    @ApiResponse(responseCode = "200", description = "Account created successfully.")
+    @ApiResponse(responseCode = "200", description = "Account created successfully." , content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = JwtAuthenticationResponse.class)) })
     @PostMapping("signup")
     public ResponseEntity<JwtAuthenticationResponse> signUp(@RequestBody SignUpRequest req) {
         return ResponseEntity.ok(authenticationService.signup(req));
     }
 
     @Operation(summary = "Authenticate an account and log in.")
-    @ApiResponse(responseCode = "200", description = "Successfully authenticated and logged user in.")
+    @ApiResponse(responseCode = "200", description = "Successfully authenticated and logged user in.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = JwtAuthenticationResponse.class)) })
     @PostMapping("signin")
     public ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody SignInRequest req) {
         return ResponseEntity.ok(authenticationService.signin(req));
@@ -45,7 +47,7 @@ public class AuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully refreshed JWT with given request token.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = JwtRefreshResponse.class)) }),
-            @ApiResponse(responseCode = "403", description = "Invalid refresh token"),
+            @ApiResponse(responseCode = "403", description = "Invalid refresh token", content = @Content),
     })
     @PostMapping("refreshToken")
     public ResponseEntity<JwtRefreshResponse> refreshToken(@RequestBody JwtRefreshRequest req) {
