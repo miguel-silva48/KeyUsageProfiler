@@ -43,18 +43,24 @@ Uses the following *Docker* images:
 docker compose up -d;     # create docker containers
 ```
 
-Access the frontend at <http://localhost:5173/>
+Access the frontend at <http://localhost:5173/>. <br>
+There is also a [.env](.env) file that you may edit if you chose to change some of the environmental variables.
 
 ### Running Keylogger Sensor
 
-Make sure you have both [Maven](https://maven.apache.org/install.html) and [Java 17+](https://openjdk.org/install/) installed.
+Make sure you have both [Maven](https://maven.apache.org/install.html) and [Java 17+](https://openjdk.org/install/) installed. Furthermore, make sure you edit the **USER_ID** in the [.env](projSensor/keylogger_sensor/.env) file to the database id of the user you want to impersonate when producing the keystrokes:
+
+```bash
+USER_ID=1
+RABBITMQ_HOST="localhost"
+```
 
 Running directly (make sure to provide the USER_ID argument):
 
 ```bash
 cd projSensor/keylogger_sensor/;
 mvn package;
-mvn exec:java -Dexec.mainClass="com.mibef108287.app.App" -Dexec.args="USER_ID";
+mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
 ```
 
 Packaging into a JAR and running (make sure to provide the USER_ID argument):
@@ -62,7 +68,7 @@ Packaging into a JAR and running (make sure to provide the USER_ID argument):
 ```bash
 cd projSensor/keylogger_sensor/;
 mvn package;
-java -jar target/keylogger_sensor-1.0-SNAPSHOT-jar-with-dependencies.jar <USER_ID>";
+java -jar target/keylogger_sensor-1.0-SNAPSHOT-jar-with-dependencies.jar;
 ```
 
 ## Architecture Diagram
