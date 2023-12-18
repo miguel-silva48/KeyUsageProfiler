@@ -4,4 +4,5 @@ import "./index.css";
 
 import App from "./App";
 
+export const baseUrl = window.location.hostname;
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);

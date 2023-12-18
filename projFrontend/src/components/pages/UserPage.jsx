@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { baseUrl } from "../../main.jsx";
 
 import "./../../utils/styles.css";
 
@@ -47,7 +48,7 @@ const UserPage = () => {
     var authtoken = localStorage.getItem("authToken");
     try {
       const response = await fetch(
-        `http://localhost:8080/api/statistics/${userId}`,
+        `http://${baseUrl}:8080/api/statistics/${userId}`,
         {
           method: "GET",
           headers: {
@@ -105,7 +106,7 @@ const UserPage = () => {
     try {
       var token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://localhost:8080/api/users/leaveteam`,
+        `http://${baseUrl}:8080/api/users/leaveteam`,
         {
           method: "PUT",
           headers: {

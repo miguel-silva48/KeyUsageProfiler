@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import HeatmapChart from "./HeatmapChart";
 import Heatmap from "./Heatmap";
 import "../../utils/heatmap.css";
+import { baseUrl } from "../../main.jsx";
 
 
 function HeatmapContainer({userId}) {
@@ -42,7 +43,7 @@ function HeatmapContainer({userId}) {
         var token = localStorage.getItem("authToken");
         try {
           const response = await fetch(
-            `http://localhost:8080/api/keystrokes/frequencies/${userId}`,
+            `http://${baseUrl}:8080/api/keystrokes/frequencies/${userId}`,
             {
               method: "GET",
               headers: {

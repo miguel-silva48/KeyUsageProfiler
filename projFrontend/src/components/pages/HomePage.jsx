@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import typing_image from "../../assets/home_typing_image.png";
+import { baseUrl } from "../../main.jsx";
 
 import "./../../utils/styles.css";
 
@@ -47,7 +48,7 @@ const HomePage = () => {
     var realLink = link.substring(link.lastIndexOf("/")+1, link.length);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/teams/join/${realLink}`,
+        `http://${baseUrl}:8080/api/teams/join/${realLink}`,
         {
           method: "POST",
           headers: {
@@ -91,7 +92,7 @@ const HomePage = () => {
     try {
       var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
-      const response = await fetch("http://localhost:8080/api/teams/create", {
+      const response = await fetch(`http://${baseUrl}:8080/api/teams/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

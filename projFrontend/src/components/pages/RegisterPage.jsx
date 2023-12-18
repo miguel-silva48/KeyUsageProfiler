@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Footer from '../layout/Footer';
 import Navbar from '../layout/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { baseUrl } from '../../main.jsx';
 
 import { RiEyeLine, RiEyeOffFill } from 'react-icons/ri';
 
@@ -46,7 +47,7 @@ const RegisterPage = () => {
         try {
             const credentials = { "username": username, "email": email, "password": password };
             // Perform sign-up API request
-            const registerResponse = await fetch("http://localhost:8080/api/auth/signup", {
+            const registerResponse = await fetch(`http://${baseUrl}:8080/api/auth/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,7 +69,7 @@ const RegisterPage = () => {
                 setToken(token);
 
                 //Auto-login after successful registration
-                const loginResponse = await fetch("http://localhost:8080/api/auth/signin", {
+                const loginResponse = await fetch(`http://${baseUrl}:8080/api/auth/signin`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

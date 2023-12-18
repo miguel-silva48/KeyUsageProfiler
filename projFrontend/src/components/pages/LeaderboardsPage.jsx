@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
+import { baseUrl } from "../../main";
 import { RiUser3Line } from "react-icons/ri";
 
 import "./../../utils/styles.css";
@@ -38,7 +39,7 @@ const Leaderboards = () => {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/leaderboards",
+        `http://${baseUrl}:8080/api/teams/leaderboards`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

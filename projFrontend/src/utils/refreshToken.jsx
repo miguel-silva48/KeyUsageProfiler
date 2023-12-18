@@ -1,3 +1,5 @@
+import { baseUrl } from "../main";
+
 // refreshes current authToken with a new one using refreshToken.
 // returns null if function fails to do so
 async function refreshToken() {
@@ -7,7 +9,7 @@ async function refreshToken() {
   if (oldToken == null || refToken == null) {
     return null;
   }
-  const response = await fetch("http://localhost:8080/api/auth/refreshToken", {
+  const response = await fetch(`http://${baseUrl}:8080/api/auth/refreshToken`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

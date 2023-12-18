@@ -2,6 +2,7 @@ import { Fragment, useRef, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { baseUrl } from "../../main";
 
 import {
   RiArrowLeftLine,
@@ -83,7 +84,7 @@ const Dashboard = () => {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamDataResponse = await fetch(
-        "http://localhost:8080/api/teams/userstatistics",
+        `http://${baseUrl}:8080/api/teams/userstatistics`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -144,7 +145,7 @@ const Dashboard = () => {
     try {
       var token = localStorage.getItem("authToken");
       const fetchLinkToken = await fetch(
-        "http://localhost:8080/api/teams/invite",
+        `http://${baseUrl}:8080/api/teams/invite`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -153,7 +154,7 @@ const Dashboard = () => {
       if (fetchLinkToken.ok) {
         let { token } = await fetchLinkToken.json();
 
-        return `http://localhost:5173/teams/join/${token}`;
+        return `http://${baseUrl}:5173/teams/join/${token}`;
       } else if (fetchLinkToken.status == 403) {
         const newToken = await refreshToken();
 
@@ -181,7 +182,7 @@ const Dashboard = () => {
       var token = localStorage.getItem("authToken");
 
       const response = await fetch(
-        `http://localhost:8080/api/users/removefromteam/${userId}`,
+        `http://${baseUrl}:8080/api/users/removefromteam/${userId}`,
         {
           method: "PUT",
           headers: {

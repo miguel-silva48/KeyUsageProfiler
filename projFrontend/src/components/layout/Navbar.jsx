@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
+import { baseUrl } from "../../main.jsx";
 
 import {
   RiArrowDownSLine,
@@ -35,7 +36,7 @@ const Navbar = () => {
       };
 
       const client = new Client({
-        brokerURL: "ws://localhost:8080/websocket",
+        brokerURL: `ws://${baseUrl}:8080/websocket`,
         connectHeaders: headers,
       });
 

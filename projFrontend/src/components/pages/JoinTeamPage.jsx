@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { baseUrl } from "../../main.jsx";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -39,7 +40,7 @@ const JoinTeam = () => {
     try {
       var authToken = localStorage.getItem("authToken");
       const joinTeamResponse = await fetch(
-        `http://localhost:8080/api/teams/join/${token}`,
+        `http://${baseUrl}:8080/api/teams/join/${token}`,
         {
           method: "POST",
           headers: {

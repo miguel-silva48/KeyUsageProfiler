@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import "./../../utils/keyboard.css";
+import { baseUrl } from "../../main.jsx";
 
 function Keyboard({ userId }) {
   const token = localStorage.getItem("authToken");
@@ -18,7 +19,7 @@ function Keyboard({ userId }) {
     };
 
     const client = new Client({
-      brokerURL: "ws://localhost:8080/websocket",
+      brokerURL: `ws://${baseUrl}:8080/websocket`,
       connectHeaders: headers,
     });
 

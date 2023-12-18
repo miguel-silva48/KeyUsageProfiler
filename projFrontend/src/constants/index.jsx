@@ -1,1 +1,3 @@
-export const API_BASE_URL = 'http://localhost:8080';
+import { baseUrl } from "../main";
+
+export const API_BASE_URL = `http://${baseUrl}:8080`;

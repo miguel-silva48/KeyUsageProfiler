@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { baseUrl } from "../../main.jsx";
 
 import {
   RiShareForwardLine,
@@ -41,7 +42,7 @@ const Notifications = () => {
       var token = localStorage.getItem("authToken");
       setToken(token);
       const teamNotificationResponse = await fetch(
-        `http://localhost:8080/api/notifications/${timestamp}`,
+        `http://${baseUrl}:8080/api/notifications/${timestamp}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
