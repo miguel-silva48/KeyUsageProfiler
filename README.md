@@ -55,7 +55,7 @@ USER_ID=1
 RABBITMQ_HOST="localhost"
 ```
 
-Running directly (make sure to provide the USER_ID argument):
+Running directly:
 
 ```bash
 cd projSensor/keylogger_sensor/;
@@ -63,7 +63,7 @@ mvn package;
 mvn exec:java -Dexec.mainClass="com.mibef108287.app.App";
 ```
 
-Packaging into a JAR and running (make sure to provide the USER_ID argument):
+Packaging into a JAR and running:
 
 ```bash
 cd projSensor/keylogger_sensor/;
