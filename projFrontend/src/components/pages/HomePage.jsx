@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import typing_image from "../../assets/home_typing_image.png";
+import { baseUrl } from "../../main.jsx";
 
 import "./../../utils/styles.css";
 
@@ -44,16 +45,10 @@ const HomePage = () => {
       setErrorMessage("Please enter an invite link and try again.");
       return;
     }
-    const path = window.location.href + "teams/join/";
-    var realLink = link;
-    console.log("my window:", window.location.href);
-    if (link.startsWith(path)) {
-      realLink = realLink.replace(path, "");
-    }
-
+    var realLink = link.substring(link.lastIndexOf("/")+1, link.length);
     try {
       const response = await fetch(
-        `http://localhost:8080/api/teams/join/${realLink}`,
+        `http://${baseUrl}:8080/api/teams/join/${realLink}`,
         {
           method: "POST",
           headers: {
@@ -81,9 +76,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to join team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to join team. Please try again."
-        );
+        setErrorMessage("Failed to join team. Please try again.");
       }
     } catch (error) {
       console.error("Error joining team:", error);
@@ -92,10 +85,14 @@ const HomePage = () => {
   };
 
   const createTeamHandler = async () => {
+    if (!teamName) {
+      setErrorMessage("Please enter a team name and try again.");
+      return;
+    }
     try {
       var token = localStorage.getItem("authToken");
       // Now that sign-in is complete, proceed with team creation
-      const response = await fetch("http://localhost:8080/api/teams/create", {
+      const response = await fetch(`http://${baseUrl}:8080/api/teams/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,9 +128,7 @@ const HomePage = () => {
       } else {
         // Handle error response
         console.error("Failed to create team:", response.statusText);
-        setErrorMessage(
-          errorData.message || "Failed to create team. Please try again."
-        );
+        setErrorMessage("Failed to create team. Please try again.");
       }
     } catch (error) {
       console.error("Error creating team:", error);

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { baseUrl } from "../../main.jsx";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +32,7 @@ const LoginPage = () => {
       const credentials = { email: email, password: password };
       // Perform sign-in API request
       const signInResponse = await fetch(
-        "http://localhost:8080/api/auth/signin",
+        `http://${baseUrl}:8080/api/auth/signin`,
         {
           method: "POST",
           headers: {

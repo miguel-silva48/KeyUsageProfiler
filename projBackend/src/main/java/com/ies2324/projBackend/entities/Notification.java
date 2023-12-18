@@ -1,5 +1,9 @@
 package com.ies2324.projBackend.entities;
 
+import java.sql.Timestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,7 +35,11 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user; // notification refers to this user
 
+    @NotNull(message = "Timestamp is mandatory")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
+    private Timestamp ts;
+
     @Enumerated(EnumType.STRING)
-    private NotificationType type;
+    private Status status;
 
 }

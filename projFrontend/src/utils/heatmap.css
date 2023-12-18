@@ -1,0 +1,38 @@
+.Heatmap {
+    position:relative;
+    width:600px;
+    height:223px;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    background-image:url(../assets/real-keyboard-600.png);
+}
+
+.column {
+    float: left;
+    width: 40%;
+}
+  
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.chartWrapper {
+    position: relative;
+}
+
+.chartWrapper > canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+}
+  
+.chartAreaWrapper {
+    width: 15000px;
+    overflow-x: scroll;
+}

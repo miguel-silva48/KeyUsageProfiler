@@ -63,12 +63,26 @@
 	display: inline-block;
 	text-transform: capitalize;
 	font-weight: 600;
-	animation: fade 0.4s linear;
+	background-color: #999999;
 }
-@keyframes fade {
-	0%, 100% { background-color: #eeeeee; }
-	50% { background-color: #999999; }
+
+.kb-main-container .kb-not-pressed {
+	padding: 6px;
+	font-size: 13px;
+	text-align: center;
+	border-radius: 6px;
+	margin: 3px;
+	cursor: pointer;
+	flex-wrap: wrap;
+    flex: 1;
+	min-height: 36px;
+	display: inline-block;
+	text-transform: capitalize;
+	font-weight: 600;
+	background-color: #eeeeee;
 }
+
+
 .kb-main-container .kb-col span{
 	display: block;
 }

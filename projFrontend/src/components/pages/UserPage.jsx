@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { baseUrl } from "../../main.jsx";
 
 import "./../../utils/styles.css";
 
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import Keyboard from "../layout/Keyboard";
+import Heatmap from "../layout/Heatmap";
 
 import refreshToken from "../../utils/refreshToken";
 
@@ -14,7 +16,9 @@ import {
   RiKeyboardFill,
   RiShieldStarLine,
   RiUser3Line,
+  RiEyeLine
 } from "react-icons/ri";
+import HeatmapContainer from "../layout/HeatmapContainer";
 
 const UserPage = () => {
   const navigate = useNavigate();
@@ -29,14 +33,22 @@ const UserPage = () => {
       navigate("/");
       return;
     }
-    if (userId) fetchUserStatistics(userId);
+    var interval_id;
+    if (userId) {
+      fetchUserStatistics(userId);
+      interval_id = setInterval(function () {
+        fetchUserStatistics(userId);
+      }, 10000);
+    }
+
+    return () => clearInterval(interval_id);
   }, []);
 
   const fetchUserStatistics = async (userId) => {
     var authtoken = localStorage.getItem("authToken");
     try {
       const response = await fetch(
-        `http://localhost:8080/api/statistics/${userId}`,
+        `http://${baseUrl}:8080/api/statistics/${userId}`,
         {
           method: "GET",
           headers: {
@@ -59,6 +71,7 @@ const UserPage = () => {
         awpm: data.awpm,
         maxWpm: data.maxWpm,
         minutesTyping: data.minutesTyping,
+        status: data.status,
       };
       setUserData(data.author);
       setUserStatistics(statistics);
@@ -93,7 +106,7 @@ const UserPage = () => {
     try {
       var token = localStorage.getItem("authToken");
       const response = await fetch(
-        `http://localhost:8080/api/users/leaveteam`,
+        `http://${baseUrl}:8080/api/users/leaveteam`,
         {
           method: "PUT",
           headers: {
@@ -153,7 +166,7 @@ const UserPage = () => {
       </div>
 
       {/* Estatísticas do User */}
-      <div className="flex justify-center mt-20 space-x-4 mb-40">
+      <div className="flex justify-center mt-20 space-x-4 mb-20">
         <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
           <RiKeyboardFill className="text-2xl text-gray-500 mb-5" />
           <p className="font-semibold text-lg mb-2">Average Typing Speed</p>
@@ -187,12 +200,25 @@ const UserPage = () => {
             <p className="text-gray-500">Loading...</p>
           )}
         </div>
+
+        <div className="text-center bg-gray-200 w-80 h-40 p-6 rounded-[16px] border border-gray-500 shadow-lg flex flex-col items-start">
+          <RiEyeLine className="text-2xl text-gray-500 mb-5" />
+          <p className="font-semibold text-lg mb-2">Current Status</p>
+          {userStatistics ? (
+            <p className="text-gray-500">
+              {userStatistics.status}
+            </p>
+          ) : (
+            <p className="text-gray-500">Loading...</p>
+          )}
+        </div>
       </div>
 
-      <div className="mb-20">
+      <div className="mb-10">
         <h2 className="text-3xl font-bold text-center mb-10">Live Keyboard</h2>
         <Keyboard userId={userId} />
       </div>
+      <HeatmapContainer userId={userId}/>
       <Footer />
     </div>
   );

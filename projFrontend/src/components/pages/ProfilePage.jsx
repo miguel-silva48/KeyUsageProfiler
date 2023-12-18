@@ -7,6 +7,8 @@ import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import refreshToken from "../../utils/refreshToken";
 
+import { baseUrl } from "../../main"
+
 import {
   RiTimeLine,
   RiKeyboardFill,
@@ -37,7 +39,7 @@ const ProfilePage = () => {
     var authtoken = localStorage.getItem("authToken");
     try {
       const response = await fetch(
-        `http://localhost:8080/api/statistics/${userId}`,
+        `http://${baseUrl}:8080/api/statistics/${userId}`,
         {
           method: "GET",
           headers: {
@@ -93,7 +95,7 @@ const ProfilePage = () => {
   const handleLeaveTeam = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/users/leaveteam`,
+        `http://${baseUrl}:8080/api/users/leaveteam`,
         {
           method: "PUT",
           headers: {
