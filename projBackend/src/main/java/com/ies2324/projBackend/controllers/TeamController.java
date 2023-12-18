@@ -20,8 +20,14 @@ import com.ies2324.projBackend.dao.JoinTeamResponse;
 import com.ies2324.projBackend.entities.Role;
 import com.ies2324.projBackend.entities.Team;
 import com.ies2324.projBackend.entities.User;
+import com.ies2324.projBackend.entities.UserStatistics;
 import com.ies2324.projBackend.services.TeamService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -31,6 +37,12 @@ public class TeamController {
 
     private final TeamService teamService;
 
+    @Operation(summary = "Creates a new team, with the requester as the team leader.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Team was successfully created.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = CreateTeamResponse.class)) }),
+        @ApiResponse(responseCode = "401", description = "Requester already belongs to a team. Couldn't create team.", content = @Content),
+    })
     @PostMapping("create")
     public ResponseEntity<CreateTeamResponse> createTeam(@RequestBody CreateTeamRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -40,6 +52,12 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createTeam(team));
     }
 
+    @Operation(summary = "Returns an invite link for the requesters' team. Refer to POST /api/teams/join/{token} for using that link. Only authorized to Team Leaders.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Invite link for requesters' team.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = InviteLinkResponse.class)) }),
+        @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leader may generate an invite link for his team.", content = @Content),
+    })
     @PostMapping("invite")
     public ResponseEntity<InviteLinkResponse> generateInviteLink() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -48,6 +66,13 @@ public class TeamController {
         return ResponseEntity.ok(teamService.createInviteLink(user.getTeam()));
     }
 
+    @Operation(summary = "Attempts to join a team with the given token. The token is part of the invite link generated at POST /api/teams/invite.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Invite link for requesters' team.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = JoinTeamResponse.class)) }),
+        @ApiResponse(responseCode = "400", description = "Invalid invite link token provided.", content = @Content),
+        @ApiResponse(responseCode = "401", description = "Unauthorized. Only regular users may join a team. Team members/leaders cannot join a team, since they already belong to one.", content = @Content),
+    })
     @PostMapping("join/{token}")
     public ResponseEntity<JoinTeamResponse> join(@PathVariable("token") String token) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -59,15 +84,12 @@ public class TeamController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("user")
-    public ResponseEntity<Team> getUserTeam() {
-        // necessary because of new team members
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user.getRole() == Role.USER)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(user.getTeam(), HttpStatus.OK);
-    }
-
+    @Operation(summary = "Returns team name and user statistics for each user that belongs to the requesters' team. Only authorized to Team Leaders.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully returns user statistics data and team name to team leader who requested it.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = UserStatistics.class)) }),
+        @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders can access this data.", content = @Content),
+    })
     @GetMapping("userstatistics")
     public ResponseEntity<Map<String, Object>> getUserStatisticsTeam() {
         // necessary because of new team members
@@ -78,6 +100,11 @@ public class TeamController {
         return new ResponseEntity<>(teamService.getUserStatisticsTeam(user.getTeam()), HttpStatus.OK);
     }
 
+    @Operation(summary = "Deletes the requesters' team. Only authorized to Team Leaders.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully removes all users from team and deletes it.", content = @Content),
+        @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders can delete their own team.", content = @Content),
+    })
     @DeleteMapping("delete")
     public ResponseEntity<Void> deleteUsersTeam() {
         Team team;
@@ -88,8 +115,15 @@ public class TeamController {
         return ResponseEntity.ok().build();
     }
 
-    // Similar to UserStatistics, but available to Team Members aswell, and hides information 
+    // Similar to UserStatistics, but available to Team Members aswell, and hides
+    // information
     // related to user status (it's not needed)
+    @Operation(summary = "Returns user statistics and team name related to each user in the requesters' team. Similar to /api/teams/userstatistics but hides unneeded information. Only authorized to Team Leaders & Team Members.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully returns necessary user statistics to display leaderboards.", content = { @Content(mediaType = "application/json", 
+      schema = @Schema(implementation = UserStatistics.class)) }),
+        @ApiResponse(responseCode = "401", description = "Unauthorized. Only team leaders and members can access this data.", content = @Content),
+    })
     @GetMapping("leaderboards")
     public ResponseEntity<Map<String, Object>> getLeaderboardData() {
         // necessary because of new team members
