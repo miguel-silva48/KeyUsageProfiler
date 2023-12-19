@@ -19,6 +19,22 @@ Made for the IES course on school year 23/24
 
 *Architect* - João Dourado <joao.dourado1@ua.pt>
 
+## Practices During Development
+The following practices were followed:
+- Conventional Commit Messages (Feat, Fix, Chore) according to the following [link](https://www.conventionalcommits.org/en/v1.0.0/#specification)
+- Feature-branching workflow - Creation of branches and development based on features and division between backend and frontend (usually each issue had one developer for frontend and another for backend). The naming of the branches followed the same approach that was ​taught in theoretical classes (new/ - new feature, imp/ - improvement) with the number of the issue(s) being developed included in the name (as we divided the issues between backend and frontend that distinction is also done).
+- Branches:
+  - feature-branches: (already mentioned) created according to the needs to implement new features
+  - develop: branch from which feature branches are created. For quick fixes direct commits were made on this branch. For each feature a pull request was made to this branch from feature branches to merge the changes (and record history). From this branch we do a pull request to main at each iteration/release. 
+  - main: used to mark the releases of each iteration and where the last version is. (For quick fixes direct commits were also made on this branch.)
+
+## Subproject Links
+- **Keylogger** - [projSensor](projSensor/) - includes implementation of keylogger and messaging of keystrokes through rabbitmq
+- **Backend** - [projBackend](projBackend/) - includes the reception of keystrokes, buffering to redis, notifications, websockets, controllers, persitence services...
+- **Frontend** - [projFrontend](projFrontend/) - includes the user interface made in react
+- More documentation on each subproject can be found on the README of the respective folder
+
+
 ## How to run
 
 ```bash
@@ -48,7 +64,7 @@ There is also a [.env](.env) file that you may edit if you chose to change some 
 
 ### Running Keylogger Sensor
 
-Make sure you have both [Maven](https://maven.apache.org/install.html) and [Java 17+](https://openjdk.org/install/) installed. Furthermore, make sure you edit the **USER_ID** in the [.env](projSensor/keylogger_sensor/.env) file to the database id of the user you want to impersonate when producing the keystrokes:
+Make sure you have both [Maven](https://maven.apache.org/install.html) and [Java 17+](https://openjdk.org/install/) installed. Furthermore, make sure you edit the **USER_ID** in the [.env](projSensor/keylogger_sensor/.env) file to the database id of the user you want to impersonate when producing the keystrokes. If you want to use the deployed version in the IES server change **RABBITMQ_HOST** to "deti-ies-16.ua.pt" (**DISCLAIMER: At this moment in time we had problems with our vm and the STIC didn't fix the issue so that we could deploy there our application. We'll send a mail if at any time the option for deployment is available for us again - that is, if STIC fix the issue**):
 
 ```bash
 USER_ID=1
@@ -83,7 +99,7 @@ java -jar target/keylogger_sensor-1.0-SNAPSHOT-jar-with-dependencies.jar;
   - **Cache Service** - [RedisService](projBackend/src/main/java/com/ies2324/projBackend/services/RedisService.java)
   - **Persistence Service** - almost all services on [Services](projBackend/src/main/java/com/ies2324/projBackend/services)
   - **Rest API Controller** - [Controllers](projBackend/src/main/java/com/ies2324/projBackend/controllers)
-- Frontend - [projFrontend](projFrontend/)
+- **Frontend** - [projFrontend](projFrontend/)
 
 ## Bookmarks
 

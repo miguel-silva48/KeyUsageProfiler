@@ -38,7 +38,11 @@ Folders in the `src/main/java/com/ies2324/projBackend` are organized as follows:
 
 ## Security
 
-Every relevant endpoint requires authentication, using [JSON Web Token](https://jwt.io/). Keep that if testing using some API testing tool. 
+Every relevant endpoint requires authentication using [JSON Web Token](https://jwt.io/). This means that, in order to get authorization to access those endpoints, you must include the following *HTTP Header* - `Authorization: Bearer <Token>`.
+
+There's also an endpoint for refreshing access tokens (`/api/auth/refreshToken`), so users can have a seamless experience in our web application, without needing to log in every single time the access token expires.
+
+Keep that in mind if testing using some API testing tool.
 
 The testing flow should be as follows:
                     

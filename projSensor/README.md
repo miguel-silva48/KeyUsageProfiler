@@ -10,7 +10,7 @@ Built using the [JNativeHook library](https://github.com/kwhat/jnativehook) as a
 
 ## Configuration before running
 
-Make sure you edit the **USER_ID** in the [.env](projSensor/keylogger_sensor/.env) file to the database id of the user you want to impersonate when producing the keystrokes:
+Make sure you edit the **USER_ID** in the [.env](projSensor/keylogger_sensor/.env) file to the database id of the user you want to impersonate when producing the keystrokes. If you want to use the deployed version in the IES server change **RABBITMQ_HOST** to "deti-ies-16.ua.pt" (**DISCLAIMER: At this moment in time we had problems with our vm and the STIC didn't fix the issue so that we could deploye there our application. We'll send a mail if at any time the option for deployment is available for us again - that is, if STIC fix the issue**):
 
 ```bash
 USER_ID=1
